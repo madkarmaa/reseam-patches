@@ -1,14 +1,10 @@
-// SPDX-FileCopyrightText: 2026 AunAli K. <hello@auna.li>
-// SPDX-License-Identifier: GPL-3.0-or-later
-
-package top.madkarma.patches.droplert.pairip
+package top.madkarma.patches.universal
 
 import app.reseam.patch.patch
 
 val removePairip =
     patch("Remove Pairip") {
         description("Remove Pairip tamper protection")
-        compatibleWith("com.shahzaman.pricetracker")
 
         execute {
             manifest.edit {

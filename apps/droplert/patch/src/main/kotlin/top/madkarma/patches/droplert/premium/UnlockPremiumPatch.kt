@@ -1,6 +1,3 @@
-// SPDX-FileCopyrightText: 2026 AunAli K. <hello@auna.li>
-// SPDX-License-Identifier: GPL-3.0-or-later
-
 package top.madkarma.patches.droplert.premium
 
 import app.reseam.patch.Type
@@ -9,7 +6,7 @@ import app.reseam.patch.invoke
 import app.reseam.patch.klass
 import app.reseam.patch.method
 import app.reseam.patch.patch
-import top.madkarma.patches.droplert.pairip.removePairip
+import top.madkarma.patches.universal.removePairip
 
 val CustomerInfo_getEntitlements = klass("com.revenuecat.purchases.CustomerInfo").method("getEntitlements")
 val EntitlementInfos_get = klass("com.revenuecat.purchases.EntitlementInfos").method("get")
