@@ -3,6 +3,7 @@ build/
 .gradle/
 .kotlin/
 out/
+kls_database.db
 
 # IDE
 .idea/
