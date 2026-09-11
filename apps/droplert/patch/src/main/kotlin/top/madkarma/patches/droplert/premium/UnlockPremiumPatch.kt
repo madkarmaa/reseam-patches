@@ -1,25 +1,10 @@
 package top.madkarma.patches.droplert.premium
 
-import app.reseam.patch.ExtClass
-import app.reseam.patch.FieldRef
-import app.reseam.patch.Instruction
-import app.reseam.patch.MethodTarget
-import app.reseam.patch.RegFieldInsn
-import app.reseam.patch.Type
-import app.reseam.patch.appEntry
-import app.reseam.patch.before
-import app.reseam.patch.dex.Opcode
-import app.reseam.patch.dex.codeUnitSize
-import app.reseam.patch.dex.fieldRef
-import app.reseam.patch.dex.opcode
-import app.reseam.patch.dex.regA
-import app.reseam.patch.invoke
-import app.reseam.patch.klass
-import app.reseam.patch.method
-import app.reseam.patch.patch
+import app.reseam.patch.*
+import app.reseam.patch.dex.*
 import top.madkarma.patches.universal.removePairip
 
-object Prefs : ExtClass("top.madkarma.ext.Prefs") {
+object Prefs : ExtClass("top.madkarma.droplert.extensions.Prefs") {
     val putBoolean = static("putBoolean", Type.Context, Type.String, Type.Boolean)
 }
 
@@ -27,65 +12,58 @@ val CustomerInfo_getEntitlements = klass("com.revenuecat.purchases.CustomerInfo"
 val EntitlementInfos_get = klass("com.revenuecat.purchases.EntitlementInfos").method("get")
 val EntitlementInfo_isActive = klass("com.revenuecat.purchases.EntitlementInfo").method("isActive")
 
-val customerInfoIsPremiumActive =
-    method("customer premium active") {
-        returns(Type.Boolean)
-        params("com.revenuecat.purchases.CustomerInfo")
-        strings("premium")
-        calls(CustomerInfo_getEntitlements)
-        calls(EntitlementInfos_get)
-        calls(EntitlementInfo_isActive)
-    }
+val customerInfoIsPremiumActive = method("customer premium active") {
+    returns(Type.Boolean)
+    params("com.revenuecat.purchases.CustomerInfo")
+    strings("premium")
+    calls(CustomerInfo_getEntitlements)
+    calls(EntitlementInfos_get)
+    calls(EntitlementInfo_isActive)
+}
 
-val isPremium =
-    method("premium gate") {
-        returns(Type.Boolean)
-        paramCount(0)
-        opcode(Opcode.CMP_LONG, Opcode.IGET_BOOLEAN, Opcode.INSTANCE_OF, Opcode.SGET_OBJECT)
-    }
+val isPremium = method("premium gate") {
+    returns(Type.Boolean)
+    paramCount(0)
+    opcode(Opcode.CMP_LONG, Opcode.IGET_BOOLEAN, Opcode.INSTANCE_OF, Opcode.SGET_OBJECT)
+}
 
-val revenueCatStateUpdater =
-    method("RevenueCat premium state updater") {
-        paramCount(2)
-        param(0, "com.revenuecat.purchases.CustomerInfo")
-        returns(Type.Object)
-        strings("premium")
-        calls(CustomerInfo_getEntitlements)
-        calls(EntitlementInfos_get)
-        calls(EntitlementInfo_isActive)
-    }
+val revenueCatStateUpdater = method("RevenueCat premium state updater") {
+    paramCount(2)
+    param(0, "com.revenuecat.purchases.CustomerInfo")
+    returns(Type.Object)
+    strings("premium")
+    calls(CustomerInfo_getEntitlements)
+    calls(EntitlementInfos_get)
+    calls(EntitlementInfo_isActive)
+}
 
-val playPurchaseCallback =
-    method("Play purchase result callback") {
-        paramCount(1)
-        returns(Type.Object)
-        strings(
-            "lifetime_premium",
-            "Play unreachable — cannot disprove a lifetime purchase, leaving status untouched",
-        )
-    }
+val playPurchaseCallback = method("Play purchase result callback") {
+    paramCount(1)
+    returns(Type.Object)
+    strings(
+        "lifetime_premium",
+        "Play unreachable — cannot disprove a lifetime purchase, leaving status untouched",
+    )
+}
 
-val unconfiguredFallback =
-    method("RevenueCat unconfigured fallback") {
-        paramCount(3)
-        returns(Type.Object)
-        strings(
-            "Purchases not configured yet, using cached or FREE tier",
-            "RevenueCat network call failed, using cached status",
-        )
-    }
+val unconfiguredFallback = method("RevenueCat unconfigured fallback") {
+    paramCount(3)
+    returns(Type.Object)
+    strings(
+        "Purchases not configured yet, using cached or FREE tier",
+        "RevenueCat network call failed, using cached status",
+    )
+}
 
-val cachedStatusLoader =
-    method("cached premium status loader") {
-        paramCount(2)
-        returns(Type.Object)
-        strings("Failed to load cached premium status")
-    }
+val cachedStatusLoader = method("cached premium status loader") {
+    paramCount(2)
+    returns(Type.Object)
+    strings("Failed to load cached premium status")
+}
 
 private fun premiumFieldOf(updater: MethodTarget): FieldRef? {
     val target = updater.method
-    return target.instructions
-        .mapNotNull { insn ->
+    return target.instructions.mapNotNull { insn ->
             insn.fieldRef?.takeIf { it.name == "PREMIUM" }
         }.firstOrNull()
 }
@@ -107,10 +85,9 @@ private fun swapFreeToPremium(
 
         val dest = insn.regA ?: continue
 
-        val replacement =
-            Instruction.RegField(
-                RegFieldInsn(Opcode.SGET_OBJECT.value.toUShort(), dest.toUShort(), 0u, premiumField),
-            )
+        val replacement = Instruction.RegField(
+            RegFieldInsn(Opcode.SGET_OBJECT.value.toUShort(), dest.toUShort(), 0u, premiumField),
+        )
 
         if (replacement.codeUnitSize != insns[i].codeUnitSize) return false
         target.replaceInstruction(i, replacement)
@@ -121,48 +98,45 @@ private fun swapFreeToPremium(
     return promoted > 0
 }
 
-val unlockPremium =
-    patch("Unlock Lifetime Premium") {
-        description("Unlocks Premium-only features.")
-        compatibleWith("com.shahzaman.pricetracker"("2.2.1"))
-        dependsOn(removePairip)
+val unlockPremium = patch("Unlock Lifetime Premium") {
+    description("Unlocks Premium-only features.")
+    compatibleWith("com.shahzaman.pricetracker"("2.2.1"))
+    dependsOn(removePairip)
 
-        val skipOnboarding =
-            boolOption(
-                "skipOnboarding",
-                title = "Skip onboarding",
-                description = "Skips the setup and buy-premium screens, landing directly on home.",
-                default = true,
-            )
+    val skipOnboarding = boolOption(
+        "skipOnboarding",
+        title = "Skip onboarding",
+        description = "Skips the setup and buy-premium screens, landing directly on home.",
+        default = true,
+    )
 
-        execute {
-            isPremium.method.alwaysReturn(true)
-            customerInfoIsPremiumActive.method.alwaysReturn(true)
+    execute {
+        isPremium.method.alwaysReturn(true)
+        customerInfoIsPremiumActive.method.alwaysReturn(true)
 
-            EntitlementInfo_isActive.method.alwaysReturn(true)
+        EntitlementInfo_isActive.method.alwaysReturn(true)
 
-            val premiumField =
-                premiumFieldOf(revenueCatStateUpdater)
-                    ?: error("Premium: RevenueCat state updater not found")
+        val premiumField =
+            premiumFieldOf(revenueCatStateUpdater) ?: error("Premium: RevenueCat state updater not found")
 
-            if (!swapFreeToPremium(revenueCatStateUpdater, premiumField)) {
-                error("Premium: state updater writes no FREE state")
-            }
-            if (!swapFreeToPremium(playPurchaseCallback, premiumField)) {
-                error("Premium: Play callback writes no FREE state")
-            }
-            if (!swapFreeToPremium(unconfiguredFallback, premiumField)) {
-                error("Premium: unconfigured fallback writes no FREE state")
-            }
-            if (!swapFreeToPremium(cachedStatusLoader, premiumField)) {
-                error("Premium: cached loader writes no FREE state")
-            }
+        if (!swapFreeToPremium(revenueCatStateUpdater, premiumField)) {
+            error("Premium: state updater writes no FREE state")
+        }
+        if (!swapFreeToPremium(playPurchaseCallback, premiumField)) {
+            error("Premium: Play callback writes no FREE state")
+        }
+        if (!swapFreeToPremium(unconfiguredFallback, premiumField)) {
+            error("Premium: unconfigured fallback writes no FREE state")
+        }
+        if (!swapFreeToPremium(cachedStatusLoader, premiumField)) {
+            error("Premium: cached loader writes no FREE state")
+        }
 
-            if (options[skipOnboarding]) {
-                appEntry.before {
-                    call(Prefs.putBoolean, thisObject, string("has_completed_onboarding"), bool(true))
-                    call(Prefs.putBoolean, thisObject, string("has_seen_paywall"), bool(true))
-                }
+        if (options[skipOnboarding]) {
+            appEntry.before {
+                call(Prefs.putBoolean, thisObject, string("has_completed_onboarding"), bool(true))
+                call(Prefs.putBoolean, thisObject, string("has_seen_paywall"), bool(true))
             }
         }
     }
+}

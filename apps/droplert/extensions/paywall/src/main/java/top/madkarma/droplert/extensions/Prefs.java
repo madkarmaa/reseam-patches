@@ -1,8 +1,10 @@
-package top.madkarma.ext;
+package top.madkarma.droplert.extensions;
 
 import android.content.Context;
 import android.util.Log;
+
 import androidx.datastore.preferences.PreferencesProto;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -16,7 +18,8 @@ public final class Prefs {
     private static final String TAG = "Prefs";
     private static final String[] STORES = {"user_preferences"};
 
-    private Prefs() {}
+    private Prefs() {
+    }
 
     public static void putBoolean(Context context, String key, boolean value) {
         File dir = new File(context.getFilesDir(), "datastore");
@@ -27,7 +30,7 @@ public final class Prefs {
         }
 
         PreferencesProto.Value entry = PreferencesProto.Value.newBuilder().setBoolean(value).build();
-        
+
         for (String store : STORES) {
             mergeKey(new File(dir, store + ".preferences_pb"), key, entry);
         }
@@ -66,9 +69,7 @@ public final class Prefs {
             throw new IOException("preferences file implausibly large: " + length);
         }
 
-        FileInputStream stream = new FileInputStream(file);
-
-        try {
+        try (FileInputStream stream = new FileInputStream(file)) {
             byte[] data = new byte[(int) length];
             int filled = 0;
 
@@ -87,8 +88,6 @@ public final class Prefs {
             }
 
             return data;
-        } finally {
-            stream.close();
         }
     }
 }
