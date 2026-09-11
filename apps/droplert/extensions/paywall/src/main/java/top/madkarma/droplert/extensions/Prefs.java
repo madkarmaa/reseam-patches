@@ -49,13 +49,10 @@ public final class Prefs {
             prefs.putPreferences(key, value);
 
             byte[] data = prefs.build().toByteArray();
-            FileOutputStream stream = new FileOutputStream(file);
 
-            try {
+            try (FileOutputStream stream = new FileOutputStream(file)) {
                 stream.write(data);
                 stream.getFD().sync();
-            } finally {
-                stream.close();
             }
         } catch (IOException e) {
             Log.w(TAG, "merge into " + file.getName() + " failed, leaving file untouched", e);
