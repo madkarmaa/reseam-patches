@@ -1,13 +1,15 @@
 package top.madkarma.patches.droplert.premium
 
-import app.reseam.patch.Branch0Insn
+import app.reseam.patch.FieldRef
 import app.reseam.patch.Instruction
 import app.reseam.patch.MethodTarget
+import app.reseam.patch.RegFieldInsn
 import app.reseam.patch.Type
 import app.reseam.patch.dex.Opcode
 import app.reseam.patch.dex.codeUnitSize
 import app.reseam.patch.dex.fieldRef
 import app.reseam.patch.dex.opcode
+import app.reseam.patch.dex.regA
 import app.reseam.patch.invoke
 import app.reseam.patch.klass
 import app.reseam.patch.method
@@ -28,15 +30,10 @@ val customerInfoIsPremiumActive =
         calls(EntitlementInfo_isActive)
     }
 
-// val System_currentTimeMillis = klass("java.lang.System").method("currentTimeMillis")
-// val Long_longValue = klass("java.lang.Long").method("longValue")
-
 val isPremium =
     method("premium gate") {
         returns(Type.Boolean)
         paramCount(0)
-        // calls(System_currentTimeMillis)
-        // calls(Long_longValue)
         opcode(Opcode.CMP_LONG, Opcode.IGET_BOOLEAN, Opcode.INSTANCE_OF, Opcode.SGET_OBJECT)
     }
 
@@ -61,56 +58,60 @@ val playPurchaseCallback =
         )
     }
 
-/**
- * The Compose UI observes the premium state flow, which is computed from real
- * purchase data in two places: the RevenueCat customer-info updater and the
- * Play purchase callback. Both select a FREE state when no purchase exists, so
- * forcing the boolean gates is not enough. This replaces the branch that
- * selects the FREE state with a size-neutral jump to the PREMIUM assignment
- * that follows it. No code shifts, no try-table or branch-target changes.
- */
-private fun forcePremiumState(updater: MethodTarget): Boolean {
-    val target = updater.method
-    val insns = target.instructions
-    val units = IntArray(insns.size)
-    var offset = 0
-    for (i in insns.indices) {
-        units[i] = offset
-        offset += insns[i].codeUnitSize
+val unconfiguredFallback =
+    method("Unconfigured RevenueCat fallback") {
+        paramCount(3)
+        returns(Type.Object)
+        strings(
+            "Purchases not configured yet, using cached or FREE tier",
+            "RevenueCat network call failed, using cached status",
+        )
     }
 
-    fun indexOfUnit(unit: Int): Int {
-        for (i in units.indices) if (units[i] == unit) return i
-        return -1
+val cachedStatusLoader =
+    method("Cached premium status loader") {
+        paramCount(2)
+        returns(Type.Object)
+        strings("Failed to load cached premium status")
     }
+
+private fun premiumFieldOf(updater: MethodTarget): FieldRef? {
+    val target = updater.method
+    return target.instructions
+        .mapNotNull { insn ->
+            insn.fieldRef?.takeIf { it.name == "PREMIUM" }
+        }.firstOrNull()
+}
+
+private fun swapFreeToPremium(
+    updater: MethodTarget,
+    premiumField: FieldRef,
+): Boolean {
+    val target = updater.method
+    val insns = target.instructions
+
+    var promoted = 0
     for (i in insns.indices) {
         val insn = insns[i]
-        val branchOffset =
-            when (insn.opcode) {
-                Opcode.IF_EQZ -> (insn as? Instruction.Branch)?.value0?.offset
-                Opcode.IF_NE -> (insn as? Instruction.Branch2)?.value0?.offset
-                else -> continue
-            } ?: continue
-        val targetIdx = indexOfUnit(units[i] + branchOffset)
-        if (targetIdx < 0) continue
-        var downgrades = false
-        var j = targetIdx
-        while (j < insns.size && j < targetIdx + 8) {
-            if (insns[j].opcode == Opcode.SGET_OBJECT) {
-                downgrades = insns[j].fieldRef?.name == "FREE"
-                break
-            }
-            j++
-        }
-        if (!downgrades || i + 1 >= insns.size) continue
-        val goto = if (insn.codeUnitSize == 2) Opcode.GOTO_16 else Opcode.GOTO_32
+        if (insn.opcode != Opcode.SGET_OBJECT) continue
+
+        val field = insn.fieldRef ?: continue
+        if (field.name != "FREE" || field.definingClass != premiumField.definingClass) continue
+
+        val dest = insn.regA ?: continue
+
         val replacement =
-            Instruction.Branch0(Branch0Insn(goto.value.toUShort(), units[i + 1] - units[i]))
-        if (replacement.codeUnitSize != insn.codeUnitSize) return false
+            Instruction.RegField(
+                RegFieldInsn(Opcode.SGET_OBJECT.value.toUShort(), dest.toUShort(), 0u, premiumField),
+            )
+
+        if (replacement.codeUnitSize != insns[i].codeUnitSize) return false
         target.replaceInstruction(i, replacement)
-        return true
+
+        promoted++
     }
-    return false
+
+    return promoted > 0
 }
 
 val unlockPremium =
@@ -125,11 +126,21 @@ val unlockPremium =
 
             EntitlementInfo_isActive.method.alwaysReturn(true)
 
-            if (!forcePremiumState(revenueCatStateUpdater)) {
-                log.warn("Premium: state updater pattern not found; premium may stay locked.")
+            val premiumField =
+                premiumFieldOf(revenueCatStateUpdater)
+                    ?: error("Premium: RevenueCat state updater not found")
+
+            if (!swapFreeToPremium(revenueCatStateUpdater, premiumField)) {
+                error("Premium: state updater writes no FREE state")
             }
-            if (!forcePremiumState(playPurchaseCallback)) {
-                log.warn("Premium: Play callback pattern not found; premium may stay locked.")
+            if (!swapFreeToPremium(playPurchaseCallback, premiumField)) {
+                error("Premium: Play callback writes no FREE state")
+            }
+            if (!swapFreeToPremium(unconfiguredFallback, premiumField)) {
+                error("Premium: unconfigured fallback writes no FREE state")
+            }
+            if (!swapFreeToPremium(cachedStatusLoader, premiumField)) {
+                error("Premium: cached loader writes no FREE state")
             }
         }
     }
