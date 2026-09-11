@@ -125,13 +125,13 @@ private fun spoofInstallerChecks(scope: BytecodeScope): Int {
 
 val removePairip = patch("Remove Pairip") {
     description(
-        "Removes Pairip (Google Play automatic integrity protection). " + "Optionally kills the Pairip VM. Does NOT bypass server-side Play " + "Integrity attestation or pairipcore virtualization.",
+        "Removes Pairip (Google Play automatic integrity protection). Optionally kills the Pairip VM. Does NOT bypass server-side Play Integrity attestation or pairipcore virtualization.",
     )
 
     val killVM = boolOption(
         "killVM",
         title = "Kill Pairip VM",
-        description = "Also kills the Pairip VM. Only enable this for apps whose VM merely runs " + "the startup integrity/license program. If the app routes real functionality " + "through the VM enabling this breaks those features. Leave off unless the app needs it.",
+        description = "Also kills the Pairip VM. Only enable this for apps whose VM merely runs the startup integrity/license program. If the app routes real functionality through the VM enabling this breaks those features. Leave off unless the app needs it.",
         default = false,
     )
 
