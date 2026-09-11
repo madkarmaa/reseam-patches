@@ -19,3 +19,9 @@ plugins {
 }
 
 rootProject.name = "madkarma-patches"
+
+dependencyResolutionManagement {
+    repositories {
+        google()
+    }
+}

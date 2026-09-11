@@ -1,10 +1,13 @@
 package top.madkarma.patches.droplert.premium
 
+import app.reseam.patch.ExtClass
 import app.reseam.patch.FieldRef
 import app.reseam.patch.Instruction
 import app.reseam.patch.MethodTarget
 import app.reseam.patch.RegFieldInsn
 import app.reseam.patch.Type
+import app.reseam.patch.appEntry
+import app.reseam.patch.before
 import app.reseam.patch.dex.Opcode
 import app.reseam.patch.dex.codeUnitSize
 import app.reseam.patch.dex.fieldRef
@@ -15,6 +18,10 @@ import app.reseam.patch.klass
 import app.reseam.patch.method
 import app.reseam.patch.patch
 import top.madkarma.patches.universal.removePairip
+
+object Prefs : ExtClass("top.madkarma.ext.Prefs") {
+    val putBoolean = static("putBoolean", Type.Context, Type.String, Type.Boolean)
+}
 
 val CustomerInfo_getEntitlements = klass("com.revenuecat.purchases.CustomerInfo").method("getEntitlements")
 val EntitlementInfos_get = klass("com.revenuecat.purchases.EntitlementInfos").method("get")
@@ -59,7 +66,7 @@ val playPurchaseCallback =
     }
 
 val unconfiguredFallback =
-    method("Unconfigured RevenueCat fallback") {
+    method("RevenueCat unconfigured fallback") {
         paramCount(3)
         returns(Type.Object)
         strings(
@@ -69,7 +76,7 @@ val unconfiguredFallback =
     }
 
 val cachedStatusLoader =
-    method("Cached premium status loader") {
+    method("cached premium status loader") {
         paramCount(2)
         returns(Type.Object)
         strings("Failed to load cached premium status")
@@ -120,6 +127,14 @@ val unlockPremium =
         compatibleWith("com.shahzaman.pricetracker"("2.2.1"))
         dependsOn(removePairip)
 
+        val skipOnboarding =
+            boolOption(
+                "skipOnboarding",
+                title = "Skip onboarding",
+                description = "Skips the setup and buy-premium screens, landing directly on home.",
+                default = true,
+            )
+
         execute {
             isPremium.method.alwaysReturn(true)
             customerInfoIsPremiumActive.method.alwaysReturn(true)
@@ -141,6 +156,13 @@ val unlockPremium =
             }
             if (!swapFreeToPremium(cachedStatusLoader, premiumField)) {
                 error("Premium: cached loader writes no FREE state")
+            }
+
+            if (options[skipOnboarding]) {
+                appEntry.before {
+                    call(Prefs.putBoolean, thisObject, string("has_completed_onboarding"), bool(true))
+                    call(Prefs.putBoolean, thisObject, string("has_seen_paywall"), bool(true))
+                }
             }
         }
     }
