@@ -1,4 +1,4 @@
-package top.madkarma.patches.niagara.pro
+package top.madkarma.patches.niagara
 
 import app.reseam.patch.Type
 import app.reseam.patch.before

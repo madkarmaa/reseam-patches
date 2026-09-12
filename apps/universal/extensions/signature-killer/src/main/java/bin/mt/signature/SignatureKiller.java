@@ -1,4 +1,4 @@
-package bin.mt.signature.extension;
+package bin.mt.signature;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;

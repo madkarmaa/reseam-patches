@@ -1,4 +1,4 @@
-package top.madkarma.patches.niagara.setup
+package top.madkarma.patches.niagara
 
 import app.reseam.patch.after
 import app.reseam.patch.appEntry

@@ -4,7 +4,7 @@ import app.reseam.patch.*
 import java.util.*
 
 object SignatureKiller :
-    ExtClass("bin.mt.signature.extension.SignatureKiller") {
+    ExtClass("bin.mt.signature.SignatureKiller") {
     val killSignature = static("killSignature", Type.String, Type.String)
     val killApkPath = static("killApkPath", Type.Context, Type.String)
 }

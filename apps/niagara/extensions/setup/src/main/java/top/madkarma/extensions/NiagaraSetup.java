@@ -1,4 +1,4 @@
-package top.madkarma.ext;
+package top.madkarma.extensions;
 
 import android.content.Context;
 import android.content.SharedPreferences;
