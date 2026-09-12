@@ -13,7 +13,8 @@ private const val STARTUP_LAUNCHER = "com.pairip.StartupLauncher"
 private const val PAIRIP_APPLICATION = "com.pairip.application.Application"
 private const val LICENSE_CLIENT = "com.pairip.licensecheck.LicenseClient"
 private const val LICENSE_CLIENT_V3 = "com.pairip.licensecheck3.LicenseClientV3"
-private const val LICENSE_CONTENT_PROVIDER = "com.pairip.licensecheck.LicenseContentProvider"
+private const val LICENSE_CONTENT_PROVIDER =
+    "com.pairip.licensecheck.LicenseContentProvider"
 private const val LICENSE_ACTIVITY = "com.pairip.licensecheck.LicenseActivity"
 private const val PLAY_STORE = "com.android.vending"
 
@@ -66,7 +67,8 @@ private fun returnTrue(
 }
 
 private fun forceLicenseResponseOk(classDef: DexClass): Int {
-    val method = classDef.methods.firstOrNull { it.name == "processResponse" } ?: return 0
+    val method = classDef.methods.firstOrNull { it.name == "processResponse" }
+        ?: return 0
     val paramBase = method.registersSize - method.insSize
     val responseCode = if (method.isStatic) paramBase else paramBase + 1
 
@@ -76,7 +78,8 @@ private fun forceLicenseResponseOk(classDef: DexClass): Int {
 
 private fun disableRepeatedCheck(classDef: DexClass): Int {
     val flag = classDef.field("repeatedCheckEnabled") ?: return 0
-    val clinit = classDef.methods.firstOrNull { it.name == "<clinit>" } ?: return 0
+    val clinit =
+        classDef.methods.firstOrNull { it.name == "<clinit>" } ?: return 0
     val scratch = clinit.registersSize
 
     if (!clinit.growLocalRegisters(1)) return 0
@@ -148,25 +151,48 @@ val removePairip = patch("Remove Pairip") {
         manifest.edit {
             findByTag("application").firstOrNull()?.let { application ->
                 if (application["android:name"] == PAIRIP_APPLICATION) {
-                    bytecode.findClass(PAIRIP_APPLICATION)?.superclass?.removePrefix("L")?.removeSuffix(";")
-                        ?.replace('/', '.')?.let { original -> application["android:name"] = original }
+                    bytecode.findClass(PAIRIP_APPLICATION)?.superclass?.removePrefix(
+                        "L"
+                    )?.removeSuffix(";")
+                        ?.replace('/', '.')?.let { original ->
+                            application["android:name"] = original
+                        }
                 }
             }
 
             findByAttribute(
-                "android:name", "com.google.android.play.core.common.PlayCoreDialogWrapperActivity"
+                "android:name",
+                "com.google.android.play.core.common.PlayCoreDialogWrapperActivity"
             ).forEach { it.remove() }
-            findByAttribute("android:name", LICENSE_ACTIVITY).forEach { it.remove() }
-            findByAttribute("android:name", "com.android.vending.CHECK_LICENSE").forEach { it.remove() }
+            findByAttribute(
+                "android:name",
+                LICENSE_ACTIVITY
+            ).forEach { it.remove() }
+            findByAttribute(
+                "android:name",
+                "com.android.vending.CHECK_LICENSE"
+            ).forEach { it.remove() }
 
-            for (tag in listOf("activity", "activity-alias", "service", "receiver", "provider", "meta-data")) {
-                findByTag(tag).filter { it["android:name"]?.startsWith("com.pairip.") == true }.forEach { it.remove() }
+            for (tag in listOf(
+                "activity",
+                "activity-alias",
+                "service",
+                "receiver",
+                "provider",
+                "meta-data"
+            )) {
+                findByTag(tag).filter { it["android:name"]?.startsWith("com.pairip.") == true }
+                    .forEach { it.remove() }
             }
         }
 
         bytecode.findClass(LICENSE_CLIENT)?.let { client ->
             patched += noOp(client, *LICENSE_CLIENT_VOID_METHODS)
-            patched += returnTrue(client, "performLocalInstallerCheck", "isIsolated")
+            patched += returnTrue(
+                client,
+                "performLocalInstallerCheck",
+                "isIsolated"
+            )
             patched += forceLicenseResponseOk(client)
             patched += disableRepeatedCheck(client)
         }
@@ -176,13 +202,17 @@ val removePairip = patch("Remove Pairip") {
         }
 
         for (validator in listOf(
-            "com.pairip.licensecheck.ResponseValidator", "com.pairip.licensecheck.LicenseResponseHelper"
+            "com.pairip.licensecheck.ResponseValidator",
+            "com.pairip.licensecheck.LicenseResponseHelper"
         )) {
             bytecode.findClass(validator)?.let { classDef ->
-                classDef.methods.filter { it.name == "validateResponse" }.forEach {
-                    if (it.returnType == "V") it.alwaysReturn() else it.alwaysReturn(true)
-                    patched++
-                }
+                classDef.methods.filter { it.name == "validateResponse" }
+                    .forEach {
+                        if (it.returnType == "V") it.alwaysReturn() else it.alwaysReturn(
+                            true
+                        )
+                        patched++
+                    }
             }
         }
 
@@ -206,7 +236,11 @@ val removePairip = patch("Remove Pairip") {
             }
         }
 
-        for (classDef in bytecode.classes.filter { it.descriptor.startsWith(PAIRIP_DESCRIPTOR_PREFIX) }) {
+        for (classDef in bytecode.classes.filter {
+            it.descriptor.startsWith(
+                PAIRIP_DESCRIPTOR_PREFIX
+            )
+        }) {
             classDef.methods.filter { it.name == "openPlayStore" }.forEach {
                 it.alwaysReturn()
                 patched++

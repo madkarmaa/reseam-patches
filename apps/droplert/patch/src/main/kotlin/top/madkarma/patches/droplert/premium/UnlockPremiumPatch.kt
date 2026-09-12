@@ -5,12 +5,16 @@ import app.reseam.patch.dex.*
 import top.madkarma.patches.universal.removePairip
 
 object Prefs : ExtClass("top.madkarma.droplert.extensions.Prefs") {
-    val putBoolean = static("putBoolean", Type.Context, Type.String, Type.Boolean)
+    val putBoolean =
+        static("putBoolean", Type.Context, Type.String, Type.Boolean)
 }
 
-val CustomerInfo_getEntitlements = klass("com.revenuecat.purchases.CustomerInfo").method("getEntitlements")
-val EntitlementInfos_get = klass("com.revenuecat.purchases.EntitlementInfos").method("get")
-val EntitlementInfo_isActive = klass("com.revenuecat.purchases.EntitlementInfo").method("isActive")
+val CustomerInfo_getEntitlements =
+    klass("com.revenuecat.purchases.CustomerInfo").method("getEntitlements")
+val EntitlementInfos_get =
+    klass("com.revenuecat.purchases.EntitlementInfos").method("get")
+val EntitlementInfo_isActive =
+    klass("com.revenuecat.purchases.EntitlementInfo").method("isActive")
 
 val customerInfoIsPremiumActive = method("customer premium active") {
     returns(Type.Boolean)
@@ -24,7 +28,12 @@ val customerInfoIsPremiumActive = method("customer premium active") {
 val isPremium = method("premium gate") {
     returns(Type.Boolean)
     paramCount(0)
-    opcode(Opcode.CMP_LONG, Opcode.IGET_BOOLEAN, Opcode.INSTANCE_OF, Opcode.SGET_OBJECT)
+    opcode(
+        Opcode.CMP_LONG,
+        Opcode.IGET_BOOLEAN,
+        Opcode.INSTANCE_OF,
+        Opcode.SGET_OBJECT
+    )
 }
 
 val revenueCatStateUpdater = method("RevenueCat premium state updater") {
@@ -63,9 +72,9 @@ val cachedStatusLoader = method("cached premium status loader") {
 
 private fun premiumFieldOf(updater: MethodTarget): FieldRef? {
     val target = updater.method
-    return target.instructions.mapNotNull { insn ->
-            insn.fieldRef?.takeIf { it.name == "PREMIUM" }
-        }.firstOrNull()
+    return target.instructions.firstNotNullOfOrNull { insn ->
+        insn.fieldRef?.takeIf { it.name == "PREMIUM" }
+    }
 }
 
 private fun swapFreeToPremium(
@@ -86,7 +95,12 @@ private fun swapFreeToPremium(
         val dest = insn.regA ?: continue
 
         val replacement = Instruction.RegField(
-            RegFieldInsn(Opcode.SGET_OBJECT.value.toUShort(), dest.toUShort(), 0u, premiumField),
+            RegFieldInsn(
+                Opcode.SGET_OBJECT.value.toUShort(),
+                dest.toUShort(),
+                0u,
+                premiumField
+            ),
         )
 
         if (replacement.codeUnitSize != insns[i].codeUnitSize) return false
@@ -117,7 +131,8 @@ val unlockPremium = patch("Unlock Lifetime Premium") {
         EntitlementInfo_isActive.method.alwaysReturn(true)
 
         val premiumField =
-            premiumFieldOf(revenueCatStateUpdater) ?: error("Premium: RevenueCat state updater not found")
+            premiumFieldOf(revenueCatStateUpdater)
+                ?: error("Premium: RevenueCat state updater not found")
 
         if (!swapFreeToPremium(revenueCatStateUpdater, premiumField)) {
             error("Premium: state updater writes no FREE state")
@@ -134,8 +149,18 @@ val unlockPremium = patch("Unlock Lifetime Premium") {
 
         if (options[skipOnboarding]) {
             appEntry.before {
-                call(Prefs.putBoolean, thisObject, string("has_completed_onboarding"), bool(true))
-                call(Prefs.putBoolean, thisObject, string("has_seen_paywall"), bool(true))
+                call(
+                    Prefs.putBoolean,
+                    thisObject,
+                    string("has_completed_onboarding"),
+                    bool(true)
+                )
+                call(
+                    Prefs.putBoolean,
+                    thisObject,
+                    string("has_seen_paywall"),
+                    bool(true)
+                )
             }
         }
     }

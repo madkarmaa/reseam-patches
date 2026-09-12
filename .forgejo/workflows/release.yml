@@ -1,53 +1,53 @@
 name: release
 
 on:
-  push:
-    tags:
-      - 'v*'
+    push:
+        tags:
+            - 'v*'
 
 jobs:
-  build:
-    if: ${{ !github.event.deleted }}
-    runs-on: docker
-    container:
-      image: cimg/android:2026.03-node
-    env:
-      ENGINE_VERSION: v0.5.0
-      RESEAM_BIN: engine/reseam-linux-x64
-      RESEAM_BUNDLE_KEY: bundle-signing.key
-    steps:
-      - name: Checkout sources
-        uses: actions/checkout@v4
+    build:
+        if: ${{ !github.event.deleted }}
+        runs-on: docker
+        container:
+            image: cimg/android:2026.03-node
+        env:
+            ENGINE_VERSION: v0.5.0
+            RESEAM_BIN: engine/reseam-linux-x64
+            RESEAM_BUNDLE_KEY: bundle-signing.key
+        steps:
+            -   name: Checkout sources
+                uses: actions/checkout@v4
 
-      - name: Set up Gradle
-        uses: https://github.com/gradle/actions/setup-gradle@v5
+            -   name: Set up Gradle
+                uses: https://github.com/gradle/actions/setup-gradle@v5
 
-      - name: Download the Reseam CLI
-        uses: https://code.forgejo.org/actions/forgejo-release@v2.13.4
-        with:
-          direction: download
-          url: https://git.reseam.app
-          repo: reseam/reseam
-          tag: ${{ env.ENGINE_VERSION }}
-          token: ${{ secrets.RELEASE_TOKEN }}
-          release-dir: engine
+            -   name: Download the Reseam CLI
+                uses: https://code.forgejo.org/actions/forgejo-release@v2.13.4
+                with:
+                    direction: download
+                    url: https://git.reseam.app
+                    repo: reseam/reseam
+                    tag: ${{ env.ENGINE_VERSION }}
+                    token: ${{ secrets.RELEASE_TOKEN }}
+                    release-dir: engine
 
-      - name: Install the signing key
-        run: |
-          chmod +x engine/reseam-linux-x64
-          echo "${{ secrets.BUNDLE_SIGNING_KEY_B64 }}" | base64 -d > bundle-signing.key
+            -   name: Install the signing key
+                run: |
+                    chmod +x engine/reseam-linux-x64
+                    echo "${{ secrets.BUNDLE_SIGNING_KEY_B64 }}" | base64 -d > bundle-signing.key
 
-      - name: Build and stage the release
-        run: ./gradlew stageRelease -PreleaseTag=${{ github.ref_name }} --no-daemon
+            -   name: Build and stage the release
+                run: ./gradlew stageRelease -PreleaseTag=${{ github.ref_name }} --no-daemon
 
-      - name: Upload to the Forgejo release
-        uses: https://code.forgejo.org/actions/forgejo-release@v2.13.4
-        with:
-          direction: upload
-          url: https://git.reseam.app
-          repo: reseam/patches
-          tag: ${{ github.ref_name }}
-          sha: ${{ github.sha }}
-          token: ${{ secrets.RELEASE_TOKEN }}
-          release-dir: build/reseam/release
-          override: true
+            -   name: Upload to the Forgejo release
+                uses: https://code.forgejo.org/actions/forgejo-release@v2.13.4
+                with:
+                    direction: upload
+                    url: https://git.reseam.app
+                    repo: reseam/patches
+                    tag: ${{ github.ref_name }}
+                    sha: ${{ github.sha }}
+                    token: ${{ secrets.RELEASE_TOKEN }}
+                    release-dir: build/reseam/release
+                    override: true

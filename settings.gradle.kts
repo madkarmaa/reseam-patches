@@ -9,7 +9,8 @@ pluginManagement {
             mavenContent { includeGroup("app.reseam") }
         }
     }
-    (System.getenv("RESEAM_WORKSPACE") ?: providers.gradleProperty("reseam.workspace").orNull)
+    (System.getenv("RESEAM_WORKSPACE")
+        ?: providers.gradleProperty("reseam.workspace").orNull)
         ?.takeIf { it.isNotBlank() }
         ?.let { includeBuild(it) }
 }
