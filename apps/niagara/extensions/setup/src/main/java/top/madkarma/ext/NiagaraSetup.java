@@ -32,14 +32,14 @@ public final class NiagaraSetup {
     }
 
     /**
-     * Marks the terms as accepted (mirrors the post-consent state).
+     * Marks the terms as accepted.
      */
     public static void acceptTerms(Context context) {
         prefs(context).edit().putInt(KEY_TERMS_VERSION, TERMS_VERSION).apply();
     }
 
     /**
-     * Answers the analytics privacy prompt with refusal (mirrors Ablehnen / Refuse).
+     * Answers the analytics privacy prompt with refusal.
      */
     public static void refuseAnalytics(Context context) {
         prefs(context).edit().putString(KEY_ANALYTICS_SELECTION, ANALYTICS_REFUSAL).apply();
@@ -49,9 +49,6 @@ public final class NiagaraSetup {
      * Forces the analytics feature flags off.
      */
     public static void disableAnalyticsFlags(Context context) {
-        prefs(context).edit()
-            .putBoolean(KEY_MARKETING_ANALYTICS_ENABLED, false)
-            .putBoolean(KEY_ANALYTICS, false)
-            .apply();
+        prefs(context).edit().putBoolean(KEY_MARKETING_ANALYTICS_ENABLED, false).putBoolean(KEY_ANALYTICS, false).apply();
     }
 }
