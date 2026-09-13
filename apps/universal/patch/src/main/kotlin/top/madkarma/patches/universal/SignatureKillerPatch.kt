@@ -3,10 +3,10 @@ package top.madkarma.patches.universal
 import app.reseam.patch.*
 import java.util.*
 
-object SignatureKiller :
-    ExtClass("bin.mt.signature.SignatureKiller") {
+object SignatureKiller : ExtClass("bin.mt.signature.SignatureKiller") {
     val killSignature = static("killSignature", Type.String, Type.String)
     val killApkPath = static("killApkPath", Type.Context, Type.String)
+    val checkSignatures = static("checkSignatures", Type.Context, Type.String, Type.String)
 }
 
 private val NATIVE_ABIS = listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
@@ -26,8 +26,8 @@ val bypassSignatureChecks = patch("Bypass signature checks") {
     )
 
     execute {
-        val packageName = manifest.packageName
-            ?: error("SignatureKiller: manifest has no package name")
+        val packageName =
+            manifest.packageName ?: error("SignatureKiller: manifest has no package name")
 
         val signers = files.signers()
         if (signers.isEmpty()) {
@@ -35,32 +35,33 @@ val bypassSignatureChecks = patch("Bypass signature checks") {
         }
         val base64Sig = Base64.getEncoder().encodeToString(signers[0])
 
+        // One block so the diagnostic always runs before the spoof it measures
+        // (killApkPath never touches PackageManager state, so its separate
+        // block cannot disturb the reading whatever the emission order is).
         appEntry.before {
             call(
-                SignatureKiller.killSignature,
-                string(packageName),
-                string(base64Sig)
+                SignatureKiller.checkSignatures, thisObject, string(packageName), string(base64Sig)
+            )
+            call(
+                SignatureKiller.killSignature, string(packageName), string(base64Sig)
             )
         }
 
         if (options[spoofApkPath]) {
-            val originalApk = files.source()
-                ?: error("SignatureKiller: original APK bytes unavailable")
+            val originalApk =
+                files.source() ?: error("SignatureKiller: original APK bytes unavailable")
             files.writeStored("assets/SignatureKiller/origin.apk", originalApk)
 
             for (abi in NATIVE_ABIS) {
                 val path = "lib/$abi/libSignatureKiller.so"
-                val bytes = patchClassLoader.getResourceAsStream(path)
-                    ?.use { it.readBytes() }
+                val bytes = patchClassLoader.getResourceAsStream(path)?.use { it.readBytes() }
                     ?: error("SignatureKiller: bundled native lib missing: $path")
                 files.write("lib/$abi/libSignatureKiller.so", bytes)
             }
 
             appEntry.before {
                 call(
-                    SignatureKiller.killApkPath,
-                    thisObject,
-                    string(packageName)
+                    SignatureKiller.killApkPath, thisObject, string(packageName)
                 )
             }
 

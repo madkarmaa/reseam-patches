@@ -14,6 +14,8 @@ import org.lsposed.hiddenapibypass.HiddenApiBypass;
 
 import java.io.*;
 import java.lang.reflect.Field;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -45,6 +47,7 @@ public class SignatureKiller {
      * Fakes PackageManager signatures.
      */
     public static void killSignature(String packageName, String base64Sig) {
+        Log.i(TAG, "killSignature: " + packageName + " (sig " + base64Sig.length() + " chars)");
         killPM(packageName, base64Sig);
     }
 
@@ -53,7 +56,54 @@ public class SignatureKiller {
      * Takes the application context to resolve its data directory.
      */
     public static void killApkPath(Context context, String packageName) {
+        Log.i(TAG, "killApkPath: " + packageName + " on " + Build.SUPPORTED_ABIS[0]);
         killOpen(context, packageName);
+    }
+
+    /**
+     * Logs the signature the app is currently installed with (read here,
+     * before any spoofing) next to the spoofed one, and whether they match.
+     * Must run before {@link #killSignature}.
+     */
+    public static void checkSignatures(Context context, String packageName, String base64Sig) {
+        String real;
+        try {
+            Signature[] current = currentSignatures(context, packageName);
+            real = current != null && current.length > 0 ? shortSig(current[0].toByteArray()) : "none";
+        } catch (PackageManager.NameNotFoundException | RuntimeException e) {
+            real = "unavailable (" + e + ")";
+        }
+
+        String spoofed = shortSig(Base64.decode(base64Sig, Base64.DEFAULT));
+        Log.i(TAG, "checkSignatures: " + packageName + " real=" + real + " spoofed=" + spoofed + (real.equals(spoofed) ? " SAME" : " DIFFERENT"));
+    }
+
+    // GET_SIGNATURES is the only API on pre-P devices.
+    @SuppressWarnings("deprecation")
+    private static Signature[] currentSignatures(Context context, String packageName) throws PackageManager.NameNotFoundException {
+        PackageManager pm = context.getPackageManager();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            PackageInfo info = pm.getPackageInfo(packageName, PackageManager.GET_SIGNING_CERTIFICATES);
+            return info.signingInfo != null ? info.signingInfo.getApkContentsSigners() : null;
+        } else {
+            return getLegacySignatures(pm.getPackageInfo(packageName, PackageManager.GET_SIGNATURES));
+        }
+    }
+
+    private static String shortSig(byte[] cert) {
+        try {
+            byte[] digest = MessageDigest.getInstance("SHA-256").digest(cert);
+
+            StringBuilder hex = new StringBuilder();
+            for (byte b : digest) {
+                hex.append(Character.forDigit((b >> 4) & 0xF, 16));
+                hex.append(Character.forDigit(b & 0xF, 16));
+            }
+
+            return hex.substring(0, 16);
+        } catch (NoSuchAlgorithmException e) {
+            return "unavailable";
+        }
     }
 
     private static void killPM(String packageName, String signatureData) {
@@ -65,6 +115,7 @@ public class SignatureKiller {
         } catch (ReflectiveOperationException | RuntimeException e) {
             throw new RuntimeException(e);
         }
+        Log.i(TAG, "killPM: PackageInfo creator spoof installed");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             HiddenApiBypass.addHiddenApiExemptions("Landroid/os/Parcel;", "Landroid/content/pm", "Landroid/app");
@@ -170,12 +221,14 @@ public class SignatureKiller {
             Log.e(TAG, "Load SignatureKiller library failed", e);
             return;
         }
+        Log.i(TAG, "killOpen: native library loaded");
 
         String apkPath = getApkPath(packageName);
         if (apkPath == null) {
             Log.e(TAG, "Get apk path failed");
             return;
         }
+        Log.i(TAG, "killOpen: installed apk at " + apkPath);
 
         File apkFile = new File(apkPath);
         File repFile;
@@ -189,6 +242,7 @@ public class SignatureKiller {
         if (repFile == null) {
             return;
         }
+        Log.i(TAG, "killOpen: hooking " + apkFile.getAbsolutePath() + " -> " + repFile.getAbsolutePath() + " (" + repFile.length() + " bytes)");
 
         hookApkPath(apkFile.getAbsolutePath(), repFile.getAbsolutePath());
     }
