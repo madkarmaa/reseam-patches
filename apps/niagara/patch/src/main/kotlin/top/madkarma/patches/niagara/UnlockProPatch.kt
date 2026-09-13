@@ -8,7 +8,6 @@ import app.reseam.patch.dex.isSet
 import app.reseam.patch.dex.opcode
 import app.reseam.patch.method
 import app.reseam.patch.patch
-import top.madkarma.patches.universal.bypassSignatureChecks
 
 // Holds the entitlement state (all features unlocked when the first flag is true).
 // Public (Z,Z,Z) constructor running INVOKE_DIRECT, three IPUT_BOOLEAN and nothing
@@ -55,11 +54,21 @@ val proCheckerConstructor = method("pro checker constructor") {
 val unlockPro = patch("Unlock Pro") {
     description("Unlocks Pro features.")
     compatibleWith("bitpit.launcher")
-    dependsOn(bypassSignatureChecks)
 
     execute {
         proCheckerConstructor.before {
             param(0).assign(bool(true))
+        }
+
+        val thankYou = resources.getString("purchase_pro_thank_you")
+            ?: error("Unlock Pro: purchase_pro_thank_you string missing")
+
+        if (!resources.setString(
+                "purchase_pro_thank_you",
+                "$thankYou\n\nPatched with ❤ by MadKarma ;)",
+            )
+        ) {
+            error("Unlock Pro: purchase_pro_thank_you string not writable")
         }
 
         log.info("Pro: unlocked via ${proCheckerConstructor.descriptor}.")
