@@ -9,13 +9,13 @@ pluginManagement {
             mavenContent { includeGroupAndSubgroups("app.reseam") }
         }
     }
-    (System.getenv("RESEAM_WORKSPACE")
-        ?: providers.gradleProperty("reseam.workspace").orNull)?.takeIf { it.isNotBlank() }
+    (System.getenv("RESEAM_WORKSPACE") ?: providers.gradleProperty("reseam.workspace").orNull)
+        ?.takeIf { it.isNotBlank() }
         ?.let { includeBuild(it) }
 }
 
 plugins {
-    id("app.reseam.workspace") version "0.8.1"
+    id("app.reseam.workspace") version "0.9.0"
 }
 
 rootProject.name = "madkarma-patches"

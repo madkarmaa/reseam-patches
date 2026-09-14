@@ -1,7 +1,12 @@
 package top.madkarma.patches.scrobbler
 
-import app.reseam.patch.*
+import app.reseam.patch.BytecodeScope
 import app.reseam.patch.dex.*
+import app.reseam.patch.klass
+import app.reseam.patch.native.FieldRef
+import app.reseam.patch.native.Instruction
+import app.reseam.patch.native.RegFieldInsn
+import app.reseam.patch.patch
 
 // LicenseState enum: UNKNOWN (initial), NO_LICENSE (receipt missing or rejected), VALID (licensed).
 val licenseStateEnum = klass("license state enum") {

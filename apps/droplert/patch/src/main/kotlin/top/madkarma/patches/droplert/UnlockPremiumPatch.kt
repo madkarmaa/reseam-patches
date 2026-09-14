@@ -2,6 +2,9 @@ package top.madkarma.patches.droplert
 
 import app.reseam.patch.*
 import app.reseam.patch.dex.*
+import app.reseam.patch.native.FieldRef
+import app.reseam.patch.native.Instruction
+import app.reseam.patch.native.RegFieldInsn
 import top.madkarma.patches.universal.removePairip
 
 object Prefs : ExtClass("top.madkarma.droplert.extensions.Prefs") {
