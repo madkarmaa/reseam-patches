@@ -64,6 +64,11 @@ val cachedStatusLoader = method("cached premium status loader") {
     strings("Failed to load cached premium status")
 }
 
+// Lifetime branch of the settings premium card
+val premiumCardStatus = method("premium card status text") {
+    strings("All features unlocked", "Renews: ")
+}
+
 private fun premiumFieldOf(updater: MethodTarget): FieldRef? {
     val target = updater.method
     return target.instructions.firstNotNullOfOrNull { insn ->
@@ -136,6 +141,15 @@ val unlockPremium = patch("Unlock Lifetime Premium") {
         if (!swapFreeToPremium(cachedStatusLoader, premiumField)) {
             error("Premium: cached loader writes no FREE state")
         }
+
+        if (premiumCardStatus.replaceAllStrings(
+                "All features unlocked",
+                "Patched with ❤ by MadKarma ;)",
+            ) == 0
+        ) {
+            error("Premium: settings card status text not found")
+        }
+        log.info("Premium: settings card tagged.")
 
         if (options[skipOnboarding]) {
             appEntry.before {
