@@ -110,7 +110,7 @@ private fun swapFreeToPremium(
 
 val unlockPremium = patch("Unlock Lifetime Premium") {
     description("Unlocks Premium-only features.")
-    compatibleWith("com.shahzaman.pricetracker"("2.2.1"))
+    compatibleWith("com.shahzaman.pricetracker"("2.2.1", "2.4.0"))
     dependsOn(removePairip)
 
     val skipOnboarding = boolOption(
