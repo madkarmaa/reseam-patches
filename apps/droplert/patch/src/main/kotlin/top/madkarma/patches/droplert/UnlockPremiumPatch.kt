@@ -19,7 +19,6 @@ val EntitlementInfo_isActive = klass("com.revenuecat.purchases.EntitlementInfo")
 val customerInfoIsPremiumActive = method("customer premium active") {
     returns(Type.Boolean)
     params("com.revenuecat.purchases.CustomerInfo")
-    strings("premium")
     calls(CustomerInfo_getEntitlements)
     calls(EntitlementInfos_get)
     calls(EntitlementInfo_isActive)
@@ -29,7 +28,7 @@ val isPremium = method("premium gate") {
     returns(Type.Boolean)
     paramCount(0)
     opcode(
-        Opcode.CMP_LONG, Opcode.IGET_BOOLEAN, Opcode.INSTANCE_OF, Opcode.SGET_OBJECT
+        Opcode.CMP_LONG, Opcode.IGET_BOOLEAN, Opcode.INSTANCE_OF
     )
 }
 
@@ -37,7 +36,6 @@ val revenueCatStateUpdater = method("RevenueCat premium state updater") {
     paramCount(2)
     param(0, "com.revenuecat.purchases.CustomerInfo")
     returns(Type.Object)
-    strings("premium")
     calls(CustomerInfo_getEntitlements)
     calls(EntitlementInfos_get)
     calls(EntitlementInfo_isActive)
@@ -47,7 +45,6 @@ val playPurchaseCallback = method("Play purchase result callback") {
     paramCount(1)
     returns(Type.Object)
     strings(
-        "lifetime_premium",
         "Play unreachable — cannot disprove a lifetime purchase, leaving status untouched",
     )
 }
@@ -56,7 +53,6 @@ val unconfiguredFallback = method("RevenueCat unconfigured fallback") {
     paramCount(3)
     returns(Type.Object)
     strings(
-        "Purchases not configured yet, using cached or FREE tier",
         "RevenueCat network call failed, using cached status",
     )
 }
@@ -69,7 +65,7 @@ val cachedStatusLoader = method("cached premium status loader") {
 
 // Lifetime branch of the settings premium card
 val premiumCardStatus = method("premium card status text") {
-    strings("All features unlocked", "Renews: ")
+    strings("All features unlocked")
 }
 
 private fun premiumFieldOf(updater: MethodTarget): FieldRef? {

@@ -17,7 +17,6 @@ private val channelCardHolder = klass("channel card holder") {
 private val channelCardGate = method("channel card gate") {
     inClass(channelCardHolder)
     returns(Type.Boolean)
-    paramCount(1)
 }
 
 val bugFixes = patch("Bug fixes") {

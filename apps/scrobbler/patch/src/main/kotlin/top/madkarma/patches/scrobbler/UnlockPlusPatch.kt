@@ -10,7 +10,7 @@ import app.reseam.patch.patch
 
 // LicenseState enum: UNKNOWN (initial), NO_LICENSE (receipt missing or rejected), VALID (licensed).
 val licenseStateEnum = klass("license state enum") {
-    strings("UNKNOWN", "NO_LICENSE", "VALID")
+    strings("NO_LICENSE")
 }
 
 // Enum entry names are kept as const-strings in <clinit>; each is stored by
