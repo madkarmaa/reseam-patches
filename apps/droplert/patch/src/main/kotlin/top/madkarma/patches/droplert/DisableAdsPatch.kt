@@ -32,7 +32,7 @@ val nativeAdUi = method("native ad composable") {
 
 val disableAds = patch("Disable ads") {
     description("Disables in-app ads")
-    compatibleWith("com.shahzaman.pricetracker"("2.2.1", "2.4.0"))
+    compatibleWith("com.shahzaman.pricetracker"("2.2.1", "2.4.0", "2.4.1"))
     dependsOn(removePairip)
 
     execute {

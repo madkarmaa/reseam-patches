@@ -1,0 +1,120 @@
+package top.madkarma.patches.droplert.premium
+
+import app.reseam.patch.*
+import app.reseam.patch.dex.*
+import app.reseam.patch.native.FieldRef
+import app.reseam.patch.native.Instruction
+import app.reseam.patch.native.RegFieldInsn
+
+object Prefs : ExtClass("top.madkarma.droplert.extensions.Prefs") {
+    val putBoolean = static("putBoolean", Type.Context, Type.String, Type.Boolean)
+}
+
+val CustomerInfo_getEntitlements =
+    klass("com.revenuecat.purchases.CustomerInfo").method("getEntitlements")
+val EntitlementInfos_get = klass("com.revenuecat.purchases.EntitlementInfos").method("get")
+val EntitlementInfo_isActive = klass("com.revenuecat.purchases.EntitlementInfo").method("isActive")
+
+val isPremium = method("premium gate") {
+    returns(Type.Boolean)
+    paramCount(0)
+    opcode(
+        Opcode.CMP_LONG, Opcode.IGET_BOOLEAN, Opcode.INSTANCE_OF
+    )
+}
+
+val revenueCatStateUpdater = method("RevenueCat premium state updater") {
+    paramCount(2)
+    param(0, "com.revenuecat.purchases.CustomerInfo")
+    returns(Type.Object)
+    calls(CustomerInfo_getEntitlements)
+    calls(EntitlementInfos_get)
+    calls(EntitlementInfo_isActive)
+}
+
+val playPurchaseCallback = method("Play purchase result callback") {
+    paramCount(1)
+    returns(Type.Object)
+    strings(
+        "Play unreachable — cannot disprove a lifetime purchase, leaving status untouched",
+    )
+}
+
+// Lifetime branch of the settings premium card
+val premiumCardStatus = method("premium card status text") {
+    strings("All features unlocked")
+}
+
+private fun premiumFieldOf(updater: MethodTarget): FieldRef? {
+    val target = updater.method
+    return target.instructions.firstNotNullOfOrNull { insn ->
+        insn.fieldRef?.takeIf { it.name == "PREMIUM" }
+    }
+}
+
+fun swapFreeToPremium(
+    updater: MethodTarget,
+    premiumField: FieldRef,
+): Boolean {
+    val target = updater.method
+    val insns = target.instructions
+
+    var promoted = 0
+    for (i in insns.indices) {
+        val insn = insns[i]
+        if (insn.opcode != Opcode.SGET_OBJECT) continue
+
+        val field = insn.fieldRef ?: continue
+        if (field.name != "FREE" || field.definingClass != premiumField.definingClass) continue
+
+        val dest = insn.regA ?: continue
+
+        val replacement = Instruction.RegField(
+            RegFieldInsn(
+                Opcode.SGET_OBJECT.value.toUShort(), dest.toUShort(), 0u, premiumField
+            ),
+        )
+
+        if (replacement.codeUnitSize != insns[i].codeUnitSize) return false
+        target.replaceInstruction(i, replacement)
+
+        promoted++
+    }
+
+    return promoted > 0
+}
+
+// Shared body of both premium patches.
+fun PatchRuntime.runUnlockPremium(): FieldRef {
+    isPremium.method.alwaysReturn(true)
+
+    EntitlementInfo_isActive.method.alwaysReturn(true)
+
+    val premiumField = premiumFieldOf(revenueCatStateUpdater)
+        ?: error("Premium: RevenueCat state updater not found")
+
+    if (!swapFreeToPremium(revenueCatStateUpdater, premiumField)) {
+        error("Premium: state updater writes no FREE state")
+    }
+    if (!swapFreeToPremium(playPurchaseCallback, premiumField)) {
+        error("Premium: Play callback writes no FREE state")
+    }
+
+    if (premiumCardStatus.replaceAllStrings(
+            "All features unlocked",
+            "Patched with ❤ by MadKarma ;)",
+        ) == 0
+    ) {
+        error("Premium: settings card status text not found")
+    }
+    log.info("Premium: settings card tagged.")
+
+    appEntry.before {
+        call(
+            Prefs.putBoolean, thisObject, string("has_seen_paywall"), bool(true)
+        )
+    }
+    log.info("Premium: paywall dismissed.")
+
+    return premiumField
+}
