@@ -1,0 +1,36 @@
+name: app-version-check
+
+on:
+    schedule: # Once a day.
+        - cron: '0 6 * * *'
+    workflow_dispatch:
+        inputs:
+            package:
+                description: 'Only check this package id (default: all pinned packages)'
+                required: false
+                default: ''
+
+permissions:
+    contents: read
+    issues: write
+
+jobs:
+    check:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout sources
+              uses: actions/checkout@v4
+
+            - name: Set up UV
+              uses: astral-sh/setup-uv@v10.1.0
+              with:
+                  python-version: '3.14'
+
+            - name: Check for app updates
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  SNIFF_BASE_URL: https://sniff.madkarma.top
+              run: |
+                  args=()
+                  if [ -n "${{ inputs.package }}" ]; then args+=(--package "${{ inputs.package }}"); fi
+                  uv run .github/scripts/check_app_updates.py "${args[@]}"
