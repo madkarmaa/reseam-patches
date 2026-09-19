@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package top.madkarma.patches.alltrails
 
 import app.reseam.patch.klass

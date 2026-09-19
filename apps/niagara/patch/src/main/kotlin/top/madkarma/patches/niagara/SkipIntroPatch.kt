@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package top.madkarma.patches.niagara
 
 import app.reseam.patch.after

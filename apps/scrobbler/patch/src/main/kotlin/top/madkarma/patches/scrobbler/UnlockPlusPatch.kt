@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package top.madkarma.patches.scrobbler
 
 import app.reseam.patch.BytecodeScope

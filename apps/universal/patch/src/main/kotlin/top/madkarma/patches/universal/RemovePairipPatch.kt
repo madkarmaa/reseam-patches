@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package top.madkarma.patches.universal
 
 import app.reseam.patch.BytecodeScope

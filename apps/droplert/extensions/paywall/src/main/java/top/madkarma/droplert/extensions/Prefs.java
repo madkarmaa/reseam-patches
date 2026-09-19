@@ -14,6 +14,7 @@ import java.io.IOException;
  * Overrides DataStore preferences before the app reads them. Runs from the
  * application entry point, before any app code opens the DataStore files.
  */
+@SuppressWarnings("unused")
 public final class Prefs {
     private static final String TAG = "Prefs";
     private static final String[] STORES = {"user_preferences"};

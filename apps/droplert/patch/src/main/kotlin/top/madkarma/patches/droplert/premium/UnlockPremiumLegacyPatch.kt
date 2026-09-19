@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package top.madkarma.patches.droplert.premium
 
 import app.reseam.patch.Type
