@@ -14,17 +14,54 @@ permissions:
     contents: read
     issues: write
 
+env:
+    # Must match the plugin version in settings.gradle.kts.
+    ENGINE_VERSION: v0.11.0
+    RESEAM_BIN: engine/reseam-linux-x64
+
 jobs:
     check:
         runs-on: ubuntu-latest
         steps:
-            - name: Checkout sources
-              uses: actions/checkout@v4
+            - name: Checkout
+              uses: actions/checkout@v7
+
+            - name: Set up Java
+              uses: actions/setup-java@v6
+              with:
+                  distribution: temurin
+                  java-version: '17'
+
+            - name: Set up Gradle
+              uses: gradle/actions/setup-gradle@v6
 
             - name: Set up UV
               uses: astral-sh/setup-uv@v10.1.0
               with:
                   python-version: '3.14'
+
+            - name: Cache the Reseam CLI
+              id: cli-cache
+              uses: actions/cache@v4
+              with:
+                  path: engine
+                  key: reseam-cli-${{ env.ENGINE_VERSION }}
+
+            - name: Download the Reseam CLI
+              if: steps.cli-cache.outputs.cache-hit != 'true'
+              run: |
+                  mkdir -p engine
+                  curl -fsSL -o engine/reseam-linux-x64 "https://git.reseam.app/reseam/reseam/releases/download/${{ env.ENGINE_VERSION }}/reseam-linux-x64"
+
+            - name: Install the signing key
+              run: |
+                  chmod +x engine/reseam-linux-x64
+                  echo "${{ secrets.BUNDLE_SIGNING_KEY_B64 }}" | base64 -d > bundle-signing.key
+
+            - name: Generate patches.json
+              env:
+                  RESEAM_BUNDLE_KEY: ${{ github.workspace }}/bundle-signing.key
+              run: ./gradlew generatePatchesJson -PreleaseTag=v0.0.0-version-check --no-daemon
 
             - name: Check for app updates
               env:
