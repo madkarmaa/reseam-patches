@@ -3,11 +3,12 @@
 Usage:
     check_app_updates.py [--dry-run] [--package <id>] [--channel stable]
                          [--base-url https://sniff.madkarma.top]
-                         [--patches-json build/reseam/patches.json]
+                         [--catalog-json build/reseam/catalog.json]
 
-The pinned versions are read from the release index written by the
-`:generatePatchesJson` Gradle task - run it first, e.g.
-`./gradlew generatePatchesJson -PreleaseTag=v0.0.0-version-check`.
+The pinned versions are read from the patch catalog dumped by
+`reseam bundle list <bundle> --trust <key> --json` — CI writes it after the
+`:generatePatchesJson` Gradle task. A `patches.json` release index works too
+(newest release), once the engine release used in CI ships patch catalogs.
 
 Environment:
     SNIFF_BASE_URL  API base URL (default https://sniff.madkarma.top).
@@ -27,7 +28,7 @@ import urllib.request
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_PATCHES_JSON = REPO_ROOT / "build" / "reseam" / "patches.json"
+DEFAULT_CATALOG_JSON = REPO_ROOT / "build" / "reseam" / "catalog.json"
 DEFAULT_BASE_URL = "https://sniff.madkarma.top"
 DEFAULT_CHANNEL = "stable"
 ISSUE_LABEL = "app-update"
@@ -47,27 +48,34 @@ def normalize_version_name(raw: str) -> str:
     return raw.split(" - ")[0].strip().split()[0]
 
 
-def collect_pins(patches_json: Path) -> tuple[dict[str, set[str]], dict[str, dict[str, str]]]:
+def collect_pins(catalog_json: Path) -> tuple[dict[str, set[str]], dict[str, dict[str, str]]]:
     """Return (pinned versions per package, declaring patch names by id per package).
 
-    Reads the newest release in the index written by `:generatePatchesJson`.
-    Packages declared with an empty version list are recorded with an empty
-    set and skipped by the caller; universal patches carry no packages.
+    Reads a `bundle list --json` catalog, or the newest release of a
+    `patches.json` index. Packages declared with an empty version list are
+    recorded with an empty set and skipped by the caller; universal patches
+    carry no packages.
     """
     try:
-        index = json.loads(patches_json.read_text(encoding="utf-8"))
+        doc = json.loads(catalog_json.read_text(encoding="utf-8"))
     except FileNotFoundError:
         raise SystemExit(
-            f"error: {patches_json} not found; run "
-            "'./gradlew generatePatchesJson -PreleaseTag=vX.Y.Z' first"
+            f"error: {catalog_json} not found; build the bundle and dump the "
+            "catalog with 'reseam bundle list <bundle> --trust <key> --json' first"
         )
     except ValueError as e:
-        raise SystemExit(f"error: could not parse {patches_json}: {e}")
+        raise SystemExit(f"error: could not parse {catalog_json}: {e}")
 
-    try:
-        patches = index["releases"][0]["patches"]
-    except (KeyError, IndexError, TypeError):
-        raise SystemExit(f"error: {patches_json} has no releases[0].patches")
+    if "patches" in doc:
+        patches = doc["patches"]
+    else:
+        try:
+            patches = doc["releases"][0]["patches"]
+        except (KeyError, IndexError, TypeError):
+            raise SystemExit(
+                f"error: {catalog_json} has neither a top-level 'patches' catalog "
+                "nor releases[0].patches"
+            )
 
     pinned: dict[str, set[str]] = {}
     declared: dict[str, dict[str, str]] = {}
@@ -178,7 +186,7 @@ def open_support_issue(title: str, package: str, title_app: str, latest: str,
         f"The Play Store `{DEFAULT_CHANNEL}` channel has **{title_app} ({package}) {latest}**, "
         f"but the patches only declare support for: {', '.join(pinned)}.\n\n"
         f"- Latest stable `version_name` (via sniff): `{latest}`\n"
-        f"- Declaring patches (via `patches.json`):\n"
+        f"- Declaring patches (via the patch catalog):\n"
         f"{entries}"
         f"\nPlease verify the patches against `{latest}` and extend `compatibleWith(...)` accordingly."
     )
@@ -204,19 +212,19 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--channel", default=DEFAULT_CHANNEL, help="sniff release channel")
     parser.add_argument("--base-url", default=os.environ.get("SNIFF_BASE_URL", DEFAULT_BASE_URL),
                         help="sniff API base URL")
-    parser.add_argument("--patches-json", default=str(DEFAULT_PATCHES_JSON),
-                        help="release index written by :generatePatchesJson")
+    parser.add_argument("--catalog-json", default=str(DEFAULT_CATALOG_JSON),
+                        help="'bundle list --json' catalog (or patches.json)")
     return parser.parse_args(argv)
 
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
-    pinned, patches = collect_pins(Path(args.patches_json))
+    pinned, patches = collect_pins(Path(args.catalog_json))
 
     targets = sorted(pinned)
     if args.package:
         if args.package not in pinned:
-            raise SystemExit(f"error: {args.package} has no entry in {args.patches_json}")
+            raise SystemExit(f"error: {args.package} has no entry in {args.catalog_json}")
         targets = [args.package]
 
     use_label = False if args.dry_run else ensure_label()

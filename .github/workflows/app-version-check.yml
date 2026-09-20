@@ -63,6 +63,11 @@ jobs:
                   RESEAM_BUNDLE_KEY: ${{ github.workspace }}/bundle-signing.key
               run: ./gradlew generatePatchesJson -PreleaseTag=v0.0.0-version-check --no-daemon
 
+            - name: Dump the patch catalog
+              run: |
+                  KEY=$(python3 -c "import json; print(json.load(open('build/reseam/patches.json'))['bundle']['public_key'])")
+                  ./engine/reseam-linux-x64 bundle list build/reseam/*.reseam --trust "$KEY" --json > build/reseam/catalog.json
+
             - name: Check for app updates
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
