@@ -42,7 +42,7 @@ jobs:
 
             - name: Cache the Reseam CLI
               id: cli-cache
-              uses: actions/cache@v4
+              uses: actions/cache@v6
               with:
                   path: engine
                   key: reseam-cli-${{ env.ENGINE_VERSION }}
