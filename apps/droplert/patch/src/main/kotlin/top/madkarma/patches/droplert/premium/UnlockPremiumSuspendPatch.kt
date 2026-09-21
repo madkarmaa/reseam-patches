@@ -30,7 +30,7 @@ val cachedStatusLoaderSuspend = method("cached premium status loader (suspend)")
 
 val unlockPremiumSuspend = patch("Unlock Lifetime Premium") {
     description("Unlocks Premium-only features.")
-    compatibleWith("com.shahzaman.pricetracker"("2.4.1"))
+    compatibleWith("com.shahzaman.pricetracker"("2.4.1", "2.5.0"))
     dependsOn(removePairip)
 
     execute {
