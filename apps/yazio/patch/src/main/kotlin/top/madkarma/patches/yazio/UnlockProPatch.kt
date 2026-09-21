@@ -56,9 +56,12 @@ val unlockPro = patch("Unlock Pro") {
 
         val premiumParams = userModelCtor.method.parameterTypes
         check(premiumParams.count { it == descriptor(PREMIUM_TYPE) } == 1) { "Unlock Pro: user model premium param not unique in ${userModelCtor.descriptor}" }
-        userModelCtor.before { // FIXME simplify?
+        userModelCtor.before {
             val premium = paramOfType(PREMIUM_TYPE)
             whenNull(premium) {
+                // NB: valueOf by backend name, NOT sget: R8 obfuscates the
+                // enum fields (a/b/c) but the runtime names ("Subscription")
+                // stay stable.
                 premium.assign(
                     callStatic(
                         PREMIUM_TYPE,
@@ -71,7 +74,9 @@ val unlockPro = patch("Unlock Pro") {
         }
         log.info("Pro: defaulting null premium to Subscription in ${userModelCtor.descriptor}.")
 
-        storePremiumStatus.replace { // FIXME simplify?
+        storePremiumStatus.replace {
+            // NB: same as above — sget would need the obfuscated field id;
+            // valueOf("Pro") resolves the stable runtime name instead.
             returnValue(
                 callStatic(
                     STORE_PREMIUM_STATUS,
