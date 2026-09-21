@@ -16,7 +16,9 @@ import app.reseam.patch.*
 // purchased, the backend-backed maps are empty, so forcing `isActive()` is
 // not enough — nothing exists to call it on. The mapper result therefore
 // gets fabricated lifetime-pro entries (built by the `pro` extension, which
-// owns all map assembly in plain Java) merged into `active`.
+// owns all map assembly in plain Java) merged into both `active` and `all`:
+// the subscription screen reads `active`, but other gates (e.g. the profile
+// paywall) read `all`, and an empty `all` keeps them firing.
 
 private val revenueCatEntitlementIsActive =
     klass("com.revenuecat.purchases.EntitlementInfo").method("isActive")
@@ -37,11 +39,8 @@ private val superwallSubscriptionStatusIsActive =
 private val superwallActiveEntitlements =
     klass("com.superwall.sdk.store.Entitlements").method("getActive")
 
-private val superwallAllEntitlements =
-    klass("com.superwall.sdk.store.Entitlements").method("getAll")
-
 object ProEntitlements : ExtClass("top.madkarma.liftoff.extensions.ProEntitlements") {
-    val proActiveEntries = static("proActiveEntries", returns = "java.util.Map")
+    val proActiveEntriesMap = static("proActiveEntriesMap", "java.util.Map")
 }
 
 val unlockPro = patch("Unlock Pro") {
@@ -53,15 +52,9 @@ val unlockPro = patch("Unlock Pro") {
         log.info("Pro: RevenueCat EntitlementInfo.isActive forced true.")
 
         revenueCatEntitlementsMapper.after {
-            capture("result").callInterface(
-                "java.util.Map", "get", proto(Type.Object, Type.Object),
-                string("active"),
-            ).cast("java.util.Map").callInterface(
-                "java.util.Map", "putAll", proto(Type.Void, "java.util.Map"),
-                call(ProEntitlements.proActiveEntries),
-            )
+            call(ProEntitlements.proActiveEntriesMap, capture("result"))
         }
-        log.info("Pro: synthetic lifetime entitlement injected into mapped active set.")
+        log.info("Pro: synthetic lifetime entitlement injected into mapped active+all sets.")
 
         // Pin the subscription-id set too, for length/subscription checks.
         revenueCatActiveSubscriptions.replace {
@@ -84,10 +77,29 @@ val unlockPro = patch("Unlock Pro") {
         superwallSubscriptionStatusIsActive.method.alwaysReturn(true)
         log.info("Pro: Superwall SubscriptionStatus.isActive forced true.")
 
-        // Same zero-arg Set shape: expose all known entitlements as active.
+        // getAll() is empty for a never-purchased account, so aliasing
+        // getActive to it stays empty and Superwall-side gates keep firing.
+        // Fabricate a live Entitlement instead: Entitlement(String) defaults
+        // to SERVICE_LEVEL with isActive=true. (The isActive() hooks above
+        // cover direct method polls; most SDK decisions use
+        // `instanceof Active` on the status object itself, which no method
+        // hook can satisfy — a non-empty active set is the lever that works
+        // from here.)
         superwallActiveEntitlements.replace {
-            returnValue(thisObject.call(superwallAllEntitlements))
+            val entitlement = newInstance(
+                "com.superwall.sdk.models.entitlements.Entitlement",
+                proto(Type.Void, Type.String),
+                string("pro"),
+            )
+            returnValue(
+                callStatic(
+                    "java.util.Collections",
+                    "singleton",
+                    proto("java.util.Set", Type.Object),
+                    entitlement,
+                )
+            )
         }
-        log.info("Pro: Superwall Entitlements.getActive aliased to getAll.")
+        log.info("Pro: Superwall Entitlements.getActive pinned to synthetic set.")
     }
 }

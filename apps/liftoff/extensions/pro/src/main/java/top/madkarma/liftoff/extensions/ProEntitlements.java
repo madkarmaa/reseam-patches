@@ -15,9 +15,19 @@ public final class ProEntitlements {
     }
 
     /**
+     * Points both the {@code active} and {@code all} maps of an
+     * {@code EntitlementInfosMapperKt.map} result at the fabricated entries.
+     */
+    public static void proActiveEntriesMap(Map<String, Object> result) {
+        Map<String, Object> entries = proActiveEntries();
+        result.put("active", entries);
+        result.put("all", entries);
+    }
+
+    /**
      * Entries to merge into the mapped {@code active} object.
      */
-    public static Map<String, Object> proActiveEntries() {
+    private static Map<String, Object> proActiveEntries() {
         long nowMillis = System.currentTimeMillis();
         String nowIso = iso8601(nowMillis);
 
