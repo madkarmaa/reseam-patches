@@ -33,4 +33,4 @@ How patches are written is documented in the engine repository under `docs/`.
 ## Release
 
 Tag `vX.Y.Z`. CI builds and signs the bundle, writes `patches.json`, and uploads
-both to the Forgejo release.
+both to the GitHub release.

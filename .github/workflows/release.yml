@@ -1,0 +1,64 @@
+name: release
+
+on:
+    push:
+        tags:
+            - 'v*'
+    # Builds the release as CI build 0.0.<run> without uploading, to validate a release or warm the caches.
+    workflow_dispatch:
+
+permissions:
+    contents: write
+
+env: # Must match the plugin version in settings.gradle.kts.
+    ENGINE_VERSION: v0.12.0
+    RESEAM_BIN: engine/reseam-linux-x64
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            -   name: Checkout sources
+                uses: actions/checkout@v7
+
+            -   name: Set up Java
+                uses: actions/setup-java@v6
+                with:
+                    distribution: temurin
+                    java-version: '17'
+
+            -   name: Set up Gradle
+                uses: gradle/actions/setup-gradle@v6
+
+            -   name: Cache the Reseam CLI
+                id: cli-cache
+                uses: actions/cache@v6
+                with:
+                    path: engine
+                    key: reseam-cli-${{ env.ENGINE_VERSION }}
+
+            -   name: Download the Reseam CLI
+                if: steps.cli-cache.outputs.cache-hit != 'true'
+                run: |
+                    mkdir -p engine
+                    curl -fsSL -o engine/reseam-linux-x64 "https://git.reseam.app/reseam/reseam/releases/download/${{ env.ENGINE_VERSION }}/reseam-linux-x64"
+
+            -   name: Install the signing key
+                run: |
+                    chmod +x engine/reseam-linux-x64
+                    echo "${{ secrets.BUNDLE_SIGNING_KEY_B64 }}" | base64 -d > bundle-signing.key
+
+            -   name: Build and stage the release
+                env:
+                    RESEAM_BUNDLE_KEY: ${{ github.workspace }}/bundle-signing.key
+                run: ./gradlew stageRelease -PreleaseTag=${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || format('v0.0.{0}', github.run_number) }} --no-daemon
+
+            -   name: Upload to the GitHub release
+                if: startsWith(github.ref, 'refs/tags/')
+                env:
+                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                run: |
+                    if ! gh release view "${{ github.ref_name }}" >/dev/null 2>&1; then
+                      gh release create "${{ github.ref_name }}" --title "${{ github.ref_name }}" --notes ""
+                    fi
+                    gh release upload "${{ github.ref_name }}" build/reseam/release/* --clobber
