@@ -72,6 +72,36 @@ public final class UpdateChecker {
         return raw.split(" - ")[0].trim().split("\\s+")[0];
     }
 
+    static int compareVersions(String a, String b) {
+        long[] ta = segments(a);
+        long[] tb = segments(b);
+
+        int n = Math.min(ta.length, tb.length);
+
+        for (int i = 0; i < n; i++) {
+            if (ta[i] != tb[i]) return Long.compare(ta[i], tb[i]);
+        }
+
+        return Integer.compare(ta.length, tb.length);
+    }
+
+    private static long[] segments(String version) {
+        String[] parts = version.split("[^0-9]+");
+        long[] numbers = new long[parts.length];
+        int count = 0;
+
+        for (String part : parts) {
+            if (part.isEmpty()) continue;
+            numbers[count++] = Long.parseLong(part);
+        }
+
+        if (count == numbers.length) return numbers;
+
+        long[] trimmed = new long[count];
+        System.arraycopy(numbers, 0, trimmed, 0, count);
+        return trimmed;
+    }
+
     private static SharedPreferences prefs(Application app) {
         return app.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
     }
@@ -110,42 +140,48 @@ public final class UpdateChecker {
 
         private void checkForUpdates() {
             try {
-                if (!isUpdateAvailable()) return;
+                String newest = newestSupportedVersion();
+                if (newest == null) return;
 
-                pendingVersion = installedVersion;
+                pendingVersion = newest;
                 showPopupIfReady();
             } catch (Throwable t) {
                 Log.w(TAG, "update check failed", t);
             }
         }
 
-        private boolean isUpdateAvailable() {
+        private String newestSupportedVersion() {
             try {
                 byte[] body = downloadBody();
-                if (body == null) return false;
+                if (body == null) return null;
 
                 JSONObject root = new JSONObject(new String(body, StandardCharsets.UTF_8));
                 JSONArray patches = latestPatches(root);
-                if (patches == null) return false;
+                if (patches == null) return null;
 
                 Set<String> supported = declaredVersions(patches);
                 if (supported == null) {
                     Log.i(TAG, "no patches entry for " + packageName);
-                    return false;
+                    return null;
                 }
                 if (supported.isEmpty()) {
                     Log.i(TAG, "all versions supported for " + packageName);
-                    return false;
-                }
-                if (supported.contains(installedVersion)) {
-                    Log.i(TAG, "supported: " + packageName + " " + installedVersion);
-                    return false;
+                    return null;
                 }
 
-                return true;
+                String newest = null;
+                for (String version : supported) {
+                    if (newest == null || compareVersions(version, newest) > 0) newest = version;
+                }
+                if (newest == null || compareVersions(newest, installedVersion) <= 0) {
+                    Log.i(TAG, "no newer version for " + packageName + " " + installedVersion);
+                    return null;
+                }
+
+                return newest;
             } catch (Throwable t) {
                 Log.w(TAG, "patches.json fetch failed", t);
-                return false;
+                return null;
             }
         }
 
@@ -256,7 +292,8 @@ public final class UpdateChecker {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1 && activity.isDestroyed())
                     return;
 
-                String message = "There's a newer version of " + packageName + " available for patching (installed: " + pendingVersion + ").";
+                String newest = pendingVersion;
+                String message = "There's a newer version of " + packageName + " available for patching (latest: " + newest + ", installed: " + installedVersion + ").";
 
                 // @formatter:off
                 new AlertDialog.Builder(activity)
@@ -275,7 +312,7 @@ public final class UpdateChecker {
                         .show();
                 // @formatter:on
 
-                Log.i(TAG, "showing update popup: newer version available for " + packageName + " (installed: " + pendingVersion + ")");
+                Log.i(TAG, "showing update popup: newer version available for " + packageName + " (latest: " + newest + ", installed: " + installedVersion + ")");
             } catch (Throwable t) {
                 Log.w(TAG, "popup failed", t);
             }
