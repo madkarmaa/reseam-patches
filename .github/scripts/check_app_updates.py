@@ -19,7 +19,6 @@ from __future__ import annotations
 import argparse
 import json
 import os
-import re
 import subprocess
 import sys
 import urllib.error
@@ -32,14 +31,6 @@ DEFAULT_BASE_URL = "https://sniff.madkarma.top"
 DEFAULT_CHANNEL = "stable"
 ISSUE_LABEL = "app-update"
 UA = {"User-Agent": "Mozilla/5.0"}
-
-
-def version_key(version: str) -> tuple:
-    """Sortable key: numeric parts compare numerically, others lexically."""
-    return tuple(
-        (0, int(part)) if part.isdigit() else (1, part)
-        for part in re.findall(r"\d+|[A-Za-z]+", version)
-    )
 
 
 def normalize_version_name(raw: str) -> str:
@@ -177,8 +168,8 @@ def open_support_issue(title: str, package: str, title_app: str, latest: str,
     body = (
         f"The Play Store `{DEFAULT_CHANNEL}` channel has **{title_app} ({package}) {latest}**, "
         f"but the patches only declare support for: {', '.join(pinned)}.\n\n"
-        f"- Latest stable `version_name` (via sniff): `{latest}`\n"
-        f"- Declaring patches (via `patches.json`):\n"
+        f"- Latest stable `version_name`: `{latest}`\n"
+        f"- Declaring patches:\n"
         f"{entries}"
         f"\nPlease verify the patches against `{latest}` and extend `compatibleWith(...)` accordingly."
     )
@@ -230,7 +221,7 @@ def main(argv: list[str] | None = None) -> int:
             skipped_unpinned += 1
             continue
 
-        ordered = sorted(versions, key=version_key)
+        ordered = sorted(versions)
         result = sniff_latest(package, args.base_url, args.channel)
         if result is None:
             continue
