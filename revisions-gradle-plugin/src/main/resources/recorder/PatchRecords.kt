@@ -23,12 +23,11 @@ private fun PatchRuntime.recordAppliedId(id: String) {
     val existing = files.read(APPLIED_PATH)?.toString(StandardCharsets.UTF_8).orEmpty()
     if (existing.contains("\"$id\":")) return
 
-    val merged =
-        if (existing.isBlank()) {
-            "{\"$id\":\"$hash\"}"
-        } else {
-            existing.trimEnd().removeSuffix("}") + ",\"$id\":\"$hash\"}"
-        }
+    val merged = if (existing.isBlank()) {
+        "{\"$id\":\"$hash\"}"
+    } else {
+        existing.trimEnd().removeSuffix("}") + ",\"$id\":\"$hash\"}"
+    }
 
     files.write(APPLIED_PATH, merged.toByteArray(StandardCharsets.UTF_8))
 }
@@ -39,9 +38,8 @@ private fun revisionEntry(
 ): String {
     val key = "\"$id\":\""
 
-    val hashStart =
-        text.indexOf(key).takeIf { it >= 0 }?.plus(key.length)
-            ?: error("patch $id has no revision entry")
+    val hashStart = text.indexOf(key).takeIf { it >= 0 }?.plus(key.length)
+        ?: error("patch $id has no revision entry")
 
     val hashEnd = text.indexOf('"', hashStart)
     if (hashEnd < 0) error("patch $id has a malformed revision entry")
@@ -80,11 +78,15 @@ private fun inferDeclaringId(): String {
 
     // Declaration time: the initializing file's facade is on the stack, so
     // the first frame naming a declared patch file is this patch.
-    val caller =
-        Thread.currentThread().stackTrace.firstOrNull {
-            it.fileName != null && it.fileName != HELPER_FILE &&
-                text.contains("\"${it.className.substringBeforeLast('.')}/${it.fileName}\":\"")
-        } ?: error("recordedPatch() must initialize a top-level patch declaration")
+    val caller = Thread.currentThread().stackTrace.firstOrNull {
+        it.fileName != null && it.fileName != HELPER_FILE && text.contains(
+            "\"${
+                it.className.substringBeforeLast(
+                    '.'
+                )
+            }/${it.fileName}\":\""
+        )
+    } ?: error("recordedPatch() must initialize a top-level patch declaration")
 
     val key = "\"${caller.className.substringBeforeLast('.')}/${caller.fileName}\":\""
 
@@ -95,11 +97,9 @@ private fun inferDeclaringId(): String {
 }
 
 private val revisionsText: String by lazy {
-    PatchRecords::class.java
-        .getResourceAsStream(
-            REVISIONS_RESOURCE,
-        )?.readBytes()
-        ?.toString(StandardCharsets.UTF_8)
+    PatchRecords::class.java.getResourceAsStream(
+        REVISIONS_RESOURCE,
+    )?.readBytes()?.toString(StandardCharsets.UTF_8)
         ?: error("revisions.json missing from patch bundle")
 }
 

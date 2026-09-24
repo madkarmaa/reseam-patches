@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
 // SPDX-License-Identifier: GPL-3.0-or-later
+@file:Suppress("unused")
 
 package top.madkarma.gradle.revisions
 
@@ -25,29 +26,27 @@ internal const val SHARED_DIR = "shared"
  */
 class PatchRevisionsPlugin : Plugin<Project> {
     override fun apply(project: Project) {
-        val generate =
-            project.tasks.register(
-                "generatePatchRevisions",
-                GeneratePatchRevisionsTask::class.java,
-            ) {
-                group = "build"
-                description =
-                    "Hashes patch inputs into revisions.json and validates patch recorders."
+        val generate = project.tasks.register(
+            "generatePatchRevisions",
+            GeneratePatchRevisionsTask::class.java,
+        ) {
+            group = "build"
+            description = "Hashes patch inputs into revisions.json and validates patch recorders."
 
-                projectDir.set(project.layout.projectDirectory)
-                outputDir.set(project.layout.buildDirectory.dir("generated/reseam/revisions"))
-                recorderDir.set(project.layout.buildDirectory.dir("generated/reseam/recorder"))
+            projectDir.set(project.layout.projectDirectory)
+            outputDir.set(project.layout.buildDirectory.dir("generated/reseam/revisions"))
+            recorderDir.set(project.layout.buildDirectory.dir("generated/reseam/recorder"))
 
-                sources.from(
-                    project.fileTree(
-                        APPS_DIR,
-                    ) { exclude("**/build/**", "**/.gradle/**", "**/.git/**") },
-                    project.fileTree(
-                        SHARED_DIR,
-                    ) { exclude("**/build/**", "**/.gradle/**", "**/.git/**") },
-                    project.layout.projectDirectory.files("settings.gradle.kts", "manifest.toml"),
-                )
-            }
+            sources.from(
+                project.fileTree(
+                    APPS_DIR,
+                ) { exclude("**/build/**", "**/.gradle/**", "**/.git/**") },
+                project.fileTree(
+                    SHARED_DIR,
+                ) { exclude("**/build/**", "**/.gradle/**", "**/.git/**") },
+                project.layout.projectDirectory.files("settings.gradle.kts", "manifest.toml"),
+            )
+        }
 
         project.tasks.matching { it.name == "stageRelease" }.configureEach {
             dependsOn(generate)
@@ -57,18 +56,15 @@ class PatchRevisionsPlugin : Plugin<Project> {
         project.allprojects.forEach { module ->
             module.pluginManager.withPlugin("app.reseam.patches") {
                 val kotlin =
-                    module.extensions
-                        .getByType(KotlinJvmProjectExtension::class.java)
-                        .sourceSets
-                        .getByName("main")
+                    module.extensions.getByType(KotlinJvmProjectExtension::class.java).sourceSets.getByName(
+                        "main"
+                    )
 
                 kotlin.kotlin.srcDir(generate.map { it.recorderDir })
 
-                val main =
-                    module.extensions
-                        .getByType(
-                            SourceSetContainer::class.java,
-                        ).getByName("main")
+                val main = module.extensions.getByType(
+                    SourceSetContainer::class.java,
+                ).getByName("main")
 
                 main.resources.srcDir(generate.map { it.outputDir })
 

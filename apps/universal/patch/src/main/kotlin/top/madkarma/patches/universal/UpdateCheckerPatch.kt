@@ -2,7 +2,10 @@
 
 package top.madkarma.patches.universal
 
-import app.reseam.patch.*
+import app.reseam.patch.ExtClass
+import app.reseam.patch.Type
+import app.reseam.patch.after
+import app.reseam.patch.appEntry
 import top.madkarma.revisions.recordedPatch
 
 object UpdateChecker : ExtClass("top.madkarma.universal.extensions.UpdateChecker") {

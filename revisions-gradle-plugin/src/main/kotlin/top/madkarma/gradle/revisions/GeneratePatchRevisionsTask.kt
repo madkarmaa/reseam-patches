@@ -6,12 +6,7 @@ package top.madkarma.gradle.revisions
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.PathSensitive
-import org.gradle.api.tasks.PathSensitivity
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.*
 import java.io.File
 
 /**
@@ -56,9 +51,7 @@ abstract class GeneratePatchRevisionsTask : DefaultTask() {
 
         // One patch per file: discover every declaration.
         val declared = mutableListOf<Declared>()
-        files
-            .filter { it.extension == "kt" }
-            .sortedBy { it.relativeTo(root).path }
+        files.filter { it.extension == "kt" }.sortedBy { it.relativeTo(root).path }
             .forEach { file ->
                 val relativePath = file.relativeTo(root).path
                 val text = file.readText()
@@ -68,14 +61,15 @@ abstract class GeneratePatchRevisionsTask : DefaultTask() {
                 if (matches.isEmpty()) return@forEach
                 if (matches.size > 1) error("$relativePath: one patch per file, found ${matches.size}")
 
-                val pkg =
-                    packageDecl
-                        .find(
-                            text,
-                        )?.groupValues
-                        ?.get(1) ?: error("$relativePath: no package declaration")
+                val pkg = packageDecl.find(
+                    text,
+                )?.groupValues?.get(1) ?: error("$relativePath: no package declaration")
 
-                declared += Declared("$pkg.${matches[0].groupValues[1]}", relativePath, matches[0].groupValues[2] == "recordedPatch")
+                declared += Declared(
+                    "$pkg.${matches[0].groupValues[1]}",
+                    relativePath,
+                    matches[0].groupValues[2] == "recordedPatch"
+                )
             }
         if (declared.isEmpty()) error("no patch declarations found")
 
@@ -83,8 +77,12 @@ abstract class GeneratePatchRevisionsTask : DefaultTask() {
         // records, and a manual call next to the decorator is redundant.
         declared.forEach { (id, relativePath, recorded) ->
             if (!recorded) error("$relativePath: declare with recordedPatch(), not patch(), so the patch records itself")
-            if (recorder.containsMatchIn(File(root, relativePath).readText()))
-                error("$relativePath: recording is automatic via recordedPatch(); drop the recordApplied() call")
+            if (recorder.containsMatchIn(
+                    File(
+                        root, relativePath
+                    ).readText()
+                )
+            ) error("$relativePath: recording is automatic via recordedPatch(); drop the recordApplied() call")
         }
         val declaringPaths = declared.map { it.relativePath }.toSet()
 
@@ -101,33 +99,26 @@ abstract class GeneratePatchRevisionsTask : DefaultTask() {
             return digest.digest().joinToString("") { "%02x".format(it) }
         }
 
-        val entries =
-            declared.sortedBy { it.id }.joinToString(",") { (id, relativePath, _) ->
-                // Layout is apps/<app>/...: segment 0 is the apps dir, 1 the app.
-                val app = relativePath.split(File.separatorChar).getOrNull(1).orEmpty()
+        val entries = declared.sortedBy { it.id }.joinToString(",") { (id, relativePath, _) ->
+            // Layout is apps/<app>/...: segment 0 is the apps dir, 1 the app.
+            val app = relativePath.split(File.separatorChar).getOrNull(1).orEmpty()
 
-                val inputs =
-                    files
-                        .map { it.relativeTo(root).path }
-                        .filter { rel ->
-                            rel.startsWith("$SHARED_DIR/") || rel == "settings.gradle.kts" ||
-                                rel == "manifest.toml" ||
-                                (
-                                    app.isNotEmpty() && rel.startsWith("$APPS_DIR/$app/") &&
-                                        rel !in declaringPaths
-                                ) ||
-                                rel == relativePath
-                        }.sorted()
+            val inputs = files.map { it.relativeTo(root).path }.filter { rel ->
+                rel.startsWith("$SHARED_DIR/") || rel == "settings.gradle.kts" || rel == "manifest.toml" || (app.isNotEmpty() && rel.startsWith(
+                    "$APPS_DIR/$app/"
+                ) && rel !in declaringPaths) || rel == relativePath
+            }.sorted()
 
-                "\"$id\":\"${hashFiles(inputs)}\""
-            }
+            "\"$id\":\"${hashFiles(inputs)}\""
+        }
 
-        val fileEntries =
-            declared.sortedBy { it.id }.joinToString(",") { (id, relativePath, _) ->
-                "\"${id.substringBeforeLast(
+        val fileEntries = declared.sortedBy { it.id }.joinToString(",") { (id, relativePath, _) ->
+            "\"${
+                id.substringBeforeLast(
                     '.',
-                )}/${relativePath.substringAfterLast(File.separatorChar)}\":\"$id\""
-            }
+                )
+            }/${relativePath.substringAfterLast(File.separatorChar)}\":\"$id\""
+        }
 
         outputDir.get().asFile.apply {
             mkdirs()
