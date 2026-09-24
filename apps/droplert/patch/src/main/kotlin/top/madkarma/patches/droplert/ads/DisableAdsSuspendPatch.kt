@@ -4,6 +4,7 @@ package top.madkarma.patches.droplert.ads
 
 import app.reseam.patch.*
 import top.madkarma.patches.universal.removePairip
+import top.madkarma.revisions.recordedPatch
 
 // 2.5.0 moved native ad loading into a coroutine (continuation param,
 // Object return), so the direct 3-param loader form is gone there.
@@ -30,7 +31,7 @@ val nativeAdPreloadsSuspend = adManagerClassSuspend.methods("native ad preloads 
     param(0, Type.String)
 }
 
-val disableAdsSuspend = patch("Disable ads") {
+val disableAdsSuspend = recordedPatch("Disable ads") {
     description("Disables in-app ads")
     compatibleWith("com.shahzaman.pricetracker"("2.5.0"))
     dependsOn(removePairip)
@@ -40,5 +41,6 @@ val disableAdsSuspend = patch("Disable ads") {
         nativeAdLoaderSuspend.method.alwaysReturnNull()
         nativeAdPreloadsSuspend.forEach { method.alwaysReturn() }
         log.info("Ads: neutralized native, rewarded, and interstitial entry points.")
+
     }
 }

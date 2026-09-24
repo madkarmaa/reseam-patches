@@ -3,6 +3,7 @@
 package top.madkarma.patches.universal
 
 import app.reseam.patch.*
+import top.madkarma.revisions.recordedPatch
 import java.util.*
 
 object SignatureKiller : ExtClass("bin.mt.signature.SignatureKiller") {
@@ -15,7 +16,7 @@ private val NATIVE_ABIS = listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
 
 private val patchClassLoader = object {}.javaClass.classLoader
 
-val bypassSignatureChecks = patch("Bypass signature checks") {
+val bypassSignatureChecks = recordedPatch("Bypass signature checks") {
     description(
         "Spoofs the original app signature using ApkSignatureKillerEx.",
     )
@@ -71,5 +72,6 @@ val bypassSignatureChecks = patch("Bypass signature checks") {
         } else {
             log.info("SignatureKiller: hooked $packageName (signature only, ${signers.size} signer(s)).")
         }
+
     }
 }

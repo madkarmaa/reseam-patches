@@ -1,7 +1,6 @@
 package top.madkarma.universal.extensions;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -9,7 +8,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
@@ -17,15 +15,15 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @SuppressWarnings("unused")
 public final class UpdateChecker {
     private static final String TAG = "UpdateChecker";
-    private static final String DEFAULT_PATCHES_JSON_URL = "https://github.com/madkarmaa/reseam-patches/releases/latest/download/patches.json";
+    private static final String DEFAULT_REVISIONS_URL = "https://github.com/madkarmaa/reseam-patches/releases/latest/download/revisions.json";
+    private static final String APPLIED_ASSET = "reseam/applied.json";
 
     private static final String PREFS = "reseam_update_checker";
     private static final String KEY_NEVER = "never_show_again";
@@ -38,17 +36,11 @@ public final class UpdateChecker {
     private UpdateChecker() {
     }
 
-    public static void check(Context context, String patchesJsonUrl, String installedVersion, String packageName) {
+    public static void check(Context context, String revisionsUrl, String packageName) {
         try {
             Context appCtx = context.getApplicationContext();
             if (!(appCtx instanceof Application app)) {
                 Log.w(TAG, "expected application context, got " + appCtx.getClass().getName());
-                return;
-            }
-
-            String normalized = normalizeVersion(installedVersion);
-            if (normalized == null || normalized.isEmpty()) {
-                Log.w(TAG, "no installed version, skipping check");
                 return;
             }
 
@@ -59,48 +51,14 @@ public final class UpdateChecker {
 
             if (isSuppressed(app)) return;
 
-            String url = patchesJsonUrl == null || patchesJsonUrl.isEmpty() ? DEFAULT_PATCHES_JSON_URL : patchesJsonUrl;
+            String url = revisionsUrl == null || revisionsUrl.isEmpty() ? DEFAULT_REVISIONS_URL : revisionsUrl;
             // The fetch fires on the first activity resume, so background starts never hit the network.
-            app.registerActivityLifecycleCallbacks(new Tracker(app, url, normalized, packageName));
+            app.registerActivityLifecycleCallbacks(new Tracker(app, url, packageName));
         } catch (Throwable t) {
             Log.w(TAG, "check failed", t);
         }
     }
 
-    static String normalizeVersion(String raw) {
-        if (raw == null) return null;
-        return raw.split(" - ")[0].trim().split("\\s+")[0];
-    }
-
-    static int compareVersions(String a, String b) {
-        long[] ta = segments(a);
-        long[] tb = segments(b);
-
-        int n = Math.min(ta.length, tb.length);
-
-        for (int i = 0; i < n; i++) {
-            if (ta[i] != tb[i]) return Long.compare(ta[i], tb[i]);
-        }
-
-        return Integer.compare(ta.length, tb.length);
-    }
-
-    private static long[] segments(String version) {
-        String[] parts = version.split("[^0-9]+");
-        long[] numbers = new long[parts.length];
-        int count = 0;
-
-        for (String part : parts) {
-            if (part.isEmpty()) continue;
-            numbers[count++] = Long.parseLong(part);
-        }
-
-        if (count == numbers.length) return numbers;
-
-        long[] trimmed = new long[count];
-        System.arraycopy(numbers, 0, trimmed, 0, count);
-        return trimmed;
-    }
 
     private static SharedPreferences prefs(Application app) {
         return app.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
@@ -113,21 +71,35 @@ public final class UpdateChecker {
 
     private static final class Tracker implements Application.ActivityLifecycleCallbacks {
         private final Application app;
-        private final String patchesJsonUrl;
-        private final String installedVersion;
+        private final String revisionsUrl;
         private final String packageName;
 
         private final AtomicBoolean popupShown = new AtomicBoolean(false);
         private final AtomicBoolean checkStarted = new AtomicBoolean(false);
 
         private volatile Activity foregroundActivity;
-        private volatile String pendingVersion;
+        private volatile boolean updatePending;
 
-        Tracker(Application app, String patchesJsonUrl, String installedVersion, String packageName) {
+        Tracker(Application app, String revisionsUrl, String packageName) {
             this.app = app;
-            this.patchesJsonUrl = patchesJsonUrl;
-            this.installedVersion = installedVersion;
+            this.revisionsUrl = revisionsUrl;
             this.packageName = packageName;
+        }
+
+        static boolean updateAvailable(JSONObject baked, JSONObject catalog) {
+            Iterator<String> ids = baked.keys();
+            while (ids.hasNext()) {
+                String id = ids.next();
+                String bakedRevision = baked.optString(id, null);
+                String catalogRevision = catalog.optString(id, null);
+                if (catalogRevision != null && !catalogRevision.equals(bakedRevision)) {
+                    Log.i(TAG, "update available: " + id);
+                    return true;
+                }
+            }
+
+            Log.i(TAG, "applied patches are up to date");
+            return false;
         }
 
         private void startUpdateCheckOnce() {
@@ -140,55 +112,49 @@ public final class UpdateChecker {
 
         private void checkForUpdates() {
             try {
-                String newest = newestSupportedVersion();
-                if (newest == null) return;
+                if (!catalogHasUpdate()) return;
 
-                pendingVersion = newest;
+                updatePending = true;
                 showPopupIfReady();
             } catch (Throwable t) {
                 Log.w(TAG, "update check failed", t);
             }
         }
 
-        private String newestSupportedVersion() {
+        private boolean catalogHasUpdate() {
             try {
+                JSONObject baked = new JSONObject(readAsset(APPLIED_ASSET));
                 byte[] body = downloadBody();
-                if (body == null) return null;
+                if (body == null) return false;
 
-                JSONObject root = new JSONObject(new String(body, StandardCharsets.UTF_8));
-                JSONArray patches = latestPatches(root);
-                if (patches == null) return null;
-
-                Set<String> supported = declaredVersions(patches);
-                if (supported == null) {
-                    Log.i(TAG, "no patches entry for " + packageName);
-                    return null;
-                }
-                if (supported.isEmpty()) {
-                    Log.i(TAG, "all versions supported for " + packageName);
-                    return null;
+                JSONObject catalog = new JSONObject(new String(body, StandardCharsets.UTF_8)).optJSONObject("patches");
+                if (catalog == null) {
+                    Log.w(TAG, "revisions.json has no patches");
+                    return false;
                 }
 
-                String newest = null;
-                for (String version : supported) {
-                    if (newest == null || compareVersions(version, newest) > 0) newest = version;
-                }
-                if (newest == null || compareVersions(newest, installedVersion) <= 0) {
-                    Log.i(TAG, "no newer version for " + packageName + " " + installedVersion);
-                    return null;
-                }
-
-                return newest;
+                return updateAvailable(baked, catalog);
             } catch (Throwable t) {
-                Log.w(TAG, "patches.json fetch failed", t);
-                return null;
+                Log.w(TAG, "revisions check failed", t);
+                return false;
+            }
+        }
+
+        private String readAsset(String path) throws java.io.IOException {
+            try (InputStream in = app.getAssets().open(path); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+                byte[] buffer = new byte[8192];
+                int read;
+                while ((read = in.read(buffer)) != -1) {
+                    out.write(buffer, 0, read);
+                }
+                return out.toString(StandardCharsets.UTF_8);
             }
         }
 
         private byte[] downloadBody() {
             HttpURLConnection conn = null;
             try {
-                conn = (HttpURLConnection) new URL(patchesJsonUrl).openConnection();
+                conn = (HttpURLConnection) new URL(revisionsUrl).openConnection();
                 conn.setConnectTimeout(TIMEOUT_MILLIS);
                 conn.setReadTimeout(TIMEOUT_MILLIS);
                 conn.setRequestProperty("User-Agent", "Mozilla/5.0");
@@ -196,7 +162,7 @@ public final class UpdateChecker {
 
                 int code = conn.getResponseCode();
                 if (code != HttpURLConnection.HTTP_OK) {
-                    Log.w(TAG, "patches.json HTTP " + code);
+                    Log.w(TAG, "revisions.json HTTP " + code);
                     return null;
                 }
 
@@ -208,7 +174,7 @@ public final class UpdateChecker {
                     while ((read = in.read(buffer)) != -1) {
                         total += read;
                         if (total > MAX_BODY_BYTES) {
-                            Log.w(TAG, "patches.json body too large");
+                            Log.w(TAG, "revisions.json body too large");
                             return null;
                         }
                         out.write(buffer, 0, read);
@@ -217,7 +183,7 @@ public final class UpdateChecker {
                     return out.toByteArray();
                 }
             } catch (Throwable t) {
-                Log.w(TAG, "patches.json fetch failed", t);
+                Log.w(TAG, "revisions.json fetch failed", t);
                 return null;
             } finally {
                 if (conn != null) {
@@ -226,56 +192,10 @@ public final class UpdateChecker {
             }
         }
 
-        private JSONArray latestPatches(JSONObject root) {
-            JSONArray releases = root.optJSONArray("releases");
-            if (releases == null || releases.length() == 0) {
-                Log.w(TAG, "patches.json has no releases");
-                return null;
-            }
-
-            JSONArray patches = releases.optJSONObject(0).optJSONArray("patches");
-            if (patches == null) {
-                Log.w(TAG, "patches.json release has no patches");
-            }
-            return patches;
-        }
-
-        // Null when the package is not declared at all; empty means every version is supported.
-        private Set<String> declaredVersions(JSONArray patches) {
-            Set<String> supported = new HashSet<>();
-            boolean declared = false;
-
-            for (int i = 0; i < patches.length(); i++) {
-                JSONObject compat = patches.optJSONObject(i).optJSONObject("compatibility");
-                if (compat == null || !"packages".equals(compat.optString("kind", null))) continue;
-
-                JSONArray packages = compat.optJSONArray("packages");
-                if (packages == null) continue;
-
-                for (int j = 0; j < packages.length(); j++) {
-                    JSONObject entry = packages.optJSONObject(j);
-                    if (entry == null || !packageName.equals(entry.optString("package", null)))
-                        continue;
-
-                    declared = true;
-                    JSONArray versions = entry.optJSONArray("versions");
-                    if (versions == null) continue;
-
-                    for (int k = 0; k < versions.length(); k++) {
-                        String version = versions.optString(k, null);
-                        if (version == null || version.isEmpty()) continue;
-                        supported.add(version);
-                    }
-                }
-            }
-
-            return declared ? supported : null;
-        }
-
         private void showPopupIfReady() {
             Activity activity = foregroundActivity;
 
-            if (activity == null || pendingVersion == null || !popupShown.compareAndSet(false, true))
+            if (activity == null || !updatePending || !popupShown.compareAndSet(false, true))
                 return;
 
             try {
@@ -292,29 +212,35 @@ public final class UpdateChecker {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1 && activity.isDestroyed())
                     return;
 
-                String newest = pendingVersion;
-                String message = "There's a newer version of " + packageName + " available for patching (latest: " + newest + ", installed: " + installedVersion + ").";
+                new ReseamDialog.Builder(activity).overtext("Reseam").title("New patchable app version").appIdentity(appIcon(), appLabel(), packageName).negativeButton("NEVER SHOW AGAIN", (dialog, which) -> {
+                    prefs(app).edit().putBoolean(KEY_NEVER, true).apply();
+                    dialog.dismiss();
+                }).positiveButton("OK", (dialog, which) -> {
+                    prefs(app).edit().putLong(KEY_SNOOZE_UNTIL, System.currentTimeMillis() + SNOOZE_MILLIS).apply();
+                    dialog.dismiss();
+                }).show();
 
-                // @formatter:off
-                new AlertDialog.Builder(activity)
-                        .setTitle("Update available")
-                        .setMessage(message)
-                        .setCancelable(true)
-                        .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
-                        .setNeutralButton("Remind me later", (dialog, which) -> {
-                            prefs(app).edit().putLong(KEY_SNOOZE_UNTIL, System.currentTimeMillis() + SNOOZE_MILLIS).apply();
-                            dialog.dismiss();
-                        })
-                        .setNegativeButton("Never show again", (dialog, which) -> {
-                            prefs(app).edit().putBoolean(KEY_NEVER, true).apply();
-                            dialog.dismiss();
-                        })
-                        .show();
-                // @formatter:on
-
-                Log.i(TAG, "showing update popup: newer version available for " + packageName + " (latest: " + newest + ", installed: " + installedVersion + ")");
+                Log.i(TAG, "showing update popup for " + packageName);
             } catch (Throwable t) {
                 Log.w(TAG, "popup failed", t);
+            }
+        }
+
+        private String appLabel() {
+            try {
+                android.content.pm.PackageManager manager = app.getPackageManager();
+                android.content.pm.ApplicationInfo info = manager.getApplicationInfo(packageName, 0);
+                return String.valueOf(manager.getApplicationLabel(info));
+            } catch (Throwable t) {
+                return packageName;
+            }
+        }
+
+        private android.graphics.drawable.Drawable appIcon() {
+            try {
+                return app.getPackageManager().getApplicationIcon(packageName);
+            } catch (Throwable t) {
+                return null;
             }
         }
 
@@ -330,7 +256,7 @@ public final class UpdateChecker {
         public void onActivityResumed(Activity activity) {
             foregroundActivity = activity;
 
-            if (pendingVersion == null) {
+            if (!updatePending) {
                 startUpdateCheckOnce();
                 return;
             }

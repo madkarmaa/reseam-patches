@@ -3,6 +3,7 @@
 package top.madkarma.patches.niagara
 
 import app.reseam.patch.*
+import top.madkarma.revisions.recordedPatch
 
 // Holder of the notification-channel diagnostics card. Found through the
 // remote-config key it reads ("channel_multiplier"); the class builds a home
@@ -21,7 +22,7 @@ private val channelCardGate = method("channel card gate") {
     returns(Type.Boolean)
 }
 
-val bugFixes = patch("Bug fixes") {
+val bugFixes = recordedPatch("Bug fixes") {
     description("Fixes various app bugs.")
     compatibleWith("bitpit.launcher")
 
@@ -32,5 +33,6 @@ val bugFixes = patch("Bug fixes") {
         log.info("Channel hash card suppressed via ${channelCardGate.descriptor}.")
 
         // Future bug fixes go here.
+
     }
 }

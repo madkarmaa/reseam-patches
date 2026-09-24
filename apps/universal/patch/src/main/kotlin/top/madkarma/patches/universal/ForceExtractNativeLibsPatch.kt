@@ -2,9 +2,9 @@
 
 package top.madkarma.patches.universal
 
-import app.reseam.patch.patch
+import top.madkarma.revisions.recordedPatch
 
-val forceExtractNativeLibs = patch("Force extract native libs") {
+val forceExtractNativeLibs = recordedPatch("Force extract native libs") {
     description("Sets android:extractNativeLibs to true when it is false.")
     enabledByDefault(true)
 
@@ -24,5 +24,6 @@ val forceExtractNativeLibs = patch("Force extract native libs") {
                 else -> log.info("ExtractNativeLibs: unexpected value, skipped.")
             }
         }
+
     }
 }

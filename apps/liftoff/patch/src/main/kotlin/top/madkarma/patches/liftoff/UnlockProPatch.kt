@@ -3,6 +3,7 @@
 package top.madkarma.patches.liftoff
 
 import app.reseam.patch.*
+import top.madkarma.revisions.recordedPatch
 
 // Liftoff (com.gymbros.app) is an Expo app with no app-owned isPro flag in
 // smali. Pro gating lives in the billing stack: RevenueCat entitlements
@@ -43,7 +44,7 @@ object ProEntitlements : ExtClass("top.madkarma.liftoff.extensions.ProEntitlemen
     val proActiveEntriesMap = static("proActiveEntriesMap", "java.util.Map")
 }
 
-val unlockPro = patch("Unlock Pro") {
+val unlockPro = recordedPatch("Unlock Pro") {
     description("Unlocks Pro features.")
     compatibleWith("com.gymbros.app"("2.16.0"))
 
@@ -101,5 +102,6 @@ val unlockPro = patch("Unlock Pro") {
             )
         }
         log.info("Pro: Superwall Entitlements.getActive pinned to synthetic set.")
+
     }
 }

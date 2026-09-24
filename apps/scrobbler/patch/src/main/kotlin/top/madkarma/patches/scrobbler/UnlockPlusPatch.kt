@@ -8,7 +8,7 @@ import app.reseam.patch.klass
 import app.reseam.patch.native.FieldRef
 import app.reseam.patch.native.Instruction
 import app.reseam.patch.native.RegFieldInsn
-import app.reseam.patch.patch
+import top.madkarma.revisions.recordedPatch
 
 // LicenseState enum: UNKNOWN (initial), NO_LICENSE (receipt missing or rejected), VALID (licensed).
 val licenseStateEnum = klass("license state enum") {
@@ -72,7 +72,7 @@ private fun promoteToValid(
     return promoted
 }
 
-val unlockPlus = patch("Unlock Plus") {
+val unlockPlus = recordedPatch("Unlock Plus") {
     description("Unlocks Plus-only features.")
     compatibleWith("com.arn.scrobble")
 
@@ -90,5 +90,6 @@ val unlockPlus = patch("Unlock Plus") {
         if (promoted == 0) error("Unlock Plus: no NO_LICENSE loads found")
 
         log.info("Plus: promoted $promoted NO_LICENSE load(s) to VALID ($enumDesc).")
+
     }
 }

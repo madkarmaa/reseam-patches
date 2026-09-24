@@ -4,7 +4,7 @@ package top.madkarma.patches.alltrails
 
 import app.reseam.patch.klass
 import app.reseam.patch.method
-import app.reseam.patch.patch
+import top.madkarma.revisions.recordedPatch
 
 // Backend user model (Gson User.java): toString keys plus @SerializedName
 // keys pin it; the kept getter names resolve off the found class.
@@ -24,7 +24,7 @@ val userSubscriptionTier = method("user subscription tier") {
     name("getSubscriptionTier")
 }
 
-val unlockPeak = patch("Unlock Peak") {
+val unlockPeak = recordedPatch("Unlock Peak") {
     description("Unlocks Peak-only features.")
     compatibleWith("com.alltrails.alltrails")
 

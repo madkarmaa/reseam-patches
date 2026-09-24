@@ -5,8 +5,8 @@ package top.madkarma.patches.droplert.premium
 import app.reseam.patch.Type
 import app.reseam.patch.invoke
 import app.reseam.patch.method
-import app.reseam.patch.patch
 import top.madkarma.patches.universal.removePairip
+import top.madkarma.revisions.recordedPatch
 
 val customerInfoIsPremiumActive = method("customer premium active") {
     returns(Type.Boolean)
@@ -30,7 +30,7 @@ val cachedStatusLoader = method("cached premium status loader") {
     strings("Failed to load cached premium status")
 }
 
-val unlockPremiumLegacy = patch("Unlock Lifetime Premium") {
+val unlockPremiumLegacy = recordedPatch("Unlock Lifetime Premium") {
     description("Unlocks Premium-only features.")
     compatibleWith("com.shahzaman.pricetracker"("2.2.1", "2.4.0"))
     dependsOn(removePairip)
@@ -47,5 +47,6 @@ val unlockPremiumLegacy = patch("Unlock Lifetime Premium") {
         if (!swapFreeToPremium(cachedStatusLoader, premiumField)) {
             error("Premium: cached loader writes no FREE state")
         }
+
     }
 }

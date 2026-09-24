@@ -5,8 +5,8 @@ package top.madkarma.patches.droplert.premium
 import app.reseam.patch.Type
 import app.reseam.patch.invoke
 import app.reseam.patch.method
-import app.reseam.patch.patch
 import top.madkarma.patches.universal.removePairip
+import top.madkarma.revisions.recordedPatch
 
 // 2.4.1 turned the premium checks into suspend functions (continuation
 // param, Object return), so the direct Boolean forms are gone there.
@@ -28,7 +28,7 @@ val cachedStatusLoaderSuspend = method("cached premium status loader (suspend)")
     strings("Failed to load cached premium status")
 }
 
-val unlockPremiumSuspend = patch("Unlock Lifetime Premium") {
+val unlockPremiumSuspend = recordedPatch("Unlock Lifetime Premium") {
     description("Unlocks Premium-only features.")
     compatibleWith("com.shahzaman.pricetracker"("2.4.1", "2.5.0"))
     dependsOn(removePairip)
@@ -43,5 +43,6 @@ val unlockPremiumSuspend = patch("Unlock Lifetime Premium") {
         if (!swapFreeToPremium(cachedStatusLoaderSuspend, premiumField)) {
             error("Premium: cached loader writes no FREE state")
         }
+
     }
 }

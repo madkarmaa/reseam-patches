@@ -4,9 +4,9 @@ package top.madkarma.patches.niagara
 
 import app.reseam.patch.after
 import app.reseam.patch.appEntry
-import app.reseam.patch.patch
+import top.madkarma.revisions.recordedPatch
 
-val skipIntro = patch("Skip intro") {
+val skipIntro = recordedPatch("Skip intro") {
     description("Skips the promo and terms screens, landing directly on setup.")
     compatibleWith("bitpit.launcher")
 
@@ -36,5 +36,6 @@ val skipIntro = patch("Skip intro") {
                 call(NiagaraSetup.skipToFavoritesSetup, thisObject)
             }
         }
+
     }
 }

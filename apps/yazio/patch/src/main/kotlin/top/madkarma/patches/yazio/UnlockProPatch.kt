@@ -3,6 +3,7 @@
 package top.madkarma.patches.yazio
 
 import app.reseam.patch.*
+import top.madkarma.revisions.recordedPatch
 
 private const val PREMIUM_TYPE = "yazio.user.api.PremiumType"
 private const val STORE_PREMIUM_STATUS = "yazio.payment.api.subscription.StorePremiumStatus"
@@ -36,7 +37,7 @@ private val storePremiumStatus = method("store premium status") {
 // Account-screen row (Profile > gear > Account).
 private const val SUBSCRIPTION_LABEL_KEY = "user.settings.label.subscription"
 
-val unlockPro = patch("Unlock Pro") {
+val unlockPro = recordedPatch("Unlock Pro") {
     description("Unlocks Pro features and credits the patch on the Account screen.")
     compatibleWith("com.yazio.android")
 
@@ -87,5 +88,6 @@ val unlockPro = patch("Unlock Pro") {
             )
         }
         log.info("Pro: store status pinned to Pro in ${storePremiumStatus.descriptor}.")
+
     }
 }
