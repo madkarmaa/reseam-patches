@@ -33,7 +33,7 @@ val nativeAdPreloadsSuspend = adManagerClassSuspend.methods("native ad preloads 
 
 val disableAdsSuspend = recordedPatch("Disable ads") {
     description("Disables in-app ads")
-    compatibleWith("com.shahzaman.pricetracker"("2.5.0"))
+    compatibleWith("com.shahzaman.pricetracker"("2.5.0", "2.5.1"))
     dependsOn(removePairip)
 
     execute {
