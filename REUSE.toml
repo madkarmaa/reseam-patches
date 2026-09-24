@@ -10,6 +10,7 @@ path = [
     "android-extension-module.gradle.kts",
     "apps/**",
     "shared/**",
+    "revisions-gradle-plugin/**",
     ".gitignore",
     "LICENSE",
 ]
