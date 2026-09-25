@@ -92,8 +92,8 @@ public final class UpdateChecker {
                 String id = ids.next();
                 String bakedRevision = baked.optString(id, null);
                 String catalogRevision = catalog.optString(id, null);
-                if (catalogRevision != null && !catalogRevision.equals(bakedRevision)) {
-                    Log.i(TAG, "update available: " + id);
+                if (catalogRevision == null || !catalogRevision.equals(bakedRevision)) {
+                    Log.i(TAG, "update available: " + id + (catalogRevision == null ? " (missing from catalog)" : ""));
                     return true;
                 }
             }
