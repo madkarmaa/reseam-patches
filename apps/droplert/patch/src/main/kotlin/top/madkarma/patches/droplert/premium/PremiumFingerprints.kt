@@ -10,6 +10,11 @@ object Prefs : ExtClass("top.madkarma.droplert.extensions.Prefs") {
     val putBoolean = static("putBoolean", Type.Context, Type.String, Type.Boolean)
 }
 
+val premiumLegacyVersions = setOf("2.2.1", "2.4.0")
+val premiumSuspendVersions = setOf("2.4.1", "2.5.0", "2.5.1")
+val tamperVersions = setOf("2.5.1")
+val supportedVersions = premiumLegacyVersions + premiumSuspendVersions + tamperVersions
+
 val CustomerInfo_getEntitlements =
     klass("com.revenuecat.purchases.CustomerInfo").method("getEntitlements")
 val EntitlementInfos_get = klass("com.revenuecat.purchases.EntitlementInfos").method("get")
@@ -43,6 +48,54 @@ val playPurchaseCallback = method("Play purchase result callback") {
 // Lifetime branch of the settings premium card
 val premiumCardStatus = method("premium card status text") {
     strings("All features unlocked")
+}
+
+// Direct Boolean premium check, gone once 2.4.1 made the checks suspend.
+val customerInfoIsPremiumActive = method("customer premium active") {
+    returns(Type.Boolean)
+    params("com.revenuecat.purchases.CustomerInfo")
+    calls(CustomerInfo_getEntitlements)
+    calls(EntitlementInfos_get)
+    calls(EntitlementInfo_isActive)
+}
+
+val unconfiguredFallback = method("RevenueCat unconfigured fallback") {
+    paramCount(3)
+    returns(Type.Object)
+    strings(
+        "RevenueCat network call failed, using cached status",
+    )
+}
+
+val cachedStatusLoader = method("cached premium status loader") {
+    paramCount(2)
+    returns(Type.Object)
+    strings("Failed to load cached premium status")
+}
+
+// 2.4.1 turned the premium checks into suspend functions (continuation
+// param, Object return), so the direct Boolean forms are gone there.
+
+// 2.4.1 turned the fallback into a suspend function (flag + continuation).
+// The string occurs in exactly one method per release, so it selects alone.
+val unconfiguredFallbackSuspend = method("RevenueCat unconfigured fallback (suspend)") {
+    strings(
+        "RevenueCat network call failed, using cached status",
+    )
+}
+
+// 2.4.1 turned the loader into a suspend function (continuation only).
+// Same single-method string as above.
+val cachedStatusLoaderSuspend = method("cached premium status loader (suspend)") {
+    strings("Failed to load cached premium status")
+}
+
+// 2.5.1 gates every per-product premium check behind this signature/
+// install-age check: certified build + older than ~3 days reads as
+// tampered, collapsing premium limits to FREE even with premium state on.
+// The string is unique app-wide, so nothing else is needed.
+val tamperCheck = method("signature/install-age tamper check") {
+    strings("layout_state")
 }
 
 private fun premiumFieldOf(updater: MethodTarget): FieldRef? {
@@ -84,7 +137,7 @@ fun swapFreeToPremium(
     return promoted > 0
 }
 
-// Shared body of both premium patches.
+// Shared body of the premium patch: version-independent gates.
 fun PatchRuntime.runUnlockPremium(): FieldRef {
     isPremium.method.alwaysReturn(true)
 
@@ -107,14 +160,12 @@ fun PatchRuntime.runUnlockPremium(): FieldRef {
     ) {
         error("Premium: settings card status text not found")
     }
-    log.info("Premium: settings card tagged.")
 
     appEntry.before {
         call(
             Prefs.putBoolean, thisObject, string("has_seen_paywall"), bool(true)
         )
     }
-    log.info("Premium: paywall dismissed.")
 
     return premiumField
 }

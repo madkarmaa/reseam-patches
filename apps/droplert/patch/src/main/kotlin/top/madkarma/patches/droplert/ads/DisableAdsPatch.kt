@@ -2,32 +2,28 @@
 
 package top.madkarma.patches.droplert.ads
 
-import app.reseam.patch.Type
 import app.reseam.patch.invoke
-import app.reseam.patch.method
 import top.madkarma.patches.universal.removePairip
 import top.madkarma.revisions.recordedPatch
 
-val nativeAdLoader = method("native ad loader") {
-    paramCount(3)
-    strings("Failed to build AdLoader.")
-}
-
-val nativeAdPreload = method("native ad preload") {
-    returns(Type.Void)
-    calls(nativeAdLoader)
-}
-
 val disableAds = recordedPatch("Disable ads") {
     description("Disables in-app ads")
-    compatibleWith("com.shahzaman.pricetracker"("2.2.1", "2.4.0", "2.4.1"))
+    compatibleWith("com.shahzaman.pricetracker"(*supportedVersions.toTypedArray()))
     dependsOn(removePairip)
 
     execute {
-        runDisableAdsCommon()
-        nativeAdLoader.method.alwaysReturn()
-        nativeAdPreload.method.alwaysReturn()
-        log.info("Ads: neutralized native, rewarded, and interstitial entry points.")
+        val version = manifest.versionName
 
+        runDisableAdsCommon()
+
+        if (version in adsLegacyVersions) {
+            nativeAdLoader.method.alwaysReturn()
+            nativeAdPreload.method.alwaysReturn()
+        }
+
+        if (version in adsSuspendVersions) {
+            nativeAdLoaderSuspend.method.alwaysReturnNull()
+            nativeAdPreloadsSuspend.forEach { method.alwaysReturn() }
+        }
     }
 }
