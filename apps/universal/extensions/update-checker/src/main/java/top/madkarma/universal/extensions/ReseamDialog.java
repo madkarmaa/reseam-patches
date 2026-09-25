@@ -16,11 +16,7 @@ import android.text.style.ForegroundColorSpan;
 import android.text.style.TypefaceSpan;
 import android.text.style.UnderlineSpan;
 import android.util.TypedValue;
-import android.view.Gravity;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewOutlineProvider;
-import android.view.Window;
+import android.view.*;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -80,37 +76,8 @@ public final class ReseamDialog extends Dialog {
     }
 
     /**
-     * Mixed plain, accented-underlined, and monospace segments for one description line.
+     * Loads the native vector resources installed by the update-checker patch.
      */
-    public static final class RichText {
-        private final SpannableStringBuilder builder = new SpannableStringBuilder();
-
-        public RichText text(String text) {
-            builder.append(text);
-            return this;
-        }
-
-        public RichText highlight(String text, int color) {
-            int start = builder.length();
-            builder.append(text);
-            builder.setSpan(new ForegroundColorSpan(color), start, builder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            builder.setSpan(new UnderlineSpan(), start, builder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            return this;
-        }
-
-        public RichText mono(String text) {
-            int start = builder.length();
-            builder.append(text);
-            builder.setSpan(new TypefaceSpan("monospace"), start, builder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            return this;
-        }
-
-        public CharSequence build() {
-            return builder;
-        }
-    }
-
-    /** Loads the native vector resources installed by the update-checker patch. */
     public Drawable logo() {
         return drawable("reseam_logo");
     }
@@ -130,85 +97,6 @@ public final class ReseamDialog extends Dialog {
         return context.getDrawable(resourceId).mutate();
     }
 
-    public static final class Builder {
-        private final Context context;
-        private int themeColor = PRIMARY;
-        private Drawable overtextIcon;
-        private String overtext;
-        private String title;
-        private CharSequence description;
-        private Drawable appIcon;
-        private String appTitle;
-        private String appSubtitle;
-        private String oldVersion;
-        private String newVersion;
-        private String negativeText;
-        private DialogInterface.OnClickListener negativeListener;
-        private String positiveText;
-        private DialogInterface.OnClickListener positiveListener;
-
-        public Builder(Context context) {
-            this.context = context;
-        }
-
-        public Builder themeColor(int themeColor) {
-            this.themeColor = themeColor;
-            return this;
-        }
-
-        public Builder overtext(Drawable icon, String overtext) {
-            this.overtextIcon = icon;
-            this.overtext = overtext;
-            return this;
-        }
-
-        public Builder overtext(String overtext) {
-            this.overtext = overtext;
-            return this;
-        }
-
-        public Builder title(String title) {
-            this.title = title;
-            return this;
-        }
-
-        public Builder description(CharSequence description) {
-            this.description = description;
-            return this;
-        }
-
-        public Builder appIdentity(Drawable icon, String title, String subtitle) {
-            this.appIcon = icon;
-            this.appTitle = title;
-            this.appSubtitle = subtitle;
-            return this;
-        }
-
-        public Builder versions(String oldVersion, String newVersion) {
-            this.oldVersion = oldVersion;
-            this.newVersion = newVersion;
-            return this;
-        }
-
-        public Builder negativeButton(String text, DialogInterface.OnClickListener listener) {
-            this.negativeText = text;
-            this.negativeListener = listener;
-            return this;
-        }
-
-        public Builder positiveButton(String text, DialogInterface.OnClickListener listener) {
-            this.positiveText = text;
-            this.positiveListener = listener;
-            return this;
-        }
-
-        public ReseamDialog show() {
-            ReseamDialog dialog = new ReseamDialog(context, this);
-            dialog.show();
-            return dialog;
-        }
-    }
-
     private LinearLayout content() {
         LinearLayout root = vertical();
         root.setPadding(dp(PADDING_DP), dp(PADDING_DP), dp(PADDING_DP), dp(BOTTOM_PADDING_DP));
@@ -216,8 +104,10 @@ public final class ReseamDialog extends Dialog {
 
         LinearLayout textSection = textSection();
         if (textSection.getChildCount() > 0) addSpaced(root, textSection, SECTION_GAP_DP);
-        if (options.oldVersion != null && options.newVersion != null) addSpaced(root, versionsRow(), SECTION_GAP_DP);
-        if (options.negativeText != null || options.positiveText != null) addSpaced(root, actionsRow(), SECTION_GAP_DP);
+        if (options.oldVersion != null && options.newVersion != null)
+            addSpaced(root, versionsRow(), SECTION_GAP_DP);
+        if (options.negativeText != null || options.positiveText != null)
+            addSpaced(root, actionsRow(), SECTION_GAP_DP);
 
         LinearLayout frame = vertical();
         frame.setPadding(dp(PADDING_DP), 0, dp(PADDING_DP), 0);
@@ -400,5 +290,115 @@ public final class ReseamDialog extends Dialog {
         LinearLayout layout = new LinearLayout(context);
         layout.setOrientation(LinearLayout.VERTICAL);
         return layout;
+    }
+
+    /**
+     * Mixed plain, accented-underlined, and monospace segments for one description line.
+     */
+    public static final class RichText {
+        private final SpannableStringBuilder builder = new SpannableStringBuilder();
+
+        public RichText text(String text) {
+            builder.append(text);
+            return this;
+        }
+
+        public RichText highlight(String text, int color) {
+            int start = builder.length();
+            builder.append(text);
+            builder.setSpan(new ForegroundColorSpan(color), start, builder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            builder.setSpan(new UnderlineSpan(), start, builder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            return this;
+        }
+
+        public RichText mono(String text) {
+            int start = builder.length();
+            builder.append(text);
+            builder.setSpan(new TypefaceSpan("monospace"), start, builder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            return this;
+        }
+
+        public CharSequence build() {
+            return builder;
+        }
+    }
+
+    public static final class Builder {
+        private final Context context;
+        private int themeColor = PRIMARY;
+        private Drawable overtextIcon;
+        private String overtext;
+        private String title;
+        private CharSequence description;
+        private Drawable appIcon;
+        private String appTitle;
+        private String appSubtitle;
+        private String oldVersion;
+        private String newVersion;
+        private String negativeText;
+        private DialogInterface.OnClickListener negativeListener;
+        private String positiveText;
+        private DialogInterface.OnClickListener positiveListener;
+
+        public Builder(Context context) {
+            this.context = context;
+        }
+
+        public Builder themeColor(int themeColor) {
+            this.themeColor = themeColor;
+            return this;
+        }
+
+        public Builder overtext(Drawable icon, String overtext) {
+            this.overtextIcon = icon;
+            this.overtext = overtext;
+            return this;
+        }
+
+        public Builder overtext(String overtext) {
+            this.overtext = overtext;
+            return this;
+        }
+
+        public Builder title(String title) {
+            this.title = title;
+            return this;
+        }
+
+        public Builder description(CharSequence description) {
+            this.description = description;
+            return this;
+        }
+
+        public Builder appIdentity(Drawable icon, String title, String subtitle) {
+            this.appIcon = icon;
+            this.appTitle = title;
+            this.appSubtitle = subtitle;
+            return this;
+        }
+
+        public Builder versions(String oldVersion, String newVersion) {
+            this.oldVersion = oldVersion;
+            this.newVersion = newVersion;
+            return this;
+        }
+
+        public Builder negativeButton(String text, DialogInterface.OnClickListener listener) {
+            this.negativeText = text;
+            this.negativeListener = listener;
+            return this;
+        }
+
+        public Builder positiveButton(String text, DialogInterface.OnClickListener listener) {
+            this.positiveText = text;
+            this.positiveListener = listener;
+            return this;
+        }
+
+        public ReseamDialog show() {
+            ReseamDialog dialog = new ReseamDialog(context, this);
+            dialog.show();
+            return dialog;
+        }
     }
 }
