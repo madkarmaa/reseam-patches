@@ -76,6 +76,26 @@ public class SignatureKiller {
 
         String spoofed = shortSig(Base64.decode(base64Sig, Base64.DEFAULT));
         Log.i(TAG, "checkSignatures: " + packageName + " real=" + real + " spoofed=" + spoofed + (real.equals(spoofed) ? " SAME" : " DIFFERENT"));
+        Log.i(TAG, "checkSignatures: " + packageName + " history=" + historySig(context, packageName));
+    }
+
+    /**
+     * Short digest of the first certificate-history entry (entry count
+     * appended), as the app would read it right now: unspoofed before {@link
+     * #killSignature}, spoofed after.
+     */
+    private static String historySig(Context context, String packageName) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+            return "n/a (pre-P)";
+        }
+
+        try {
+            PackageInfo info = context.getPackageManager().getPackageInfo(packageName, PackageManager.GET_SIGNING_CERTIFICATES);
+            Signature[] history = info.signingInfo != null ? info.signingInfo.getSigningCertificateHistory() : null;
+            return history != null && history.length > 0 ? shortSig(history[0].toByteArray()) + " x" + history.length : "none";
+        } catch (PackageManager.NameNotFoundException | RuntimeException e) {
+            return "unavailable (" + e + ")";
+        }
     }
 
     // GET_SIGNATURES is the only API on pre-P devices.

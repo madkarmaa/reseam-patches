@@ -2,7 +2,10 @@
 
 package top.madkarma.patches.universal
 
-import app.reseam.patch.*
+import app.reseam.patch.ExtClass
+import app.reseam.patch.Type
+import app.reseam.patch.appEntry
+import app.reseam.patch.before
 import top.madkarma.revisions.recordedPatch
 import java.util.*
 
@@ -47,6 +50,9 @@ val bypassSignatureChecks = recordedPatch("Bypass signature checks") {
             )
             call(
                 SignatureKiller.killSignature, string(packageName), string(base64Sig)
+            )
+            call(
+                SignatureKiller.checkSignatures, thisObject, string(packageName), string(base64Sig)
             )
         }
 
