@@ -46,7 +46,7 @@ object ProEntitlements : ExtClass("top.madkarma.liftoff.extensions.ProEntitlemen
 
 val unlockPro = recordedPatch("Unlock Pro") {
     description("Unlocks Pro features.")
-    compatibleWith("com.gymbros.app"("2.16.0"))
+    compatibleWith("com.gymbros.app")
 
     execute {
         revenueCatEntitlementIsActive.method.alwaysReturn(true)
