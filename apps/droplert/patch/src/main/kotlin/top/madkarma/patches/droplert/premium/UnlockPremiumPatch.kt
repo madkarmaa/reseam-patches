@@ -3,6 +3,7 @@
 package top.madkarma.patches.droplert.premium
 
 import app.reseam.patch.invoke
+import top.madkarma.patches.shared.isPresent
 import top.madkarma.patches.universal.removePairip
 import top.madkarma.revisions.recordedPatch
 
@@ -12,34 +13,40 @@ val unlockPremium = recordedPatch("Unlock Lifetime Premium") {
     dependsOn(removePairip)
 
     execute {
-        val version = manifest.versionName
-
-        if (version in premiumLegacyVersions) {
-            customerInfoIsPremiumActive.method.alwaysReturn(true)
-        }
-
         val premiumField = runUnlockPremium()
 
-        if (version in premiumLegacyVersions) {
-            if (!swapFreeToPremium(unconfiguredFallback, premiumField)) {
-                error("Premium: unconfigured fallback writes no FREE state")
-            }
-            if (!swapFreeToPremium(cachedStatusLoader, premiumField)) {
-                error("Premium: cached loader writes no FREE state")
-            }
+        var patchedVariants = 0
+
+        if (isPresent(customerInfoIsPremiumActive)) {
+            customerInfoIsPremiumActive.method.alwaysReturn(true)
+            patchedVariants++
         }
 
-        if (version in premiumSuspendVersions) {
-            if (!swapFreeToPremium(unconfiguredFallbackSuspend, premiumField)) {
-                error("Premium: unconfigured fallback writes no FREE state")
+        val fallbacks = unconfiguredFallbacks.all
+        val loaders = cachedStatusLoaders.all
+
+        if (fallbacks.isNotEmpty() || loaders.isNotEmpty()) {
+            fallbacks.forEach {
+                if (!swapFreeToPremium(
+                        it, premiumField
+                    )
+                ) error("Premium: unconfigured fallback writes no FREE state (${it.descriptor})")
             }
-            if (!swapFreeToPremium(cachedStatusLoaderSuspend, premiumField)) {
-                error("Premium: cached loader writes no FREE state")
+
+            loaders.forEach {
+                if (!swapFreeToPremium(
+                        it, premiumField
+                    )
+                ) error("Premium: cached loader writes no FREE state (${it.descriptor})")
             }
+
+            patchedVariants++
         }
 
-        if (version in tamperVersions) {
+        if (isPresent(tamperCheck)) {
             tamperCheck.method.alwaysReturn(false)
         }
+
+        if (patchedVariants == 0) error("Premium: unsupported app version")
     }
 }

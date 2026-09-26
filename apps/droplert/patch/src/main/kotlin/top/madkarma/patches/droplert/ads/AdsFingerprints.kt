@@ -3,8 +3,9 @@ package top.madkarma.patches.droplert.ads
 import app.reseam.patch.*
 
 // Interstitial, rewarded, and the native composable kept their shapes
-// across the 2.5.0 coroutine refactor, so both disable-ads variants
-// share these targets.
+// across the coroutine refactor, so every disable-ads variant shares
+// these targets. Loader variants below are applied by availability:
+// whichever shapes exist in the app get patched.
 
 val adsLegacyVersions = setOf("2.2.1", "2.4.0", "2.4.1")
 val adsSuspendVersions = setOf("2.5.0", "2.5.1")
@@ -34,8 +35,10 @@ val nativeAdPreload = method("native ad preload") {
     calls(nativeAdLoader)
 }
 
-// 2.5.0 moved native ad loading into a coroutine (continuation param,
-// Object return), so the direct 3-param loader form is gone there.
+// The coroutine refactor moved native ad loading into a suspend function
+// (continuation param, Object return), so the direct 3-param loader form
+// is gone there. The loader queries match only their own shape, so
+// existence selects the right variant.
 
 // The only AdLoader-string method returning Object here is the coroutine
 // body (the dispatcher and SDK paths return Void), so the return type

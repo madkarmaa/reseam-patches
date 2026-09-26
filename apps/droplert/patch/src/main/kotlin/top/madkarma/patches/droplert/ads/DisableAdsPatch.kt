@@ -3,6 +3,7 @@
 package top.madkarma.patches.droplert.ads
 
 import app.reseam.patch.invoke
+import top.madkarma.patches.shared.isPresent
 import top.madkarma.patches.universal.removePairip
 import top.madkarma.revisions.recordedPatch
 
@@ -12,18 +13,16 @@ val disableAds = recordedPatch("Disable ads") {
     dependsOn(removePairip)
 
     execute {
-        val version = manifest.versionName
-
         runDisableAdsCommon()
 
-        if (version in adsLegacyVersions) {
+        if (isPresent(nativeAdLoader)) {
             nativeAdLoader.method.alwaysReturn()
             nativeAdPreload.method.alwaysReturn()
-        }
-
-        if (version in adsSuspendVersions) {
+        } else if (isPresent(nativeAdLoaderSuspend)) {
             nativeAdLoaderSuspend.method.alwaysReturnNull()
             nativeAdPreloadsSuspend.forEach { method.alwaysReturn() }
+        } else {
+            error("Ads: unsupported app version")
         }
     }
 }

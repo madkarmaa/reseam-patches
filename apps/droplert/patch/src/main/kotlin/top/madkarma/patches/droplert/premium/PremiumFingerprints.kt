@@ -15,6 +15,9 @@ val premiumSuspendVersions = setOf("2.4.1", "2.5.0", "2.5.1")
 val tamperVersions = setOf("2.5.1")
 val supportedVersions = premiumLegacyVersions + premiumSuspendVersions + tamperVersions
 
+// Variant targets below are applied by availability: whichever shapes
+// exist in the app get patched.
+
 val CustomerInfo_getEntitlements =
     klass("com.revenuecat.purchases.CustomerInfo").method("getEntitlements")
 val EntitlementInfos_get = klass("com.revenuecat.purchases.EntitlementInfos").method("get")
@@ -50,7 +53,8 @@ val premiumCardStatus = method("premium card status text") {
     strings("All features unlocked")
 }
 
-// Direct Boolean premium check, gone once 2.4.1 made the checks suspend.
+// Direct Boolean premium check, gone once the checks became suspend.
+// Patched when present.
 val customerInfoIsPremiumActive = method("customer premium active") {
     returns(Type.Boolean)
     params("com.revenuecat.purchases.CustomerInfo")
@@ -59,41 +63,23 @@ val customerInfoIsPremiumActive = method("customer premium active") {
     calls(EntitlementInfo_isActive)
 }
 
-val unconfiguredFallback = method("RevenueCat unconfigured fallback") {
-    paramCount(3)
-    returns(Type.Object)
+// The fallback and loader strings each occur in exactly one method per
+// release, in both direct and suspend shapes, so one string-only query
+// selects whichever form the app carries.
+val unconfiguredFallbacks = methods("RevenueCat unconfigured fallback") {
     strings(
         "RevenueCat network call failed, using cached status",
     )
 }
 
-val cachedStatusLoader = method("cached premium status loader") {
-    paramCount(2)
-    returns(Type.Object)
+val cachedStatusLoaders = methods("cached premium status loader") {
     strings("Failed to load cached premium status")
 }
 
-// 2.4.1 turned the premium checks into suspend functions (continuation
-// param, Object return), so the direct Boolean forms are gone there.
-
-// 2.4.1 turned the fallback into a suspend function (flag + continuation).
-// The string occurs in exactly one method per release, so it selects alone.
-val unconfiguredFallbackSuspend = method("RevenueCat unconfigured fallback (suspend)") {
-    strings(
-        "RevenueCat network call failed, using cached status",
-    )
-}
-
-// 2.4.1 turned the loader into a suspend function (continuation only).
-// Same single-method string as above.
-val cachedStatusLoaderSuspend = method("cached premium status loader (suspend)") {
-    strings("Failed to load cached premium status")
-}
-
-// 2.5.1 gates every per-product premium check behind this signature/
-// install-age check: certified build + older than ~3 days reads as
-// tampered, collapsing premium limits to FREE even with premium state on.
-// The string is unique app-wide, so nothing else is needed.
+// Patched when present: gates per-product premium checks behind a
+// signature/install-age check, collapsing premium limits to FREE even
+// with premium state on. The string is unique app-wide, so nothing else
+// is needed.
 val tamperCheck = method("signature/install-age tamper check") {
     strings("layout_state")
 }
