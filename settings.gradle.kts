@@ -18,10 +18,14 @@ pluginManagement {
 }
 
 plugins {
-    id("app.reseam.workspace") version "0.12.0"
+    id("app.reseam.workspace") version "0.12.1"
 }
 
 rootProject.name = "madkarma-patches"
+
+// Shared patch helpers. Not an app or extension, so the workspace plugin
+// above ignores it; wired manually like any plain Gradle module.
+include("apps:shared")
 
 dependencyResolutionManagement {
     repositories {

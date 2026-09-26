@@ -15,7 +15,7 @@ permissions:
     issues: write
 
 env: # Must match the plugin version in settings.gradle.kts.
-    ENGINE_VERSION: v0.12.0
+    ENGINE_VERSION: v0.12.1
     RESEAM_BIN: engine/reseam-linux-x64
 
 jobs:
