@@ -10,15 +10,13 @@ pluginManagement {
         }
     }
 
-    includeBuild("revisions-gradle-plugin")
-
-    (System.getenv("RESEAM_WORKSPACE") ?: providers.gradleProperty("reseam.workspace").orNull)
-        ?.takeIf { it.isNotBlank() }
+    (System.getenv("RESEAM_WORKSPACE")
+        ?: providers.gradleProperty("reseam.workspace").orNull)?.takeIf { it.isNotBlank() }
         ?.let { includeBuild(it) }
 }
 
 plugins {
-    id("app.reseam.workspace") version "0.12.1"
+    id("app.reseam.workspace") version "0.13.0"
 }
 
 rootProject.name = "madkarma-patches"

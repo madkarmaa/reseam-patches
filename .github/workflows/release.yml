@@ -11,7 +11,7 @@ permissions:
     contents: write
 
 env: # Must match the plugin version in settings.gradle.kts.
-    ENGINE_VERSION: v0.12.1
+    ENGINE_VERSION: v0.13.0
     RESEAM_BIN: engine/reseam-linux-x64
 
 jobs:
@@ -20,6 +20,8 @@ jobs:
         steps:
             -   name: Checkout sources
                 uses: actions/checkout@v7
+                with:
+                    fetch-depth: 0
 
             -   name: Set up Java
                 uses: actions/setup-java@v6
@@ -51,14 +53,16 @@ jobs:
             -   name: Build and stage the release
                 env:
                     RESEAM_BUNDLE_KEY: ${{ github.workspace }}/bundle-signing.key
-                run: ./gradlew stageRelease -PreleaseTag=${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || format('v0.0.{0}', github.run_number) }} --no-daemon
+                    RELEASE_TAG: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || format('v0.0.{0}', github.run_number) }}
+                run: ./gradlew stageRelease "-PreleaseTag=$RELEASE_TAG" --no-daemon
 
             -   name: Upload to the GitHub release
                 if: startsWith(github.ref, 'refs/tags/')
                 env:
                     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                    RELEASE_TAG: ${{ github.ref_name }}
                 run: |
-                    if ! gh release view "${{ github.ref_name }}" >/dev/null 2>&1; then
-                      gh release create "${{ github.ref_name }}" --title "${{ github.ref_name }}" --notes ""
+                    if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+                       gh release create "$RELEASE_TAG" --title "$RELEASE_TAG" --notes ""
                     fi
-                    gh release upload "${{ github.ref_name }}" build/reseam/release/* --clobber
+                    gh release upload "$RELEASE_TAG" build/reseam/release/* --clobber
