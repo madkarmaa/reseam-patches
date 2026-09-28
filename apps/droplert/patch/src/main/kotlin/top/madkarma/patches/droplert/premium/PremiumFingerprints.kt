@@ -126,8 +126,10 @@ fun swapFreeToPremium(
 // Shared body of the premium patch: version-independent gates.
 fun PatchRuntime.runUnlockPremium(): FieldRef {
     isPremium.method.alwaysReturn(true)
+    log.info("Premium: ${isPremium.descriptor} forced true.")
 
     EntitlementInfo_isActive.method.alwaysReturn(true)
+    log.info("Premium: ${EntitlementInfo_isActive.descriptor} forced true.")
 
     val premiumField = premiumFieldOf(revenueCatStateUpdater)
         ?: error("Premium: RevenueCat state updater not found")
@@ -138,6 +140,7 @@ fun PatchRuntime.runUnlockPremium(): FieldRef {
     if (!swapFreeToPremium(playPurchaseCallback, premiumField)) {
         error("Premium: Play callback writes no FREE state")
     }
+    log.info("Premium: state updater and Play callback promoted to ${premiumField.definingClass}.")
 
     if (premiumCardStatus.replaceAllStrings(
             "All features unlocked",
@@ -146,12 +149,14 @@ fun PatchRuntime.runUnlockPremium(): FieldRef {
     ) {
         error("Premium: settings card status text not found")
     }
+    log.info("Premium: settings card status text tagged.")
 
-    appEntry.before {
+    appEntry {
         call(
-            Prefs.putBoolean, thisObject, string("has_seen_paywall"), bool(true)
+            Prefs.putBoolean, application, string("has_seen_paywall"), bool(true)
         )
     }
+    log.info("Premium: paywall marked seen at startup.")
 
     return premiumField
 }

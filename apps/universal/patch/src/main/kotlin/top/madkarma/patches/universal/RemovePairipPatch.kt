@@ -6,7 +6,7 @@ import app.reseam.patch.BytecodeScope
 import app.reseam.patch.dex.AccessFlags
 import app.reseam.patch.dex.DexClass
 import app.reseam.patch.dex.isSet
-import top.madkarma.revisions.recordedPatch
+import app.reseam.patch.patch
 
 private const val PAIRIP_DESCRIPTOR_PREFIX = "Lcom/pairip/"
 private const val SIGNATURE_CHECK = "com.pairip.SignatureCheck"
@@ -125,7 +125,7 @@ private fun spoofInstallerChecks(scope: BytecodeScope): Int {
     return (if (booleanDone) 1 else 0) + (if (stringDone) 1 else 0)
 }
 
-val removePairip = recordedPatch("Remove Pairip") {
+val removePairip = patch("Remove Pairip") {
     description(
         "Removes Pairip (Google Play automatic integrity protection). Optionally kills the Pairip VM. Does NOT bypass server-side Play Integrity attestation or pairipcore virtualization.",
     )
@@ -257,6 +257,5 @@ val removePairip = recordedPatch("Remove Pairip") {
         } else {
             log.info("Pairip: $patched method(s) neutralized.")
         }
-
     }
 }

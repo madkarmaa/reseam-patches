@@ -8,7 +8,7 @@ import app.reseam.patch.dex.AccessFlags
 import app.reseam.patch.dex.Opcode
 import app.reseam.patch.dex.isSet
 import app.reseam.patch.methods
-import top.madkarma.revisions.recordedPatch
+import app.reseam.patch.patch
 
 // Holds the entitlement state (all features unlocked when the first flag is true).
 // Several (Z,Z,Z) constructors store booleans; the genuine holder is the only
@@ -22,7 +22,7 @@ private val proCheckerCandidates = methods("pro checker constructor") {
     opcode(Opcode.IPUT_BOOLEAN)
 }
 
-val unlockPro = recordedPatch("Unlock Pro") {
+val unlockPro = patch("Unlock Pro") {
     description("Unlocks Pro features.")
     compatibleWith("bitpit.launcher")
 
@@ -44,6 +44,7 @@ val unlockPro = recordedPatch("Unlock Pro") {
         ) {
             error("Unlock Pro: purchase_pro_thank_you string not writable")
         }
+        log.info("Pro: thank-you label tagged.")
 
         log.info("Pro: unlocked via ${proCheckerConstructor.descriptor}.")
 

@@ -3,11 +3,11 @@
 package top.madkarma.patches.droplert.premium
 
 import app.reseam.patch.invoke
+import app.reseam.patch.patch
 import top.madkarma.patches.shared.isPresent
 import top.madkarma.patches.universal.removePairip
-import top.madkarma.revisions.recordedPatch
 
-val unlockPremium = recordedPatch("Unlock Lifetime Premium") {
+val unlockPremium = patch("Unlock Lifetime Premium") {
     description("Unlocks Premium-only features.")
     compatibleWith("com.shahzaman.pricetracker"(*supportedVersions.toTypedArray()))
     dependsOn(removePairip)
@@ -20,6 +20,7 @@ val unlockPremium = recordedPatch("Unlock Lifetime Premium") {
         if (isPresent(customerInfoIsPremiumActive)) {
             customerInfoIsPremiumActive.method.alwaysReturn(true)
             patchedVariants++
+            log.info("Premium: direct premium check patched.")
         }
 
         val fallbacks = unconfiguredFallbacks.all
@@ -41,10 +42,12 @@ val unlockPremium = recordedPatch("Unlock Lifetime Premium") {
             }
 
             patchedVariants++
+            log.info("Premium: patched ${fallbacks.size} fallback(s) and ${loaders.size} loader(s).")
         }
 
         if (isPresent(tamperCheck)) {
             tamperCheck.method.alwaysReturn(false)
+            log.info("Premium: tamper check patched.")
         }
 
         if (patchedVariants == 0) error("Premium: unsupported app version")

@@ -3,7 +3,6 @@
 package top.madkarma.patches.yazio
 
 import app.reseam.patch.*
-import top.madkarma.revisions.recordedPatch
 
 private const val PREMIUM_TYPE = "yazio.user.api.PremiumType"
 private const val STORE_PREMIUM_STATUS = "yazio.payment.api.subscription.StorePremiumStatus"
@@ -37,7 +36,7 @@ private val storePremiumStatus = method("store premium status") {
 // Account-screen row (Profile > gear > Account).
 private const val SUBSCRIPTION_LABEL_KEY = "user.settings.label.subscription"
 
-val unlockPro = recordedPatch("Unlock Pro") {
+val unlockPro = patch("Unlock Pro") {
     description("Unlocks Pro features and credits the patch on the Account screen.")
     compatibleWith("com.yazio.android")
 
@@ -45,7 +44,7 @@ val unlockPro = recordedPatch("Unlock Pro") {
         val label = resources.getString(SUBSCRIPTION_LABEL_KEY)
         check(
             resources.setString(
-                SUBSCRIPTION_LABEL_KEY, "Subscription patched with ❤ by MadKarma ;)"
+                SUBSCRIPTION_LABEL_KEY, "Patched with ❤ by MadKarma ;)"
             )
         ) { "Unlock Pro: failed to rewrite string $SUBSCRIPTION_LABEL_KEY" }
         log.info("Pro: account subscription label rewritten.")
@@ -53,7 +52,7 @@ val unlockPro = recordedPatch("Unlock Pro") {
         val gates = subscriptionGates.all
         check(gates.size == 2) { "Unlock Pro: expected 2 subscription gates, found ${gates.size}" }
         gates.forEach { it.alwaysReturn(true) }
-        log.info("Pro: forced ${gates.size} subscription gate(s) true.")
+        log.info("Pro: forced ${gates.size} subscription gate(s) true (${gates.joinToString { it.descriptor }}).")
 
         val premiumParams = userModelCtor.method.parameterTypes
         check(premiumParams.count { it == descriptor(PREMIUM_TYPE) } == 1) { "Unlock Pro: user model premium param not unique in ${userModelCtor.descriptor}" }
@@ -88,6 +87,5 @@ val unlockPro = recordedPatch("Unlock Pro") {
             )
         }
         log.info("Pro: store status pinned to Pro in ${storePremiumStatus.descriptor}.")
-
     }
 }

@@ -3,7 +3,6 @@
 package top.madkarma.patches.liftoff
 
 import app.reseam.patch.*
-import top.madkarma.revisions.recordedPatch
 
 // Liftoff (com.gymbros.app) is an Expo app with no app-owned isPro flag in
 // smali. Pro gating lives in the billing stack: RevenueCat entitlements
@@ -44,18 +43,18 @@ object ProEntitlements : ExtClass("top.madkarma.liftoff.extensions.ProEntitlemen
     val proActiveEntriesMap = static("proActiveEntriesMap", "java.util.Map")
 }
 
-val unlockPro = recordedPatch("Unlock Pro") {
+val unlockPro = patch("Unlock Pro") {
     description("Unlocks Pro features.")
     compatibleWith("com.gymbros.app")
 
     execute {
         revenueCatEntitlementIsActive.method.alwaysReturn(true)
-        log.info("Pro: RevenueCat EntitlementInfo.isActive forced true.")
+        log.info("Pro: RevenueCat EntitlementInfo.isActive forced true (${revenueCatEntitlementIsActive.descriptor}).")
 
         revenueCatEntitlementsMapper.after {
             call(ProEntitlements.proActiveEntriesMap, capture("result"))
         }
-        log.info("Pro: synthetic lifetime entitlement injected into mapped active+all sets.")
+        log.info("Pro: synthetic lifetime entitlement injected in ${revenueCatEntitlementsMapper.descriptor}.")
 
         // Pin the subscription-id set too, for length/subscription checks.
         revenueCatActiveSubscriptions.replace {
@@ -68,15 +67,15 @@ val unlockPro = recordedPatch("Unlock Pro") {
                 )
             )
         }
-        log.info("Pro: RevenueCat CustomerInfo.getActiveSubscriptions pinned.")
+        log.info("Pro: RevenueCat active subscriptions pinned in ${revenueCatActiveSubscriptions.descriptor}.")
 
         superwallEntitlementIsActive.method.alwaysReturn(true)
-        log.info("Pro: Superwall Entitlement.isActive forced true.")
+        log.info("Pro: Superwall Entitlement.isActive forced true (${superwallEntitlementIsActive.descriptor}).")
 
         // Base impl is `instance-of Active`; pinning true keeps every
         // subscription-status poll entitled.
         superwallSubscriptionStatusIsActive.method.alwaysReturn(true)
-        log.info("Pro: Superwall SubscriptionStatus.isActive forced true.")
+        log.info("Pro: Superwall SubscriptionStatus.isActive forced true (${superwallSubscriptionStatusIsActive.descriptor}).")
 
         // getAll() is empty for a never-purchased account, so aliasing
         // getActive to it stays empty and Superwall-side gates keep firing.
@@ -101,7 +100,6 @@ val unlockPro = recordedPatch("Unlock Pro") {
                 )
             )
         }
-        log.info("Pro: Superwall Entitlements.getActive pinned to synthetic set.")
-
+        log.info("Pro: Superwall active entitlements pinned in ${superwallActiveEntitlements.descriptor}.")
     }
 }

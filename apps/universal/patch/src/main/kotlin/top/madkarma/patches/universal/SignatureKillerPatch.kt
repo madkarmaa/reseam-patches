@@ -5,8 +5,7 @@ package top.madkarma.patches.universal
 import app.reseam.patch.ExtClass
 import app.reseam.patch.Type
 import app.reseam.patch.appEntry
-import app.reseam.patch.before
-import top.madkarma.revisions.recordedPatch
+import app.reseam.patch.patch
 import java.util.*
 
 object SignatureKiller : ExtClass("bin.mt.signature.SignatureKiller") {
@@ -19,7 +18,7 @@ private val NATIVE_ABIS = listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
 
 private val patchClassLoader = object {}.javaClass.classLoader
 
-val bypassSignatureChecks = recordedPatch("Bypass signature checks") {
+val bypassSignatureChecks = patch("Bypass signature checks") {
     description(
         "Spoofs the original app signature using ApkSignatureKillerEx.",
     )
@@ -44,15 +43,15 @@ val bypassSignatureChecks = recordedPatch("Bypass signature checks") {
         // One block so the diagnostic always runs before the spoof it measures
         // (killApkPath never touches PackageManager state, so its separate
         // block cannot disturb the reading whatever the emission order is).
-        appEntry.before {
+        appEntry {
             call(
-                SignatureKiller.checkSignatures, thisObject, string(packageName), string(base64Sig)
+                SignatureKiller.checkSignatures, application, string(packageName), string(base64Sig)
             )
             call(
                 SignatureKiller.killSignature, string(packageName), string(base64Sig)
             )
             call(
-                SignatureKiller.checkSignatures, thisObject, string(packageName), string(base64Sig)
+                SignatureKiller.checkSignatures, application, string(packageName), string(base64Sig)
             )
         }
 
@@ -68,9 +67,9 @@ val bypassSignatureChecks = recordedPatch("Bypass signature checks") {
                 files.write("lib/$abi/libSignatureKiller.so", bytes)
             }
 
-            appEntry.before {
+            appEntry {
                 call(
-                    SignatureKiller.killApkPath, thisObject, string(packageName)
+                    SignatureKiller.killApkPath, application, string(packageName)
                 )
             }
 
@@ -78,6 +77,5 @@ val bypassSignatureChecks = recordedPatch("Bypass signature checks") {
         } else {
             log.info("SignatureKiller: hooked $packageName (signature only, ${signers.size} signer(s)).")
         }
-
     }
 }

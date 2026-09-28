@@ -3,7 +3,6 @@
 package top.madkarma.patches.niagara
 
 import app.reseam.patch.*
-import top.madkarma.revisions.recordedPatch
 
 // Holder of the notification-channel diagnostics card. Found through the
 // remote-config key it reads ("channel_multiplier"); the class builds a home
@@ -22,7 +21,7 @@ private val channelCardGate = method("channel card gate") {
     returns(Type.Boolean)
 }
 
-val bugFixes = recordedPatch("Bug fixes") {
+val bugFixes = patch("Bug fixes") {
     description("Fixes various app bugs.")
     compatibleWith("bitpit.launcher")
 
@@ -30,9 +29,8 @@ val bugFixes = recordedPatch("Bug fixes") {
         // Broken diagnostics card showing an unreadable app hash dump instead
         // of a message after restoring a backup.
         channelCardGate.alwaysReturn(false)
-        log.info("Channel hash card suppressed via ${channelCardGate.descriptor}.")
+        log.info("Bug fixes: ${channelCardGate.descriptor} forced false.")
 
         // Future bug fixes go here.
-
     }
 }

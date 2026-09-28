@@ -65,6 +65,9 @@ val nativeAdPreloadsSuspend = adManagerClassSuspend.methods("native ad preloads 
 // Shared body of the disable-ads patch: version-independent loaders.
 fun PatchRuntime.runDisableAdsCommon() {
     interstitialLoader.method.alwaysReturn()
+    log.info("Ads: ${interstitialLoader.descriptor} disabled.")
     rewardedAdLoader.method.alwaysReturn()
+    log.info("Ads: ${rewardedAdLoader.descriptor} disabled.")
     nativeAdUi.method.alwaysReturn()
+    log.info("Ads: ${nativeAdUi.descriptor} disabled.")
 }
