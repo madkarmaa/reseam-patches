@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Usage:
-    check_app_updates.py [--dry-run] [--package <id>] [--channel stable]
+    compatibility_bump_notifier.py [--dry-run] [--package <id>] [--channel stable]
                          [--base-url https://sniff.madkarma.top]
                          [--patches-json build/reseam/patches.json]
 
