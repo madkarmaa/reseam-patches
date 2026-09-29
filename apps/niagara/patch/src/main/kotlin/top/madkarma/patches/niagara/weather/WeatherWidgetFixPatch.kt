@@ -7,7 +7,7 @@ import top.madkarma.patches.niagara.pro.unlockPro
 
 val weatherWidgetFix = patch("Weather widget fix") {
     description(
-        "Serves the weather widget from WeatherAPI.com instead of the Niagara backend.",
+        "Serves the weather widget from WeatherAPI.com instead of the Niagara backend. Enter your key in the weather settings sheet.",
     )
     compatibleWith("bitpit.launcher")
 
@@ -15,17 +15,7 @@ val weatherWidgetFix = patch("Weather widget fix") {
     // unless you actually use the weather widget
     dependsOn(unlockPro)
 
-    val apiKeyOption = stringOption(
-        "weatherApiKey",
-        title = "WeatherAPI.com key",
-        description = "API key used for every weather fetch. Get yours at weatherapi.com.",
-        required = true,
-    )
-
     execute {
-        val apiKey = options[apiKeyOption]
-        if (apiKey.isBlank()) error("Weather widget fix: patch option weatherApiKey is blank")
-
         val hint = resources.setString(
             "weather_forecast_hint",
             "Weather forecasts are probabilistic and can be wrong. Never use them as the sole basis for safety-critical decisions.",
@@ -46,7 +36,7 @@ val weatherWidgetFix = patch("Weather widget fix") {
         val appContext = weatherRepo.fieldOfType(Type.Context)
         weatherFetch.replace {
             val context = thisObject.field(appContext)
-            val api = call(WeatherApi.create, context, string(apiKey))
+            val api = call(WeatherApi.create, context)
             val json = api.call(WeatherApi.fetch)
             val timestamp = api.call(WeatherApi.now)
             val forecast = thisObject.call(parseResponse, json, timestamp)
@@ -58,5 +48,11 @@ val weatherWidgetFix = patch("Weather widget fix") {
         }
 
         log.info("Weather widget fix: fetch wired to WeatherAPI.com")
+
+        weatherContentBind.after {
+            call(ApiKeyField.attach, param(1))
+        }
+
+        log.info("Weather widget fix: key field added to weather sheet")
     }
 }

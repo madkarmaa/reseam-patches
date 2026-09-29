@@ -1,6 +1,5 @@
 package top.madkarma.extensions;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Location;
@@ -35,6 +34,7 @@ public final class WeatherApi {
     private static final String KEY_LAT = "bitpit.launcher.key.WEATHER_LOCATION_LAT";
     private static final String KEY_LONG = "bitpit.launcher.key.WEATHER_LOCATION_LONG";
     private static final String KEY_LANG = "bitpit.launcher.key.WEATHER_LANGUAGE";
+    private static final String KEY_API_RUNTIME = "madkarma.weather.apiKey";
 
     private static final String ENDPOINT = "https://api.weatherapi.com/v1/forecast.json";
     private static final int FORECAST_DAYS = 3;
@@ -76,22 +76,21 @@ public final class WeatherApi {
 
     // Application-scoped: the worker always receives getApplicationContext(),
     // and the reference is cleared when it finishes, so nothing leaks.
-    @SuppressLint("StaticFieldLeak")
+    @SuppressWarnings("StaticFieldLeak")
     private static FetchWorker inFlight;
 
     private final Context appContext;
-    private final String apiKey;
 
-    private WeatherApi(Context context, String apiKey) {
+    private WeatherApi(Context context) {
         this.appContext = context.getApplicationContext();
-        this.apiKey = apiKey;
     }
 
     /**
-     * Single construction point: application context plus the patch-time key.
+     * Single construction point: the key lives in settings now, so only
+     * the application context is needed.
      */
-    public static WeatherApi create(Context context, String apiKey) {
-        return new WeatherApi(context, apiKey);
+    public static WeatherApi create(Context context) {
+        return new WeatherApi(context);
     }
 
     @SuppressWarnings("unchecked")
@@ -108,6 +107,13 @@ public final class WeatherApi {
             hour += 24;
         }
         return hour;
+    }
+
+    /**
+     * Fails fetch setup with a message telling the user where the key goes.
+     */
+    private static RuntimeException missingKey() {
+        return new RuntimeException("No WeatherAPI key - enter one below the temperature-units button");
     }
 
     public long now() {
@@ -228,7 +234,7 @@ public final class WeatherApi {
 
     // Permission is checked by the caller via checkSelfPermission just above;
     // the catch below stays as a second guard for revoked-while-running.
-    @SuppressLint("MissingPermission")
+    @SuppressWarnings("MissingPermission")
     private Location lastKnown() {
         if (Build.VERSION.SDK_INT >= 23 && appContext.checkSelfPermission(android.Manifest.permission.ACCESS_COARSE_LOCATION) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
             return null;
@@ -317,7 +323,28 @@ public final class WeatherApi {
     }
 
     private String requestUrl(double lat, double lon, String lang) {
-        return ENDPOINT + "?key=" + apiKey + "&q=" + lat + "," + lon + "&days=" + FORECAST_DAYS + "&aqi=no&alerts=no&lang=" + lang;
+        return ENDPOINT + "?key=" + currentApiKey() + "&q=" + lat + "," + lon + "&days=" + FORECAST_DAYS + "&aqi=no&alerts=no&lang=" + lang;
+    }
+
+    /**
+     * Key the next fetch uses: the settings-sheet value, or blank when
+     * none was entered yet.
+     */
+    public String currentApiKey() {
+        String saved = prefs().getString(KEY_API_RUNTIME, null);
+        if (saved != null && !saved.isEmpty()) {
+            return saved;
+        }
+        return "";
+    }
+
+    /**
+     * Persists a sheet-entered key and drops the cache so it takes
+     * effect on the next fetch.
+     */
+    public void saveApiKey(String key) {
+        String value = key == null ? "" : key.trim();
+        prefs().edit().putString(KEY_API_RUNTIME, value).remove(KEY_CACHE_JSON).remove(KEY_CACHE_TIME).apply();
     }
 
     private JSONObject parseError(String body) {
@@ -579,6 +606,10 @@ public final class WeatherApi {
         @Override
         public void run() {
             try {
+                if (currentApiKey().isEmpty()) {
+                    throw missingKey();
+                }
+
                 double[] coords = resolveCoords();
                 String lang = mapLang(readLang());
 
