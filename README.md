@@ -1,38 +1,59 @@
-# Reseam patches
+# MadKarma Reseam patches
 
-The official patch bundle for Reseam. Each app under `apps/` has a `patch`
-module with the patches and, where needed, extension modules with code that gets
-injected into the app. The `app.reseam.workspace` Gradle plugin configures every
-module from the directory layout.
+My patch bundle for Android apps I use, built with [Reseam](https://reseam.app).
 
 ## Setup
 
 - JDK 17.
 - Android SDK, with `ANDROID_HOME` pointing at it.
-- The `reseam` CLI on `PATH`, or its path in `RESEAM_BIN`. Get the release that
-  matches the plugin version in `settings.gradle.kts`.
-- A signing key: `reseam bundle keygen --out ~/.reseam/bundle-signing.key`.
+- The `reseam` CLI on `PATH`, or at the path in `RESEAM_BIN`. Use the release
+  matching the plugin version in `settings.gradle.kts`. Releases provide a
+  Linux x64 binary; on other
+  platforms, [build the CLI from source](https://reseam.app/docs/cli/install/).
+- A signing key, created with `reseam bundle keygen --out ~/.reseam/bundle-signing.key`.
+  The command prints the public key users will trust. Keep the private key
+  secret and out of the repository.
 
-## Build
+## Build and try the bundle
 
 ```shell
 ./gradlew bundle
 ```
 
-Writes `build/reseam/reseam-patches.reseam`. Try it on an APK:
+This writes `build/reseam/madkarma-patches.reseam`. List its patches and try
+one on an APK:
 
 ```shell
-reseam patch app.apk --bundle build/reseam/reseam-patches.reseam --trust <your public key> --output patched.apk
+reseam bundle list build/reseam/madkarma-patches.reseam --trust <public key>
+reseam patch app.apk \
+  --bundle build/reseam/madkarma-patches.reseam \
+  --trust <public key> \
+  --enable "<patch name>" \
+  --output patched.apk
 ```
 
-To build against a local engine checkout instead of the published SDK and
-plugin, set `RESEAM_WORKSPACE=/path/to/reseam`.
+Only when changing the engine alongside these patches, set
+`RESEAM_WORKSPACE=/path/to/reseam` to use that checkout's SDK, Gradle plugin,
+and CLI instead of the published versions.
 
-How patches are written is documented in the engine repository under `docs/`.
+## Get updates in Reseam Manager
 
-## Release
+Add this index URL in Reseam Manager:
 
-Push conventional commits to `dev` for prereleases. Manually run the release
-workflow on `main` for stable releases. Manual runs on other branches build a
-validation bundle only. CI builds and signs the bundle, writes `patches.json`,
-and attaches both to the GitHub release.
+```text
+https://github.com/madkarmaa/reseam-patches/releases/latest/download/patches.json
+```
+
+Manager shows the bundle signer's public key before trust is granted. Publish
+that key somewhere users can verify independently.
+
+## Releases
+
+Commit messages are checked locally by Husky and Commitlint and must follow
+Conventional Commits. Push conventional commits to `dev` for prereleases. To
+publish a stable release, manually run the `release` workflow on `main`.
+
+Set the repository secret `BUNDLE_SIGNING_KEY_B64` to the base64-encoded bundle
+signing key (for example, `base64 -w0 ~/.reseam/bundle-signing.key`). When
+updating Reseam, keep the plugin version in `settings.gradle.kts` and
+`ENGINE_VERSION` in `.github/workflows/*.yml` in sync.
