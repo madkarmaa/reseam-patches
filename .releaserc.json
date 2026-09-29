@@ -36,7 +36,8 @@
                 "assets": [
                     "build/reseam/release/*"
                 ],
-                "successComment": false
+                "successComment": false,
+                "failComment": false
             }
         ]
     ]
