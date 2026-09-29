@@ -1,4 +1,4 @@
-name: compatibility-bump-notifier
+name: Compatibility bump notifier
 
 on:
     schedule: # Once a day.
@@ -15,7 +15,7 @@ permissions:
     issues: write
 
 env: # Must match the plugin version in settings.gradle.kts.
-    ENGINE_VERSION: v0.14.1
+    ENGINE_VERSION: v0.14.2
     RESEAM_BIN: engine/reseam-linux-x64
 
 jobs:

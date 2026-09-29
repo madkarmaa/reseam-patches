@@ -1,4 +1,4 @@
-name: release
+name: Release
 
 on:
     push:
@@ -10,7 +10,7 @@ permissions:
     contents: write
 
 env: # Must match the plugin version in settings.gradle.kts.
-    ENGINE_VERSION: v0.14.1
+    ENGINE_VERSION: v0.14.2
     RESEAM_BIN: engine/reseam-linux-x64
 
 jobs:
@@ -55,7 +55,7 @@ jobs:
                     chmod +x engine/reseam-linux-x64
                     echo "${{ secrets.BUNDLE_SIGNING_KEY_B64 }}" | base64 -d > bundle-signing.key
 
-            -   name: Release from commits
+            -   name: Release
                 if: (github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch') || (github.ref == 'refs/heads/dev' && github.event_name == 'push')
                 env:
                     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -63,7 +63,7 @@ jobs:
                     RESEAM_HOMEPAGE: ${{ github.server_url }}/${{ github.repository }}
                 run: bun run release
 
-            -   name: Build manual validation bundle
+            -   name: Build manual bundle
                 if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
                 env:
                     RESEAM_BUNDLE_KEY: ${{ github.workspace }}/bundle-signing.key
