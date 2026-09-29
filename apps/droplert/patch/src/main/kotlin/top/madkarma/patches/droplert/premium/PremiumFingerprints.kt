@@ -5,10 +5,7 @@ import app.reseam.patch.dex.*
 import app.reseam.patch.native.FieldRef
 import app.reseam.patch.native.Instruction
 import app.reseam.patch.native.RegFieldInsn
-
-object Prefs : ExtClass("top.madkarma.droplert.extensions.Prefs") {
-    val putBoolean = static("putBoolean", Type.Context, Type.String, Type.Boolean)
-}
+import top.madkarma.patches.droplert.Prefs
 
 val premiumLegacyVersions = setOf("2.2.1", "2.4.0")
 val premiumSuspendVersions = setOf("2.4.1", "2.5.0", "2.5.1")
