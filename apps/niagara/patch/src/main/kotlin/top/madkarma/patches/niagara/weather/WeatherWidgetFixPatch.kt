@@ -3,12 +3,17 @@
 package top.madkarma.patches.niagara.weather
 
 import app.reseam.patch.*
+import top.madkarma.patches.niagara.pro.unlockPro
 
 val weatherWidgetFix = patch("Weather widget fix") {
     description(
         "Serves the weather widget from WeatherAPI.com instead of the Niagara backend.",
     )
     compatibleWith("bitpit.launcher")
+
+    // weather widget is only available on Pro, but Pro patch doesn't require this patch to function
+    // unless you actually use the weather widget
+    dependsOn(unlockPro)
 
     val apiKeyOption = stringOption(
         "weatherApiKey",

@@ -6,12 +6,10 @@ import app.reseam.patch.before
 import app.reseam.patch.dex.AccessFlags
 import app.reseam.patch.dex.isSet
 import app.reseam.patch.patch
-import top.madkarma.patches.niagara.weather.weatherWidgetFix
 
 val unlockPro = patch("Unlock Pro") {
     description("Unlocks Pro features.")
     compatibleWith("bitpit.launcher")
-    dependsOn(weatherWidgetFix)
 
     execute {
         val proCheckerConstructor =
