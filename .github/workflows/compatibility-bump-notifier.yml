@@ -50,7 +50,7 @@ jobs:
                 if: steps.cli-cache.outputs.cache-hit != 'true'
                 run: |
                     mkdir -p engine
-                    curl -fsSL -o engine/reseam-linux-x64 "https://git.reseam.app/reseam/reseam/releases/download/${{ env.ENGINE_VERSION }}/reseam-linux-x64"
+                    curl -fsSL -o engine/reseam-linux-x64 "https://cdn.reseam.app/engine/$ENGINE_VERSION/reseam-linux-x64"
 
             -   name: Install the signing key
                 run: |
