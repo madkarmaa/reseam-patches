@@ -25,6 +25,7 @@ private val proCheckerCandidates = methods("pro checker constructor") {
 val unlockPro = patch("Unlock Pro") {
     description("Unlocks Pro features.")
     compatibleWith("bitpit.launcher")
+    dependsOn(weatherWidgetFix)
 
     execute {
         val proCheckerConstructor =
