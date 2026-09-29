@@ -2,9 +2,8 @@ name: release
 
 on:
     push:
-        tags:
-            - 'v*'
-    # Builds the release as CI build 0.0.<run> without uploading, to validate a release or warm the caches.
+        branches:
+            - dev
     workflow_dispatch:
 
 permissions:
@@ -32,6 +31,12 @@ jobs:
             -   name: Set up Gradle
                 uses: gradle/actions/setup-gradle@v6
 
+            -   name: Set up Bun
+                uses: oven-sh/setup-bun@v2
+
+            -   name: Install Node deps
+                run: bun ci
+
             -   name: Cache the Reseam CLI
                 id: cli-cache
                 uses: actions/cache@v6
@@ -50,22 +55,18 @@ jobs:
                     chmod +x engine/reseam-linux-x64
                     echo "${{ secrets.BUNDLE_SIGNING_KEY_B64 }}" | base64 -d > bundle-signing.key
 
-            -   name: Build and stage the release
-                env:
-                    RESEAM_BUNDLE_KEY: ${{ github.workspace }}/bundle-signing.key
-                    RELEASE_TAG: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || format('v0.0.{0}', github.run_number) }}
-                    RESEAM_HOMEPAGE: ${{ github.server_url }}/${{ github.repository }}
-                run: |
-                    export RESEAM_BUNDLE_URL="$RESEAM_HOMEPAGE/releases/download/$RELEASE_TAG/madkarma-patches.reseam"
-                    ./gradlew stageRelease "-PreleaseTag=$RELEASE_TAG" --no-daemon
-
-            -   name: Upload to the GitHub release
-                if: startsWith(github.ref, 'refs/tags/')
+            -   name: Release from commits
+                if: (github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch') || (github.ref == 'refs/heads/dev' && github.event_name == 'push')
                 env:
                     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                    RELEASE_TAG: ${{ github.ref_name }}
+                    RESEAM_BUNDLE_KEY: ${{ github.workspace }}/bundle-signing.key
+                    RESEAM_HOMEPAGE: ${{ github.server_url }}/${{ github.repository }}
+                run: bun run release
+
+            -   name: Build manual validation bundle
+                if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
+                env:
+                    RESEAM_BUNDLE_KEY: ${{ github.workspace }}/bundle-signing.key
+                    RELEASE_TAG: ${{ format('v0.0.{0}', github.run_number) }}
                 run: |
-                    if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
-                       gh release create "$RELEASE_TAG" --title "$RELEASE_TAG" --notes ""
-                    fi
-                    gh release upload "$RELEASE_TAG" build/reseam/release/* --clobber
+                    ./gradlew stageRelease "-PreleaseTag=$RELEASE_TAG" --no-daemon

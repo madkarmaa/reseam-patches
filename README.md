@@ -32,5 +32,7 @@ How patches are written is documented in the engine repository under `docs/`.
 
 ## Release
 
-Tag `vX.Y.Z`. CI builds and signs the bundle, writes `patches.json`, and uploads
-both to the GitHub release.
+Push conventional commits to `dev` for prereleases. Manually run the release
+workflow on `main` for stable releases. Manual runs on other branches build a
+validation bundle only. CI builds and signs the bundle, writes `patches.json`,
+and attaches both to the GitHub release.
