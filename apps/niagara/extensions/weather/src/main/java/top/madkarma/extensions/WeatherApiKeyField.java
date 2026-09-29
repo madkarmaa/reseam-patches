@@ -26,6 +26,7 @@ public final class WeatherApiKeyField {
 
     private static final String METRIC_BUTTON = "use_metric_button";
     private static final String HEADER_TEXT = "header_text_view";
+    private static final String CONTENT_TEXT = "content_text_view";
     private static final String LOCK_ICON = "ic_ip_act_lock";
     private static final String ON_BACKGROUND_ATTR = "onBackgroundColor";
 
@@ -35,6 +36,7 @@ public final class WeatherApiKeyField {
 
     private static final String LABEL_TEXT = "WeatherAPI.com key";
     private static final String HINT_TEXT = "a1b2c3d4";
+    private static final String NOTE_TEXT = "Never share this key with anybody - keep it safe.";
 
     private WeatherApiKeyField() {
     }
@@ -87,16 +89,40 @@ public final class WeatherApiKeyField {
      * layout no longer has one.
      */
     private static TextView headerSample(View metricButton) {
-        View header = findByName(metricButton, HEADER_TEXT);
-        if (!(header instanceof TextView sample)) {
-            return null;
-        }
-
-        return sample;
+        return sampleText(metricButton, HEADER_TEXT);
     }
 
     /**
-     * Lock icon plus label and key input, mirroring the tile rows above.
+     * Value text of the temperature-units button (like "Celsius", same
+     * style as "Berlin"), or null when the app layout no longer has one.
+     */
+    private static TextView contentSample(View metricButton) {
+        return sampleText(metricButton, CONTENT_TEXT);
+    }
+
+    /**
+     * Sample text by view name, or null when it is missing.
+     */
+    private static TextView sampleText(View metricButton, String name) {
+        View sample = findByName(metricButton, name);
+        if (!(sample instanceof TextView text)) {
+            return null;
+        }
+
+        return text;
+    }
+
+    /**
+     * Copies a sample's size and color onto a target.
+     */
+    private static void styleLike(TextView target, TextView sample) {
+        target.setTextSize(TypedValue.COMPLEX_UNIT_PX, sample.getTextSize());
+        target.setTextColor(sample.getTextColors());
+    }
+
+    /**
+     * Lock icon plus label, key input and safety note, mirroring the tile
+     * rows above.
      */
     private static LinearLayout buildRow(LinearLayout sheet, View metricButton, WeatherApi api) {
         Context context = sheet.getContext();
@@ -116,6 +142,7 @@ public final class WeatherApiKeyField {
         LinearLayout body = buildBody(context, icon != null);
         body.addView(buildLabel(context, metricButton));
         body.addView(buildInput(context, api));
+        body.addView(buildNote(context, metricButton));
         row.addView(body);
         return row;
     }
@@ -143,7 +170,8 @@ public final class WeatherApiKeyField {
     }
 
     /**
-     * Vertical label-plus-input stack, starting where the tile texts start.
+     * Vertical label, input and note stack, starting where the tile texts
+     * start.
      */
     private static LinearLayout buildBody(Context context, boolean hasIcon) {
         int iconWidth = hasIcon ? dimenPx(context, ICON_SIZE_DIMEN, 24) : 0;
@@ -168,24 +196,39 @@ public final class WeatherApiKeyField {
 
         TextView sample = headerSample(metricButton);
         if (sample != null) {
-            label.setTextSize(TypedValue.COMPLEX_UNIT_PX, sample.getTextSize());
-            label.setTextColor(sample.getTextColors());
+            styleLike(label, sample);
         }
 
         return label;
     }
 
     /**
-     * Monospace key input, saving to settings on every edit. The text is
-     * set before the watcher is added, so prefilling never writes.
+     * Safety note in the tile value's size and color.
+     */
+    @SuppressWarnings("SetTextI18n")
+    private static TextView buildNote(Context context, View metricButton) {
+        TextView note = new TextView(context);
+        note.setText(NOTE_TEXT);
+
+        TextView sample = contentSample(metricButton);
+        if (sample != null) {
+            styleLike(note, sample);
+        }
+
+        return note;
+    }
+
+    /**
+     * Censored monospace key input, saving to settings on every edit. The
+     * text is set before the watcher is added, so prefilling never writes.
      */
     @SuppressWarnings("SetTextI18n")
     private static EditText buildInput(Context context, WeatherApi api) {
         EditText input = new EditText(context);
-        input.setInputType(InputType.TYPE_CLASS_TEXT);
         input.setSingleLine(true);
         input.setSelectAllOnFocus(true);
         input.setTypeface(Typeface.MONOSPACE);
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         input.setHint(HINT_TEXT);
         input.setText(api.currentApiKey());
         input.addTextChangedListener(new KeySaver() {
