@@ -1,6 +1,6 @@
 @file:Suppress("unused")
 
-package top.madkarma.patches.universal
+package top.madkarma.patches.universal.nativelibs
 
 import app.reseam.patch.patch
 

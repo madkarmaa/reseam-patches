@@ -1,26 +1,12 @@
 @file:Suppress("unused")
 
-package top.madkarma.patches.niagara
+package top.madkarma.patches.niagara.pro
 
-import app.reseam.patch.Type
 import app.reseam.patch.before
 import app.reseam.patch.dex.AccessFlags
-import app.reseam.patch.dex.Opcode
 import app.reseam.patch.dex.isSet
-import app.reseam.patch.methods
 import app.reseam.patch.patch
-
-// Holds the entitlement state (all features unlocked when the first flag is true).
-// Several (Z,Z,Z) constructors store booleans; the genuine holder is the only
-// non-synthetic one, so a plain predicate replaces ranking entirely.
-//
-// SYNTHETIC is set by the compiler — not the developer — on members it
-// generates itself (default-arg overloads, bridges, desugared wrappers, ...).
-private val proCheckerCandidates = methods("pro checker constructor") {
-    name("<init>")
-    params(Type.Boolean, Type.Boolean, Type.Boolean)
-    opcode(Opcode.IPUT_BOOLEAN)
-}
+import top.madkarma.patches.niagara.weather.weatherWidgetFix
 
 val unlockPro = patch("Unlock Pro") {
     description("Unlocks Pro features.")

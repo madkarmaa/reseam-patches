@@ -1,40 +1,8 @@
 @file:Suppress("unused")
 
-package top.madkarma.patches.yazio
+package top.madkarma.patches.yazio.pro
 
 import app.reseam.patch.*
-
-private const val PREMIUM_TYPE = "yazio.user.api.PremiumType"
-private const val STORE_PREMIUM_STATUS = "yazio.payment.api.subscription.StorePremiumStatus"
-
-// SubscriptionStatus readers: exactly two single-param Boolean helpers —
-// full entitlement + paying subset. Force both true.
-private val subscriptionGates = methods("subscription pro gates") {
-    returns(Type.Boolean)
-    paramCount(1)
-    param(0, "yazio.subscription.api.SubscriptionStatus")
-}
-
-// User model <init>: the constructor taking both PremiumType and Sex.
-// Both producers (DTO mapper, backend validator) funnel through here, so
-// defaulting null covers every read. (Sex excludes a PremiumType-only wrapper
-// ctor that otherwise matches.)
-private val userModelCtor = method("user model constructor") {
-    name("<init>")
-    hasParam(PREMIUM_TYPE)
-    hasParam("yazio.user.api.Sex")
-}
-
-// Play purchase lookup; pinned so store and backend agree instead of
-// tripping the mismatch path.
-private val storePremiumStatus = method("store premium status") {
-    strings("getStorePremiumStatus")
-    returns("java.lang.Enum")
-    paramCount(1)
-}
-
-// Account-screen row (Profile > gear > Account).
-private const val SUBSCRIPTION_LABEL_KEY = "user.settings.label.subscription"
 
 val unlockPro = patch("Unlock Pro") {
     description("Unlocks Pro features and credits the patch on the Account screen.")
@@ -75,7 +43,7 @@ val unlockPro = patch("Unlock Pro") {
         log.info("Pro: defaulting null premium to Subscription in ${userModelCtor.descriptor}.")
 
         storePremiumStatus.replace {
-            // NB: same as above — sget would need the obfuscated field id;
+            // NB: same as above - sget would need the obfuscated field id;
             // valueOf("Pro") resolves the stable runtime name instead.
             returnValue(
                 callStatic(

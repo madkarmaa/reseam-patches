@@ -1,22 +1,10 @@
 @file:Suppress("unused")
 
-package top.madkarma.patches.universal
+package top.madkarma.patches.universal.signature
 
-import app.reseam.patch.ExtClass
-import app.reseam.patch.Type
 import app.reseam.patch.appEntry
 import app.reseam.patch.patch
 import java.util.*
-
-object SignatureKiller : ExtClass("bin.mt.signature.SignatureKiller") {
-    val killSignature = static("killSignature", Type.String, Type.String)
-    val killApkPath = static("killApkPath", Type.Context, Type.String)
-    val checkSignatures = static("checkSignatures", Type.Context, Type.String, Type.String)
-}
-
-private val NATIVE_ABIS = listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
-
-private val patchClassLoader = object {}.javaClass.classLoader
 
 val bypassSignatureChecks = patch("Bypass signature checks") {
     description(

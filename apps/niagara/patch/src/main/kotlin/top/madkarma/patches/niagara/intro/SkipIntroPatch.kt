@@ -1,9 +1,10 @@
 @file:Suppress("unused")
 
-package top.madkarma.patches.niagara
+package top.madkarma.patches.niagara.intro
 
 import app.reseam.patch.appEntry
 import app.reseam.patch.patch
+import top.madkarma.patches.niagara.NiagaraSetup
 
 val skipIntro = patch("Skip intro") {
     description("Skips the promo and terms screens, landing directly on setup.")

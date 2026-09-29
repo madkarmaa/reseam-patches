@@ -5,7 +5,7 @@ package top.madkarma.patches.droplert.premium
 import app.reseam.patch.invoke
 import app.reseam.patch.patch
 import top.madkarma.patches.shared.isPresent
-import top.madkarma.patches.universal.removePairip
+import top.madkarma.patches.universal.pairip.removePairip
 
 val unlockPremium = patch("Unlock Lifetime Premium") {
     description("Unlocks Premium-only features.")

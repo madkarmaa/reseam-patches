@@ -1,6 +1,4 @@
-@file:Suppress("unused")
-
-package top.madkarma.patches.scrobbler
+package top.madkarma.patches.scrobbler.plus
 
 import app.reseam.patch.BytecodeScope
 import app.reseam.patch.dex.*
@@ -8,7 +6,6 @@ import app.reseam.patch.klass
 import app.reseam.patch.native.FieldRef
 import app.reseam.patch.native.Instruction
 import app.reseam.patch.native.RegFieldInsn
-import app.reseam.patch.patch
 
 // LicenseState enum: UNKNOWN (initial), NO_LICENSE (receipt missing or rejected), VALID (licensed).
 val licenseStateEnum = klass("license state enum") {
@@ -17,7 +14,7 @@ val licenseStateEnum = klass("license state enum") {
 
 // Enum entry names are kept as const-strings in <clinit>; each is stored by
 // the next sput of the enum type. Collects entry name -> field in one pass.
-private fun enumEntries(enumDesc: String, clinit: Method): Map<String, FieldRef> {
+fun enumEntries(enumDesc: String, clinit: Method): Map<String, FieldRef> {
     val entries = mutableMapOf<String, FieldRef>()
     var pendingName: String? = null
 
@@ -36,7 +33,7 @@ private fun enumEntries(enumDesc: String, clinit: Method): Map<String, FieldRef>
 }
 
 // Points every NO_LICENSE load at the VALID entry instead.
-private fun promoteToValid(
+fun promoteToValid(
     bytecode: BytecodeScope,
     enumDesc: String,
     denied: FieldRef,
@@ -70,24 +67,4 @@ private fun promoteToValid(
     }
 
     return promoted
-}
-
-val unlockPlus = patch("Unlock Plus") {
-    description("Unlocks Plus-only features.")
-    compatibleWith("com.arn.scrobble")
-
-    execute {
-        val enumDef = licenseStateEnum.classDef
-        val enumDesc = enumDef.descriptor
-        val clinit = enumDef.method("<clinit>") ?: error("Unlock Plus: $enumDesc has no <clinit>")
-
-        val entries = enumEntries(enumDesc, clinit)
-        val valid = entries["VALID"] ?: error("Unlock Plus: VALID entry not found in $enumDesc")
-        val denied =
-            entries["NO_LICENSE"] ?: error("Unlock Plus: NO_LICENSE entry not found in $enumDesc")
-
-        val promoted = promoteToValid(bytecode, enumDesc, denied, valid)
-        if (promoted == 0) error("Unlock Plus: no NO_LICENSE loads found")
-        log.info("Plus: promoted $promoted NO_LICENSE load(s) to VALID ($enumDesc).")
-    }
 }
