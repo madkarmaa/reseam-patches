@@ -1,6 +1,6 @@
 {
     "name": "madkarma-patches",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "private": true,
     "scripts": {
         "commitlint": "commitlint",
