@@ -1,0 +1,47 @@
+name: Sync mirror
+
+on:
+    push:
+        branches:
+            - '**'
+        tags:
+            - '**'
+    workflow_run:
+        workflows:
+            - Release
+        types:
+            - completed
+
+permissions:
+    contents: read
+
+concurrency:
+    group: sync-mirror
+    cancel-in-progress: false
+
+jobs:
+    sync:
+        runs-on: ubuntu-latest
+        steps:
+            -   name: Checkout all refs
+                uses: actions/checkout@v7
+                with:
+                    fetch-depth: 0
+                    ref: ${{ github.event_name == 'push' && github.event.deleted && format('refs/heads/{0}', github.event.repository.default_branch) || github.ref }}
+
+            -   name: Push branches and tags to mirror
+                env:
+                    MIRROR_USERNAME: ${{ vars.MIRROR_USERNAME }}
+                    MIRROR_API_KEY: ${{ secrets.MIRROR_API_KEY }}
+                run: |
+                    git fetch --prune origin '+refs/heads/*:refs/remotes/origin/*' '+refs/tags/*:refs/tags/*'
+                    cat > "$RUNNER_TEMP/git-askpass" <<'EOF'
+                    #!/bin/sh
+                    case "$1" in
+                        *Username*) printf '%s\n' "$MIRROR_USERNAME" ;;
+                        *Password*) printf '%s\n' "$MIRROR_API_KEY" ;;
+                        *) exit 1 ;;
+                    esac
+                    EOF
+                    chmod 700 "$RUNNER_TEMP/git-askpass"
+                    GIT_ASKPASS="$RUNNER_TEMP/git-askpass" GIT_TERMINAL_PROMPT=0 git push --force --prune https://git.reseam.app/reseam-community/patches.git 'refs/remotes/origin/*:refs/heads/*' 'refs/tags/*:refs/tags/*'

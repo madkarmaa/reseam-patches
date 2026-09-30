@@ -63,7 +63,7 @@ jobs:
                     RESEAM_HOMEPAGE: ${{ github.server_url }}/${{ github.repository }}
                 run: bun run release
 
-            -   name: Sync dev with main after stable release
+            -   name: Sync dev with main
                 if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
                 run: |
                     git fetch origin main dev
