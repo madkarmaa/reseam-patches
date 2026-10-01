@@ -1,15 +1,18 @@
+// SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 package top.madkarma.patches.droplert.premium
 
 import app.reseam.patch.*
 import app.reseam.patch.dex.*
-import app.reseam.patch.native.FieldRef
-import app.reseam.patch.native.Instruction
-import app.reseam.patch.native.RegFieldInsn
+import app.reseam.patch.types.FieldRef
+import app.reseam.patch.types.Instruction
+import app.reseam.patch.types.RegFieldInsn
 import top.madkarma.patches.droplert.Prefs
 
 val premiumLegacyVersions = setOf("2.2.1", "2.4.0")
-val premiumSuspendVersions = setOf("2.4.1", "2.5.0", "2.5.1")
-val tamperVersions = setOf("2.5.1")
+val premiumSuspendVersions = setOf("2.4.1", "2.5.0", "2.5.1", "2.5.2")
+val tamperVersions = setOf("2.5.1", "2.5.2")
 val supportedVersions = premiumLegacyVersions + premiumSuspendVersions + tamperVersions
 
 // Variant targets below are applied by availability: whichever shapes

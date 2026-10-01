@@ -1,11 +1,14 @@
+// SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 package top.madkarma.patches.scrobbler.plus
 
 import app.reseam.patch.BytecodeScope
 import app.reseam.patch.dex.*
 import app.reseam.patch.klass
-import app.reseam.patch.native.FieldRef
-import app.reseam.patch.native.Instruction
-import app.reseam.patch.native.RegFieldInsn
+import app.reseam.patch.types.FieldRef
+import app.reseam.patch.types.Instruction
+import app.reseam.patch.types.RegFieldInsn
 
 // LicenseState enum: UNKNOWN (initial), NO_LICENSE (receipt missing or rejected), VALID (licensed).
 val licenseStateEnum = klass("license state enum") {

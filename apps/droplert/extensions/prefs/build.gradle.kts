@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 dependencies {
     // The app keeps no datastore classes under their real names, so nothing collides.
     implementation("androidx.datastore:datastore-preferences-proto:1.2.1") {

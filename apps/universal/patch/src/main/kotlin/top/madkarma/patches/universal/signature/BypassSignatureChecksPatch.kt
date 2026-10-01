@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 @file:Suppress("unused")
 
 package top.madkarma.patches.universal.signature
@@ -45,7 +48,7 @@ val bypassSignatureChecks = patch("Bypass signature checks") {
 
         if (options[spoofApkPath]) {
             val originalApk =
-                files.source() ?: error("SignatureKiller: original APK bytes unavailable")
+                files.sourceStream().use { it.readBytes() }
             files.writeStored("assets/SignatureKiller/origin.apk", originalApk)
 
             for (abi in NATIVE_ABIS) {

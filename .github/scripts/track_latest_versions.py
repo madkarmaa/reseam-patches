@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """
 Usage:
     track_latest_versions.py [--dry-run] [--package <id>] [--channel stable]

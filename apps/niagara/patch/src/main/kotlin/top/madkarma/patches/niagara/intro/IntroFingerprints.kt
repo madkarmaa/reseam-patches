@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 package top.madkarma.patches.niagara.intro
 
 // No method targets: the patch only wires the shared NiagaraSetup calls via

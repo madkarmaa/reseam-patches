@@ -10,7 +10,7 @@ permissions:
     contents: write
 
 env: # Must match the plugin version in settings.gradle.kts.
-    ENGINE_VERSION: v0.14.2
+    ENGINE_VERSION: v0.16.0
     RESEAM_BIN: engine/reseam-linux-x64
 
 jobs:
@@ -63,7 +63,7 @@ jobs:
                     RESEAM_HOMEPAGE: ${{ github.server_url }}/${{ github.repository }}
                 run: bun run release
 
-            -   name: Sync dev with main after stable release
+            -   name: Sync dev with main
                 if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
                 run: |
                     git fetch origin main dev

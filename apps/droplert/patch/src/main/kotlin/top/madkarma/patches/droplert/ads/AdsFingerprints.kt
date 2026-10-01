@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 package top.madkarma.patches.droplert.ads
 
 import app.reseam.patch.*
@@ -8,7 +11,7 @@ import app.reseam.patch.*
 // whichever shapes exist in the app get patched.
 
 val adsLegacyVersions = setOf("2.2.1", "2.4.0", "2.4.1")
-val adsSuspendVersions = setOf("2.5.0", "2.5.1")
+val adsSuspendVersions = setOf("2.5.0", "2.5.1", "2.5.2")
 val supportedVersions = adsLegacyVersions + adsSuspendVersions
 
 val interstitialLoader = method("interstitial ad loader") {

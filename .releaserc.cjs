@@ -1,7 +1,7 @@
 const plugins = [
     "@semantic-release/commit-analyzer",
     "@semantic-release/release-notes-generator",
-    ["@semantic-release/npm", { npmPublish: false }],
+    ["@semantic-release/npm", {npmPublish: false}],
     [
         "@semantic-release/exec",
         {
@@ -29,6 +29,6 @@ if (process.env.GITHUB_REF === "refs/heads/main")
     ]);
 
 module.exports = {
-    branches: ["main", { name: "dev", prerelease: true }],
+    branches: ["main", {name: "dev", prerelease: true}],
     plugins,
 };
