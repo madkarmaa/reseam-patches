@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 @file:Suppress("unused")
 
 package top.madkarma.patches.niagara.pro
