@@ -44,4 +44,4 @@ jobs:
                     esac
                     EOF
                     chmod 700 "$RUNNER_TEMP/git-askpass"
-                    GIT_ASKPASS="$RUNNER_TEMP/git-askpass" GIT_TERMINAL_PROMPT=0 git push --force --prune https://git.reseam.app/reseam-community/patches.git 'refs/remotes/origin/*:refs/heads/*' 'refs/tags/*:refs/tags/*'
+                    GIT_ASKPASS="$RUNNER_TEMP/git-askpass" GIT_TERMINAL_PROMPT=0 git push --force --prune https://git.reseam.app/reseam-community/madkarma-patches.git 'refs/remotes/origin/*:refs/heads/*' 'refs/tags/*:refs/tags/*'
