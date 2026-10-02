@@ -52,7 +52,9 @@ def normalize_version_name(raw: str) -> str:
     return raw.split(" - ")[0].strip().split()[0]
 
 
-def collect_packages(patches_json: Path) -> tuple[dict[str, dict[str, str]], dict[str, list[str]]]:
+def collect_packages(
+    patches_json: Path,
+) -> tuple[dict[str, dict[str, str]], dict[str, list[str]]]:
     """Return (declaring patch names by id per package, sorted pinned versions per package).
 
     Reads the newest release in the index written by `:generatePatchesJson`.
@@ -71,7 +73,7 @@ def collect_packages(patches_json: Path) -> tuple[dict[str, dict[str, str]], dic
 
     try:
         patches = index["releases"][0]["patches"]
-    except (KeyError, IndexError, TypeError):
+    except KeyError, IndexError, TypeError:
         raise SystemExit(f"error: {patches_json} has no releases[0].patches")
 
     declared: dict[str, dict[str, str]] = {}
@@ -113,7 +115,7 @@ def sniff_latest(package: str, base_url: str, channel: str) -> tuple[str, int | 
         details = item["details"]["app_details"]
         raw_version = str(details["version_string"])
         title = str(item.get("title", package))
-    except (KeyError, TypeError):
+    except KeyError, TypeError:
         print(f"warning: {package}: unexpected details shape", file=sys.stderr)
         return None
 
@@ -124,9 +126,7 @@ def sniff_latest(package: str, base_url: str, channel: str) -> tuple[str, int | 
 
 
 def gh(*args: str) -> str:
-    proc = subprocess.run(
-        ["gh", *args], capture_output=True, text=True, cwd=REPO_ROOT
-    )
+    proc = subprocess.run(["gh", *args], capture_output=True, text=True, cwd=REPO_ROOT)
 
     if proc.returncode != 0:
         raise RuntimeError(f"gh {' '.join(args)} failed: {proc.stderr.strip()}")
@@ -136,14 +136,23 @@ def gh(*args: str) -> str:
 
 def find_sticky_issue(title: str) -> int | None:
     try:
-        raw = gh("issue", "list", "--state", "open", "--limit", "100", "--json", "number,title")
+        raw = gh(
+            "issue",
+            "list",
+            "--state",
+            "open",
+            "--limit",
+            "100",
+            "--json",
+            "number,title",
+        )
     except RuntimeError as e:
         raise RuntimeError(f"could not list open issues: {e}")
     try:
         for entry in json.loads(raw):
             if entry.get("title") == title:
                 return int(entry["number"])
-    except (ValueError, KeyError, TypeError):
+    except ValueError, KeyError, TypeError:
         return None
     return None
 
@@ -157,9 +166,15 @@ def ensure_label(label: str) -> bool:
     if label in names:
         return True
     try:
-        gh("label", "create", label,
-           "--description", "Tracks latest upstream app releases for re-patch attempts",
-           "--color", "1D76DB")
+        gh(
+            "label",
+            "create",
+            label,
+            "--description",
+            "Tracks latest upstream app releases for re-patch attempts",
+            "--color",
+            "1D76DB",
+        )
         return True
     except RuntimeError as e:
         print(f"warning: could not create label {label!r}: {e}", file=sys.stderr)
@@ -192,22 +207,28 @@ def build_body(results: list[dict], channel: str, base_url: str) -> str:
             latest = f"`{result['latest']}`{code}"
             app = result["title"]
         pinned = ", ".join(f"`{version}`" for version in result["pinned"]) or "unpinned"
-        patches = "<br>".join(
-            f"`{patch_id}` ({name})" for patch_id, name in sorted(result["declaring"].items())
-        ) or "-"
+        patches = (
+            "<br>".join(
+                f"`{patch_id}` ({name})" for patch_id, name in sorted(result["declaring"].items())
+            )
+            or "-"
+        )
         lines.append(
-            f"| {escape_cell(app)} | `{result['package']}` | {latest} | {pinned} | {escape_cell(patches)} |"
+            f"| {escape_cell(app)} | `{result['package']}` | {latest} | {pinned} | {
+                escape_cell(patches)
+            } |"
         )
     lines += [
         "",
-        f"{len(results)} app(s) tracked. Updated daily and after successful releases by `latest-versions.yml`.",
+        f"{len(results)} app(s) tracked.",
         "",
     ]
     return "\n".join(lines)
 
 
-def upsert_sticky_issue(number: int | None, title: str, body: str, label: str,
-                        use_label: bool) -> None:
+def upsert_sticky_issue(
+    number: int | None, title: str, body: str, label: str, use_label: bool
+) -> None:
     with tempfile.NamedTemporaryFile("w", suffix=".md", delete=False, encoding="utf-8") as tmp:
         tmp.write(body)
         body_file = tmp.name
@@ -239,16 +260,25 @@ def upsert_sticky_issue(number: int | None, title: str, body: str, label: str,
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Track latest upstream app versions in a sticky issue.")
-    parser.add_argument("--dry-run", action="store_true",
-                        help="print the sticky issue body without creating/updating anything")
-    parser.add_argument("--package", default=None,
-                        help="only check this package id (default: all)")
+        description="Track latest upstream app versions in a sticky issue."
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="print the sticky issue body without creating/updating anything",
+    )
+    parser.add_argument("--package", default=None, help="only check this package id (default: all)")
     parser.add_argument("--channel", default=DEFAULT_CHANNEL, help="sniff release channel")
-    parser.add_argument("--base-url", default=os.environ.get("SNIFF_BASE_URL", DEFAULT_BASE_URL),
-                        help="sniff API base URL")
-    parser.add_argument("--patches-json", default=str(DEFAULT_PATCHES_JSON),
-                        help="release index written by :generatePatchesJson")
+    parser.add_argument(
+        "--base-url",
+        default=os.environ.get("SNIFF_BASE_URL", DEFAULT_BASE_URL),
+        help="sniff API base URL",
+    )
+    parser.add_argument(
+        "--patches-json",
+        default=str(DEFAULT_PATCHES_JSON),
+        help="release index written by :generatePatchesJson",
+    )
     parser.add_argument("--issue-title", default=STICKY_TITLE, help="sticky issue title")
     parser.add_argument("--label", default=ISSUE_LABEL, help="sticky issue label")
     return parser.parse_args(argv)
@@ -269,16 +299,30 @@ def main(argv: list[str] | None = None) -> int:
         result = sniff_latest(package, args.base_url, args.channel)
         if result is None:
             print(f"unknown {package}: sniff lookup failed")
-            results.append({"package": package, "title": package, "latest": None,
-                            "version_code": None, "pinned": pinned.get(package, []),
-                            "declaring": declared.get(package, {})})
+            results.append(
+                {
+                    "package": package,
+                    "title": package,
+                    "latest": None,
+                    "version_code": None,
+                    "pinned": pinned.get(package, []),
+                    "declaring": declared.get(package, {}),
+                }
+            )
             continue
 
         latest, version_code, title = result
         print(f"found {package}: {latest} ({title})")
-        results.append({"package": package, "title": title, "latest": latest,
-                        "version_code": version_code, "pinned": pinned.get(package, []),
-                        "declaring": declared.get(package, {})})
+        results.append(
+            {
+                "package": package,
+                "title": title,
+                "latest": latest,
+                "version_code": version_code,
+                "pinned": pinned.get(package, []),
+                "declaring": declared.get(package, {}),
+            }
+        )
 
     body = build_body(results, args.channel, args.base_url)
     if args.dry_run:
