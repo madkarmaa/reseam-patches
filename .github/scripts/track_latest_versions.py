@@ -200,7 +200,7 @@ def build_body(results: list[dict], channel: str, base_url: str) -> str:
         )
     lines += [
         "",
-        f"{len(results)} app(s) tracked. Updated daily by `latest-versions.yml`.",
+        f"{len(results)} app(s) tracked. Updated daily and after successful releases by `latest-versions.yml`.",
         "",
     ]
     return "\n".join(lines)
