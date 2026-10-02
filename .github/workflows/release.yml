@@ -19,72 +19,72 @@ jobs:
     build:
         runs-on: ubuntu-latest
         steps:
-            - name: Checkout sources
-              uses: actions/checkout@v7
-              with:
-                  fetch-depth: 0
+            -   name: Checkout sources
+                uses: actions/checkout@v7
+                with:
+                    fetch-depth: 0
 
-            - name: Set up Java
-              uses: actions/setup-java@v6
-              with:
-                  distribution: temurin
-                  java-version: "17"
+            -   name: Set up Java
+                uses: actions/setup-java@v6
+                with:
+                    distribution: temurin
+                    java-version: "17"
 
-            - name: Set up Gradle
-              uses: gradle/actions/setup-gradle@v6
+            -   name: Set up Gradle
+                uses: gradle/actions/setup-gradle@v6
 
-            - name: Set up Bun
-              uses: oven-sh/setup-bun@v2
+            -   name: Set up Bun
+                uses: oven-sh/setup-bun@v2
 
-            - name: Install Node deps
-              run: bun ci
+            -   name: Install Node deps
+                run: bun ci
 
-            - name: Cache the Reseam CLI
-              id: cli-cache
-              uses: actions/cache@v6
-              with:
-                  path: engine
-                  key: reseam-cli-${{ env.ENGINE_VERSION }}
+            -   name: Cache the Reseam CLI
+                id: cli-cache
+                uses: actions/cache@v6
+                with:
+                    path: engine
+                    key: reseam-cli-${{ env.ENGINE_VERSION }}
 
-            - name: Download the Reseam CLI
-              if: steps.cli-cache.outputs.cache-hit != 'true'
-              run: |
-                  mkdir -p engine
-                  curl -fsSL -o engine/reseam-linux-x64 "https://cdn.reseam.app/engine/$ENGINE_VERSION/reseam-linux-x64"
+            -   name: Download the Reseam CLI
+                if: steps.cli-cache.outputs.cache-hit != 'true'
+                run: |
+                    mkdir -p engine
+                    curl -fsSL -o engine/reseam-linux-x64 "https://cdn.reseam.app/engine/$ENGINE_VERSION/reseam-linux-x64"
 
-            - name: Install the signing key
-              run: |
-                  chmod +x engine/reseam-linux-x64
-                  echo "${{ secrets.BUNDLE_SIGNING_KEY_B64 }}" | base64 -d > bundle-signing.key
+            -   name: Install the signing key
+                run: |
+                    chmod +x engine/reseam-linux-x64
+                    echo "${{ secrets.BUNDLE_SIGNING_KEY_B64 }}" | base64 -d > bundle-signing.key
 
-            - name: Release
-              if: (github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch') || (github.ref == 'refs/heads/dev' && github.event_name == 'push')
-              env:
-                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  RESEAM_BUNDLE_KEY: ${{ github.workspace }}/bundle-signing.key
-                  RESEAM_HOMEPAGE: ${{ github.server_url }}/${{ github.repository }}
-              run: bun run release
+            -   name: Release
+                if: (github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch') || (github.ref == 'refs/heads/dev' && github.event_name == 'push')
+                env:
+                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                    RESEAM_BUNDLE_KEY: ${{ github.workspace }}/bundle-signing.key
+                    RESEAM_HOMEPAGE: ${{ github.server_url }}/${{ github.repository }}
+                run: bun run release
 
-            - name: Build manual bundle
-              if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
-              env:
-                  RESEAM_BUNDLE_KEY: ${{ github.workspace }}/bundle-signing.key
-                  RELEASE_TAG: ${{ format('v0.0.{0}', github.run_number) }}
-              run: |
-                  ./gradlew stageRelease "-PreleaseTag=$RELEASE_TAG" --no-daemon
+            -   name: Build manual bundle
+                if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
+                env:
+                    RESEAM_BUNDLE_KEY: ${{ github.workspace }}/bundle-signing.key
+                    RELEASE_TAG: ${{ format('v0.0.{0}', github.run_number) }}
+                run: |
+                    ./gradlew stageRelease "-PreleaseTag=$RELEASE_TAG" --no-daemon
 
-            - name: Attest release artifacts
-              if: hashFiles('build/reseam/release/*') != ''
-              uses: actions/attest@v4
-              with:
-                  subject-path: build/reseam/release/*
+            -   name: Attest release artifacts
+                if: hashFiles('build/reseam/release/*') != ''
+                uses: actions/attest@v4
+                with:
+                    subject-path: build/reseam/release/*
 
-            - name: Sync dev with main
-              if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
-              run: |
-                  git fetch origin main dev
-                  git config user.name "github-actions[bot]"
-                  git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-                  git switch -C dev origin/dev
-                  git merge --no-edit -m "chore: sync stable release to dev [skip ci]" origin/main
-                  git push origin dev
+            -   name: Sync dev with main
+                if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
+                run: |
+                    git fetch origin main dev
+                    git config user.name "github-actions[bot]"
+                    git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+                    git switch -C dev origin/dev
+                    git merge --no-edit -m "chore: sync stable release to dev [skip ci]" origin/main
+                    git push origin dev

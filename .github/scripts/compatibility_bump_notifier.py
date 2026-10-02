@@ -197,7 +197,7 @@ def open_support_issue(
         f"- Declaring patches:\n"
         f"{entries}"
         f"\nPlease verify the patches against `{
-            latest
+        latest
         }` and extend `compatibleWith(...)` accordingly."
     )
     cmd = ["issue", "create", "--title", title, "--body", body]
