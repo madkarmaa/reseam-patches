@@ -41,7 +41,9 @@ def normalize_version_name(raw: str) -> str:
     return raw.split(" - ")[0].strip().split()[0]
 
 
-def collect_pins(patches_json: Path) -> tuple[dict[str, set[str]], dict[str, dict[str, str]]]:
+def collect_pins(
+    patches_json: Path,
+) -> tuple[dict[str, set[str]], dict[str, dict[str, str]]]:
     """Return (pinned versions per package, declaring patch names by id per package).
 
     Reads the newest release in the index written by `:generatePatchesJson`.
@@ -60,7 +62,7 @@ def collect_pins(patches_json: Path) -> tuple[dict[str, set[str]], dict[str, dic
 
     try:
         patches = index["releases"][0]["patches"]
-    except (KeyError, IndexError, TypeError):
+    except KeyError, IndexError, TypeError:
         raise SystemExit(f"error: {patches_json} has no releases[0].patches")
 
     pinned: dict[str, set[str]] = {}
@@ -102,16 +104,14 @@ def sniff_latest(package: str, base_url: str, channel: str) -> tuple[str, str] |
         details = item["details"]["app_details"]
         raw_version = str(details["version_string"])
         title = str(item.get("title", package))
-    except (KeyError, TypeError):
+    except KeyError, TypeError:
         print(f"warning: {package}: unexpected details shape", file=sys.stderr)
         return None
     return normalize_version_name(raw_version), title
 
 
 def gh(*args: str) -> str:
-    proc = subprocess.run(
-        ["gh", *args], capture_output=True, text=True, cwd=REPO_ROOT
-    )
+    proc = subprocess.run(["gh", *args], capture_output=True, text=True, cwd=REPO_ROOT)
 
     if proc.returncode != 0:
         raise RuntimeError(f"gh {' '.join(args)} failed: {proc.stderr.strip()}")
@@ -121,13 +121,22 @@ def gh(*args: str) -> str:
 
 def open_issue_titles() -> dict[str, int]:
     try:
-        raw = gh("issue", "list", "--state", "open", "--limit", "100", "--json", "number,title")
+        raw = gh(
+            "issue",
+            "list",
+            "--state",
+            "open",
+            "--limit",
+            "100",
+            "--json",
+            "number,title",
+        )
     except RuntimeError as e:
         print(f"warning: could not list open issues: {e}", file=sys.stderr)
         return {}
     try:
         return {entry["title"]: entry["number"] for entry in json.loads(raw)}
-    except (ValueError, KeyError, TypeError):
+    except ValueError, KeyError, TypeError:
         return {}
 
 
@@ -156,17 +165,30 @@ def ensure_label() -> bool:
     if ISSUE_LABEL in names:
         return True
     try:
-        gh("label", "create", ISSUE_LABEL,
-           "--description", "Upstream app release needs patch support",
-           "--color", "FBCA04")
+        gh(
+            "label",
+            "create",
+            ISSUE_LABEL,
+            "--description",
+            "Upstream app release needs patch support",
+            "--color",
+            "FBCA04",
+        )
         return True
     except RuntimeError as e:
         print(f"warning: could not create label {ISSUE_LABEL!r}: {e}", file=sys.stderr)
         return False
 
 
-def open_support_issue(title: str, package: str, title_app: str, latest: str,
-                       pinned: list[str], declaring: dict[str, str], use_label: bool) -> None:
+def open_support_issue(
+    title: str,
+    package: str,
+    title_app: str,
+    latest: str,
+    pinned: list[str],
+    declaring: dict[str, str],
+    use_label: bool,
+) -> None:
     entries = "".join(f"  - `{pid}` ({name})\n" for pid, name in sorted(declaring.items()))
     body = (
         f"The Play Store `{DEFAULT_CHANNEL}` channel has **{title_app} ({package}) {latest}**, "
@@ -174,7 +196,9 @@ def open_support_issue(title: str, package: str, title_app: str, latest: str,
         f"- Latest stable `version_name`: `{latest}`\n"
         f"- Declaring patches:\n"
         f"{entries}"
-        f"\nPlease verify the patches against `{latest}` and extend `compatibleWith(...)` accordingly."
+        f"\nPlease verify the patches against `{
+            latest
+        }` and extend `compatibleWith(...)` accordingly."
     )
     cmd = ["issue", "create", "--title", title, "--body", body]
     if use_label:
@@ -191,15 +215,23 @@ def open_support_issue(title: str, package: str, title_app: str, latest: str,
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Check pinned app versions against Play releases.")
-    parser.add_argument("--dry-run", action="store_true",
-                        help="print what would be done without opening issues")
-    parser.add_argument("--package", default=None,
-                        help="only check this package id (default: all)")
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="print what would be done without opening issues",
+    )
+    parser.add_argument("--package", default=None, help="only check this package id (default: all)")
     parser.add_argument("--channel", default=DEFAULT_CHANNEL, help="sniff release channel")
-    parser.add_argument("--base-url", default=os.environ.get("SNIFF_BASE_URL", DEFAULT_BASE_URL),
-                        help="sniff API base URL")
-    parser.add_argument("--patches-json", default=str(DEFAULT_PATCHES_JSON),
-                        help="release index written by :generatePatchesJson")
+    parser.add_argument(
+        "--base-url",
+        default=os.environ.get("SNIFF_BASE_URL", DEFAULT_BASE_URL),
+        help="sniff API base URL",
+    )
+    parser.add_argument(
+        "--patches-json",
+        default=str(DEFAULT_PATCHES_JSON),
+        help="release index written by :generatePatchesJson",
+    )
     return parser.parse_args(argv)
 
 
@@ -247,8 +279,7 @@ def main(argv: list[str] | None = None) -> int:
             continue
 
         try:
-            open_support_issue(title, package, title_app, latest, ordered,
-                               declaring, use_label)
+            open_support_issue(title, package, title_app, latest, ordered, declaring, use_label)
             existing[title] = -1
             opened += 1
         except RuntimeError as e:
