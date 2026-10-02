@@ -13,7 +13,7 @@ private const val SUBSCRIPTION_LABEL_KEY = "user.settings.label.subscription"
 
 val unlockPro =
     patch("Unlock Pro") {
-        description("Unlocks Pro features and credits the patch on the Account screen.")
+        description("Unlocks Pro-only features.")
         compatibleWith("com.yazio.android")
 
         execute {

@@ -22,6 +22,7 @@ val forceExtractNativeLibs = patch("Force extract native libs") {
                 flipped = true
             }
         }
+
         if (flipped) log.info("ExtractNativeLibs: extractNativeLibs flipped to true.")
         else log.info("ExtractNativeLibs: extractNativeLibs already true, nothing to do.")
     }

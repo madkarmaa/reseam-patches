@@ -11,7 +11,7 @@ import java.util.*
 
 val bypassSignatureChecks = patch("Bypass signature checks") {
     description(
-        "Spoofs the original app signature using ApkSignatureKillerEx.",
+        "Spoofs the original app signature (port of ApkSignatureKillerEx).",
     )
 
     val spoofApkPath = boolOption(

@@ -8,7 +8,7 @@ package top.madkarma.patches.liftoff.pro
 import app.reseam.patch.*
 
 val unlockPro = patch("Unlock Pro") {
-    description("Unlocks Pro features.")
+    description("Unlocks Pro-only features, including shop items.")
     compatibleWith("com.gymbros.app")
 
     execute {
