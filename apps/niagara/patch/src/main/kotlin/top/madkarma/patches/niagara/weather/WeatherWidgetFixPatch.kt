@@ -14,8 +14,7 @@ val weatherWidgetFix = patch("Weather widget fix") {
     )
     compatibleWith("bitpit.launcher")
 
-    // weather widget is only available on Pro, but Pro patch doesn't require this patch to function
-    // unless you actually use the weather widget
+    // Niagara exposes the weather widget only to Pro users.
     dependsOn(unlockPro)
 
     execute {
@@ -36,7 +35,7 @@ val weatherWidgetFix = patch("Weather widget fix") {
 
         log.info("Weather widget fix: sheets updated")
 
-        val appContext = weatherRepo.fieldOfType(Type.Context)
+        val appContext = weatherRepository.fieldOfType(Type.Context)
         weatherFetch.replace {
             val context = thisObject.field(appContext)
             val api = call(WeatherApi.create, context)
@@ -53,9 +52,19 @@ val weatherWidgetFix = patch("Weather widget fix") {
         log.info("Weather widget fix: fetch wired to WeatherAPI.com")
 
         weatherContentBind.after {
-            call(ApiKeyField.attach, param(1))
+            call(ApiKeyField.attach, lastParam)
         }
 
         log.info("Weather widget fix: key field added to weather sheet")
     }
+}
+
+private object WeatherApi : ExtClass("top.madkarma.extensions.WeatherApi") {
+    val create = static("create", Type.Context, returns = "top.madkarma.extensions.WeatherApi")
+    val fetch = method("fetch", returns = Type.String)
+    val now = method("now", returns = Type.Long)
+}
+
+private object ApiKeyField : ExtClass("top.madkarma.extensions.WeatherApiKeyField") {
+    val attach = static("attach", Type.Object)
 }

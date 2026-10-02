@@ -1,13 +1,13 @@
+// SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 package top.madkarma.liftoff.extensions;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
- * Fabricates the JS-facing "pro" entitlement entries that RevenueCat's
- * backend never sends for an account that never purchased. Keys and shapes
- * mirror {@code EntitlementInfoMapperKt} output, so key lookups, emptiness
- * checks, and field reads all see Pro.
+ * Supplies lifetime Pro entries in RevenueCat's React Native mapper format.
  */
 @SuppressWarnings("unused")
 public final class ProEntitlements {
@@ -18,15 +18,12 @@ public final class ProEntitlements {
      * Points both the {@code active} and {@code all} maps of an
      * {@code EntitlementInfosMapperKt.map} result at the fabricated entries.
      */
-    public static void proActiveEntriesMap(Map<String, Object> result) {
+    public static void applyProEntitlements(Map<String, Object> result) {
         Map<String, Object> entries = proActiveEntries();
         result.put("active", entries);
         result.put("all", entries);
     }
 
-    /**
-     * Entries to merge into the mapped {@code active} object.
-     */
     private static Map<String, Object> proActiveEntries() {
         long nowMillis = System.currentTimeMillis();
         String nowIso = iso8601(nowMillis);
@@ -54,12 +51,12 @@ public final class ProEntitlements {
         pro.put("ownershipType", "PURCHASED");
         pro.put("verification", "VERIFIED");
 
-        Map<String, Object> active = new HashMap<>();
+        Map<String, Object> entries = new HashMap<>();
 
-        active.put("pro", pro);
-        active.put("premium", pro);
+        entries.put("pro", pro);
+        entries.put("premium", pro);
 
-        return active;
+        return entries;
     }
 
     private static String iso8601(long millis) {

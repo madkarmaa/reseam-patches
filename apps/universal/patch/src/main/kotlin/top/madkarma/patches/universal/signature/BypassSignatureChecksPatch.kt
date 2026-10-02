@@ -26,47 +26,53 @@ val bypassSignatureChecks = patch("Bypass signature checks") {
             manifest.packageName ?: error("SignatureKiller: manifest has no package name")
 
         val signers = files.signers()
-        if (signers.isEmpty()) {
-            error("SignatureKiller: no v2/v3 signers found; unsigned or v1-only APKs are not supported")
-        }
-        val base64Sig = Base64.getEncoder().encodeToString(signers[0])
+        val originalSignature = signers.firstOrNull()
+            ?: error("SignatureKiller: no v2/v3 signers found; unsigned or v1-only APKs are not supported")
+        val encodedSignature = Base64.getEncoder().encodeToString(originalSignature)
 
-        // One block so the diagnostic always runs before the spoof it measures
-        // (killApkPath never touches PackageManager state, so its separate
-        // block cannot disturb the reading whatever the emission order is).
+        // Keep the before/after diagnostics and spoof in one ordered entry hook.
         appEntry {
             call(
-                SignatureKiller.checkSignatures, application, string(packageName), string(base64Sig)
+                SignatureKiller.checkSignatures,
+                application,
+                string(packageName),
+                string(encodedSignature)
             )
             call(
-                SignatureKiller.killSignature, string(packageName), string(base64Sig)
+                SignatureKiller.killSignature, string(packageName), string(encodedSignature)
             )
             call(
-                SignatureKiller.checkSignatures, application, string(packageName), string(base64Sig)
+                SignatureKiller.checkSignatures,
+                application,
+                string(packageName),
+                string(encodedSignature)
             )
         }
 
-        if (options[spoofApkPath]) {
-            val originalApk =
-                files.sourceStream().use { it.readBytes() }
-            files.writeStored("assets/SignatureKiller/origin.apk", originalApk)
-
-            for (abi in NATIVE_ABIS) {
-                val path = "lib/$abi/libSignatureKiller.so"
-                val bytes = patchClassLoader.getResourceAsStream(path)?.use { it.readBytes() }
-                    ?: error("SignatureKiller: bundled native lib missing: $path")
-                files.write("lib/$abi/libSignatureKiller.so", bytes)
-            }
-
-            appEntry {
-                call(
-                    SignatureKiller.killApkPath, application, string(packageName)
-                )
-            }
-
-            log.info("SignatureKiller: hooked $packageName with APK-path spoofing (${originalApk.size} byte origin, ${signers.size} signer(s)).")
-        } else {
+        if (!options[spoofApkPath]) {
             log.info("SignatureKiller: hooked $packageName (signature only, ${signers.size} signer(s)).")
+            return@execute
         }
+
+        val originalApk = files.sourceStream().use { it.readBytes() }
+        files.writeStored("assets/SignatureKiller/origin.apk", originalApk)
+
+        for (abi in NATIVE_ABIS) {
+            val path = "lib/$abi/libSignatureKiller.so"
+            val bytes = SignatureResources.javaClass.classLoader.getResourceAsStream(path)
+                ?.use { it.readBytes() }
+                ?: error("SignatureKiller: bundled native lib missing: $path")
+            files.write(path, bytes)
+        }
+
+        appEntry {
+            call(SignatureKiller.killApkPath, application, string(packageName))
+        }
+
+        log.info("SignatureKiller: hooked $packageName with APK-path spoofing (${originalApk.size} byte origin, ${signers.size} signer(s)).")
     }
 }
+
+private val NATIVE_ABIS = listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
+
+private object SignatureResources

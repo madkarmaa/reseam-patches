@@ -5,7 +5,7 @@
 
 package top.madkarma.patches.universal.pairip
 
-import app.reseam.patch.patch
+import app.reseam.patch.*
 
 val removePairip = patch("Remove Pairip") {
     description(
@@ -32,11 +32,9 @@ val removePairip = patch("Remove Pairip") {
         manifest.edit {
             findByTag("application").firstOrNull()?.let { application ->
                 if (application["android:name"] == PAIRIP_APPLICATION) {
-                    bytecode.findClass(PAIRIP_APPLICATION)?.superclass?.removePrefix(
-                        "L"
-                    )?.removeSuffix(";")?.replace('/', '.')?.let { original ->
-                        application["android:name"] = original
-                    }
+                    val original = bytecode.findClass(PAIRIP_APPLICATION)?.superclass
+                        ?: error("Pairip: application wrapper has no superclass")
+                    application["android:name"] = className(original)
                 }
             }
 
@@ -73,10 +71,8 @@ val removePairip = patch("Remove Pairip") {
             "com.pairip.licensecheck.LicenseResponseHelper"
         )) {
             bytecode.findClass(validator)?.let { classDef ->
-                classDef.methods.filter { it.name == "validateResponse" }.forEach {
-                    if (it.returnType == "V") it.alwaysReturn() else it.alwaysReturn(
-                        true
-                    )
+                classDef.namedMethods("validateResponse").forEach {
+                    if (it.returnType == Type.Void) it.alwaysReturn() else it.alwaysReturn(true)
                     patched++
                 }
             }
@@ -96,28 +92,22 @@ val removePairip = patch("Remove Pairip") {
         }
 
         bytecode.findClass(PAIRIP_APPLICATION)?.let { wrapper ->
-            wrapper.methods.filter { it.name == "attachBaseContext" }.forEach {
-                it.remove()
+            wrapper.namedMethods("attachBaseContext").forEach {
+                it.method.remove()
                 patched++
             }
         }
 
-        for (classDef in bytecode.classes.filter {
-            it.descriptor.startsWith(
-                PAIRIP_DESCRIPTOR_PREFIX
-            )
-        }) {
-            classDef.methods.filter { it.name == "openPlayStore" }.forEach {
-                it.alwaysReturn()
-                patched++
-            }
+        pairipStoreLaunchers.forEach {
+            alwaysReturn()
+            patched++
         }
 
         if (options[killVM]) {
             bytecode.findClass(VM_RUNNER)?.let { vmRunner ->
                 patched += noOp(vmRunner, "<clinit>")
 
-                vmRunner.methods.filter { it.name == "invoke" }.forEach {
+                vmRunner.namedMethods("invoke").forEach {
                     it.alwaysReturnNull()
                     patched++
                 }
@@ -131,13 +121,10 @@ val removePairip = patch("Remove Pairip") {
         }
 
         if (options[spoofInstaller]) {
-            patched += spoofInstallerChecks(bytecode)
+            patched += spoofInstallerChecks()
         }
 
-        if (patched == 0) {
-            log.warn("Pairip: no Pairip methods found; no bytecode changes applied.")
-        } else {
-            log.info("Pairip: $patched method(s) neutralized.")
-        }
+        if (patched == 0) error("Pairip: no supported integrity or installer checks found")
+        log.info("Pairip: $patched method(s) neutralized.")
     }
 }

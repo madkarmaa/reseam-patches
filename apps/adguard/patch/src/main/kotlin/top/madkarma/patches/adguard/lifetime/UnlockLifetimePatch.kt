@@ -5,13 +5,7 @@
 
 package top.madkarma.patches.adguard.lifetime
 
-import app.reseam.patch.CodeScope
-import app.reseam.patch.Type
-import app.reseam.patch.ValueRef
-import app.reseam.patch.before
-import app.reseam.patch.invoke
-import app.reseam.patch.patch
-import app.reseam.patch.replace
+import app.reseam.patch.*
 
 val unlockLifetime =
     patch("Unlock Lifetime premium") {

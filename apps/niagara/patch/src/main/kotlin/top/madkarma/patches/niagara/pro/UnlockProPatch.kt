@@ -6,8 +6,6 @@
 package top.madkarma.patches.niagara.pro
 
 import app.reseam.patch.before
-import app.reseam.patch.dex.AccessFlags
-import app.reseam.patch.dex.isSet
 import app.reseam.patch.patch
 
 val unlockPro = patch("Unlock Pro") {
@@ -15,9 +13,7 @@ val unlockPro = patch("Unlock Pro") {
     compatibleWith("bitpit.launcher")
 
     execute {
-        val proCheckerConstructor =
-            proCheckerCandidates.single { !AccessFlags.SYNTHETIC.isSet(method.info.accessFlags) }
-
+        // Only the first flag grants Pro; retain the other entitlement flags.
         proCheckerConstructor.before {
             param(0).assign(bool(true))
         }
@@ -25,16 +21,14 @@ val unlockPro = patch("Unlock Pro") {
         val thankYou = resources.getString("purchase_pro_thank_you")
             ?: error("Unlock Pro: purchase_pro_thank_you string missing")
 
-        if (!resources.setString(
-                "purchase_pro_thank_you",
-                "$thankYou\n\nPatched with ❤ by MadKarma ;)",
-            )
-        ) {
+        val tagged = resources.setString(
+            "purchase_pro_thank_you",
+            "$thankYou\n\nPatched with ❤ by MadKarma ;)",
+        )
+        if (!tagged)
             error("Unlock Pro: purchase_pro_thank_you string not writable")
-        }
         log.info("Pro: thank-you label tagged.")
 
         log.info("Pro: unlocked via ${proCheckerConstructor.descriptor}.")
-
     }
 }
