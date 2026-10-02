@@ -9,7 +9,7 @@ import app.reseam.patch.before
 import app.reseam.patch.patch
 
 val unlockPro = patch("Unlock Pro") {
-    description("Unlocks Pro features.")
+    description("Unlocks Pro-only features.")
     compatibleWith("bitpit.launcher")
 
     execute {
