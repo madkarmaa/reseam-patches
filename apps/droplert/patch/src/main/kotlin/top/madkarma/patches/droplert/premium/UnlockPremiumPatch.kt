@@ -5,8 +5,8 @@
 
 package top.madkarma.patches.droplert.premium
 
-import app.reseam.patch.invoke
-import app.reseam.patch.patch
+import app.reseam.patch.*
+import top.madkarma.patches.droplert.Prefs
 import top.madkarma.patches.shared.isPresent
 import top.madkarma.patches.universal.pairip.removePairip
 
@@ -16,43 +16,42 @@ val unlockPremium = patch("Unlock Lifetime Premium") {
     dependsOn(removePairip)
 
     execute {
-        val premiumField = runUnlockPremium()
+        isPremium.alwaysReturn(true)
+        entitlementIsActive.alwaysReturn(true)
+        revenueCatStateUpdater.promoteFreeTier()
+        playPurchaseCallback.promoteFreeTier()
 
-        var patchedVariants = 0
+        if (premiumCardStatus.replaceAllStrings(
+                "All features unlocked", "Patched with ❤ by MadKarma ;)"
+            ) == 0
+        ) error("Premium: settings card status text not found")
 
-        if (isPresent(customerInfoIsPremiumActive)) {
-            customerInfoIsPremiumActive.method.alwaysReturn(true)
-            patchedVariants++
-            log.info("Premium: direct premium check patched.")
+        appEntry {
+            call(Prefs.putBoolean, application, string("has_seen_paywall"), bool(true))
         }
 
-        val fallbacks = unconfiguredFallbacks.all
-        val loaders = cachedStatusLoaders.all
+        val hasDirectCheck = isPresent(customerInfoIsPremiumActive)
+        if (hasDirectCheck) customerInfoIsPremiumActive.alwaysReturn(true)
 
-        if (fallbacks.isNotEmpty() || loaders.isNotEmpty()) {
-            fallbacks.forEach {
-                if (!swapFreeToPremium(
-                        it, premiumField
-                    )
-                ) error("Premium: unconfigured fallback writes no FREE state (${it.descriptor})")
-            }
+        val cachedWriters = unconfiguredFallbacks.all + cachedStatusLoaders.all
+        if (!hasDirectCheck && cachedWriters.isEmpty()) error("Premium: unsupported app version")
+        cachedWriters.forEach { it.promoteFreeTier() }
 
-            loaders.forEach {
-                if (!swapFreeToPremium(
-                        it, premiumField
-                    )
-                ) error("Premium: cached loader writes no FREE state (${it.descriptor})")
-            }
+        if (isPresent(tamperCheck)) tamperCheck.alwaysReturn(false)
+    }
+}
 
-            patchedVariants++
-            log.info("Premium: patched ${fallbacks.size} fallback(s) and ${loaders.size} loader(s).")
+// Keep each updater's original side effects while replacing the FREE values it consumes.
+private fun MethodTarget.promoteFreeTier() {
+    val freeReads = points("freeTierReads") {
+        field {
+            owner(premium.owner)
+            name("FREE")
         }
+    }.all
+    if (freeReads.isEmpty()) error("Premium: $descriptor reads no FREE tier")
 
-        if (isPresent(tamperCheck)) {
-            tamperCheck.method.alwaysReturn(false)
-            log.info("Premium: tamper check patched.")
-        }
-
-        if (patchedVariants == 0) error("Premium: unsupported app version")
+    freeReads.forEach {
+        it.captureAs("tier").after { capture("tier").assign(staticField(premium)) }
     }
 }

@@ -4,37 +4,31 @@
 package top.madkarma.patches.yazio.pro
 
 import app.reseam.patch.Type
+import app.reseam.patch.klass
 import app.reseam.patch.method
 import app.reseam.patch.methods
 
-const val PREMIUM_TYPE = "yazio.user.api.PremiumType"
-const val STORE_PREMIUM_STATUS = "yazio.payment.api.subscription.StorePremiumStatus"
+private val subscriptionHelpers =
+    klass("subscriptionHelpers") {
+        strings("in_trial_period")
+    }
 
-// SubscriptionStatus readers: exactly two single-param Boolean helpers -
-// full entitlement + paying subset. Force both true.
-val subscriptionGates = methods("subscription pro gates") {
-    returns(Type.Boolean)
-    paramCount(1)
-    param(0, "yazio.subscription.api.SubscriptionStatus")
-}
+// The two gates have no strings; the neighboring status-name mapper identifies their class.
+internal val subscriptionGates =
+    methods("subscriptionGates") {
+        inClass(subscriptionHelpers)
+        params("yazio.subscription.api.SubscriptionStatus")
+        returns(Type.Boolean)
+    }
 
-// User model <init>: the constructor taking both PremiumType and Sex.
-// Both producers (DTO mapper, backend validator) funnel through here, so
-// defaulting null covers every read. (Sex excludes a PremiumType-only wrapper
-// ctor that otherwise matches.)
-val userModelCtor = method("user model constructor") {
-    name("<init>")
-    hasParam(PREMIUM_TYPE)
-    hasParam("yazio.user.api.Sex")
-}
+private val userModel =
+    klass("userModel") {
+        strings("User(sex=")
+    }
 
-// Play purchase lookup; pinned so store and backend agree instead of
-// tripping the mismatch path.
-val storePremiumStatus = method("store premium status") {
-    strings("getStorePremiumStatus")
-    returns("java.lang.Enum")
-    paramCount(1)
-}
+internal val userModelConstructor = userModel.method("<init>")
 
-// Account-screen row (Profile > gear > Account).
-const val SUBSCRIPTION_LABEL_KEY = "user.settings.label.subscription"
+internal val storePremiumStatus =
+    method("storePremiumStatus") {
+        strings("getStorePremiumStatus")
+    }

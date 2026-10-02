@@ -215,7 +215,7 @@ def build_body(results: list[dict], channel: str, base_url: str) -> str:
         )
         lines.append(
             f"| {escape_cell(app)} | `{result['package']}` | {latest} | {pinned} | {
-                escape_cell(patches)
+            escape_cell(patches)
             } |"
         )
     lines += [

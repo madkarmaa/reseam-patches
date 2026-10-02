@@ -3,74 +3,53 @@
 
 package top.madkarma.patches.droplert.ads
 
-import app.reseam.patch.*
+import app.reseam.patch.Type
+import app.reseam.patch.klass
+import app.reseam.patch.method
+import app.reseam.patch.methods
 
-// Interstitial, rewarded, and the native composable kept their shapes
-// across the coroutine refactor, so every disable-ads variant shares
-// these targets. Loader variants below are applied by availability:
-// whichever shapes exist in the app get patched.
+internal val supportedVersions = setOf("2.2.1", "2.4.0", "2.4.1", "2.5.0", "2.5.1", "2.5.2")
 
-val adsLegacyVersions = setOf("2.2.1", "2.4.0", "2.4.1")
-val adsSuspendVersions = setOf("2.5.0", "2.5.1", "2.5.2")
-val supportedVersions = adsLegacyVersions + adsSuspendVersions
-
-val interstitialLoader = method("interstitial ad loader") {
+internal val interstitialLoader = method("interstitialLoader") {
     strings("Loading on UI thread")
 }
 
-val rewardedAdLoader = method("rewarded ad scenario loader") {
-    paramCount(1)
+internal val rewardedAdLoader = method("rewardedAdLoader") {
     calls(interstitialLoader)
+    stringsStartingWith("ca-app-pub-")
 }
 
-val nativeAdUi = method("native ad composable") {
-    paramCount(10)
-    callsMethod { definingClass == "Lcom/google/android/gms/ads/nativead/NativeAd;" }
+private val productDetails = method("productDetails") {
+    strings("PRICE HISTORY")
 }
 
-val nativeAdLoader = method("native ad loader") {
-    paramCount(3)
+// The product-details renderer delegates its native ad to this composable.
+internal val nativeAdUi = method("nativeAdUi") {
+    calledBy(productDetails)
+    calls { owner("com.google.android.gms.ads.nativead.NativeAd") }
+}
+
+// The direct loader accepts an ad-unit ID; the coroutine body and SDK paths do not.
+internal val nativeAdLoader = method("nativeAdLoader") {
     strings("Failed to build AdLoader.")
+    hasParam(Type.String)
 }
 
-val nativeAdPreload = method("native ad preload") {
-    returns(Type.Void)
+internal val nativeAdPreload = method("nativeAdPreload") {
     calls(nativeAdLoader)
-}
-
-// The coroutine refactor moved native ad loading into a suspend function
-// (continuation param, Object return), so the direct 3-param loader form
-// is gone there. The loader queries match only their own shape, so
-// existence selects the right variant.
-
-// The only AdLoader-string method returning Object here is the coroutine
-// body (the dispatcher and SDK paths return Void), so the return type
-// selects it alone.
-val nativeAdLoaderSuspend = method("native ad loader (suspend)") {
-    returns(Type.Object)
-    strings("Failed to build AdLoader.")
-}
-
-// The ad-manager class is the first param of the native composable;
-// its Void(String) entry points launch native loads.
-val adManagerClassSuspend = classTarget("ad manager class (suspend)") {
-    val mgr =
-        nativeAdUi.method.parameterTypes.firstOrNull() ?: error("Ads: native UI has no params")
-    bytecode.findClass(mgr) ?: error("Ads: ad manager class not found: $mgr")
-}
-
-val nativeAdPreloadsSuspend = adManagerClassSuspend.methods("native ad preloads (suspend)") {
     returns(Type.Void)
-    paramCount(1)
-    param(0, Type.String)
 }
 
-// Shared body of the disable-ads patch: version-independent loaders.
-fun PatchRuntime.runDisableAdsCommon() {
-    interstitialLoader.method.alwaysReturn()
-    log.info("Ads: ${interstitialLoader.descriptor} disabled.")
-    rewardedAdLoader.method.alwaysReturn()
-    log.info("Ads: ${rewardedAdLoader.descriptor} disabled.")
-    nativeAdUi.method.alwaysReturn()
-    log.info("Ads: ${nativeAdUi.descriptor} disabled.")
+internal val nativeAdLoaderSuspend = method("nativeAdLoaderSuspend") {
+    strings("Failed to build AdLoader.")
+    returns(Type.Object)
+}
+
+private val adManager = klass("adManager") {
+    strings("Failed to check cached premium status")
+}
+
+internal val nativeAdPreloadsSuspend = adManager.methods("nativeAdPreloadsSuspend") {
+    params(Type.String)
+    returns(Type.Void)
 }

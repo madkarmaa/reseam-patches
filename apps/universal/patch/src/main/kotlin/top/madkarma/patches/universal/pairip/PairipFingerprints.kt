@@ -3,10 +3,9 @@
 
 package top.madkarma.patches.universal.pairip
 
-import app.reseam.patch.BytecodeScope
+import app.reseam.patch.*
 import app.reseam.patch.dex.AccessFlags
 import app.reseam.patch.dex.DexClass
-import app.reseam.patch.dex.isSet
 
 const val PAIRIP_DESCRIPTOR_PREFIX = "Lcom/pairip/"
 const val SIGNATURE_CHECK = "com.pairip.SignatureCheck"
@@ -39,88 +38,59 @@ val LICENSE_ACTIVITY_VOID_METHODS = arrayOf(
     "logAndShowErrorDialog",
 )
 
-fun noOp(
-    classDef: DexClass,
-    vararg methodNames: String,
-): Int {
-    var patched = 0
-    for (methodName in methodNames) {
-        classDef.methods.filter { it.name == methodName }.forEach {
-            it.alwaysReturn()
-            patched++
-        }
-    }
-    return patched
-}
+// Pairip retains these SDK names; class-scoped queries also cover overloaded methods.
+internal fun DexClass.namedMethods(vararg names: String): List<MethodTarget> =
+    klass(descriptor).methods { custom { name in names } }.all
 
-fun returnTrue(
-    classDef: DexClass,
-    vararg methodNames: String,
-): Int {
-    var patched = 0
-    for (methodName in methodNames) {
-        classDef.methods.filter { it.name == methodName }.forEach {
-            it.alwaysReturn(true)
-            patched++
-        }
-    }
-    return patched
-}
+internal fun noOp(classDef: DexClass, vararg methodNames: String): Int =
+    classDef.namedMethods(*methodNames).onEach { it.alwaysReturn() }.size
 
-fun forceLicenseResponseOk(classDef: DexClass): Int {
-    val method = classDef.methods.firstOrNull { it.name == "processResponse" } ?: return 0
-    val paramBase = method.registersSize - method.insSize
-    val responseCode = if (method.isStatic) paramBase else paramBase + 1
+internal fun returnTrue(classDef: DexClass, vararg methodNames: String): Int =
+    classDef.namedMethods(*methodNames).onEach { it.alwaysReturn(true) }.size
 
-    method.addInstructions(0) { const4(responseCode, 0) }
-    return 1
-}
+internal fun forceLicenseResponseOk(classDef: DexClass): Int {
+    if (classDef.methods.none { it.name == "processResponse" }) return 0
 
-fun disableRepeatedCheck(classDef: DexClass): Int {
-    val flag = classDef.field("repeatedCheckEnabled") ?: return 0
-    val clinit = classDef.methods.firstOrNull { it.name == "<clinit>" } ?: return 0
-    val scratch = clinit.registersSize
-
-    if (!clinit.growLocalRegisters(1)) return 0
-
-    clinit.addInstructions(0) {
-        const4(scratch, 0)
-        sputBoolean(scratch, flag)
+    klass(classDef.descriptor).method("processResponse").before {
+        paramOfType(Type.Int).assign(int(0))
     }
     return 1
 }
 
-fun spoofInstallerChecks(scope: BytecodeScope): Int {
-    var booleanDone = false
-    var stringDone = false
+internal fun disableRepeatedCheck(classDef: DexClass): Int {
+    if (classDef.field("repeatedCheckEnabled") == null) return 0
+    if (classDef.methods.none { it.name == "<clinit>" }) return 0
 
-    for (classDef in scope.classes) {
-        if (classDef.descriptor.startsWith(PAIRIP_DESCRIPTOR_PREFIX)) continue
-
-        for (method in classDef.methods) {
-            if (method.parameterTypes.isNotEmpty()) continue
-            if (method.indexOfFirstString(PLAY_STORE) == null) continue
-            if (!AccessFlags.PRIVATE.isSet(method.info.accessFlags)) continue
-
-            when (method.returnType) {
-                "Z" -> {
-                    if (!booleanDone) {
-                        method.alwaysReturn(true)
-                        booleanDone = true
-                    }
-                }
-
-                "Ljava/lang/String;" -> {
-                    if (!stringDone) {
-                        method.alwaysReturn(PLAY_STORE)
-                        stringDone = true
-                    }
-                }
-            }
-        }
-
-        if (booleanDone && stringDone) break
+    val client = klass(classDef.descriptor)
+    client.method("<clinit>").before {
+        setStatic(client.field("repeatedCheckEnabled"), bool(false))
     }
+    return 1
+}
 
-    return (if (booleanDone) 1 else 0) + (if (stringDone) 1 else 0)
+// These optional checks live outside Pairip. Reject ambiguity instead of selecting an arbitrary app method.
+private fun installerCheck(returnType: String): MethodTarget? {
+    val matches = methods("installerCheck:$returnType") {
+        strings(PLAY_STORE)
+        params()
+        returns(returnType)
+        flags(AccessFlags.PRIVATE)
+        custom { !owner.startsWith(PAIRIP_DESCRIPTOR_PREFIX) }
+    }.all
+    if (matches.isEmpty()) return null
+    return matches.singleOrNull()
+        ?: error("Pairip: multiple installer checks returning $returnType")
+}
+
+internal fun spoofInstallerChecks(): Int {
+    val booleanCheck = installerCheck(Type.Boolean)
+    val installerName = installerCheck(Type.String)
+    booleanCheck?.alwaysReturn(true)
+    installerName?.alwaysReturn(PLAY_STORE)
+    return listOfNotNull(booleanCheck, installerName).size
+}
+
+internal val pairipStoreLaunchers = methods("pairipStoreLaunchers") {
+    name("openPlayStore")
+    custom { owner.startsWith(PAIRIP_DESCRIPTOR_PREFIX) }
 }

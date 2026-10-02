@@ -17,7 +17,5 @@ val bugFixes = patch("Bug fixes") {
         // of a message after restoring a backup.
         channelCardGate.alwaysReturn(false)
         log.info("Bug fixes: ${channelCardGate.descriptor} forced false.")
-
-        // Future bug fixes go here.
     }
 }

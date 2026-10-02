@@ -40,7 +40,8 @@ https://github.com/madkarmaa/reseam-patches/releases/latest/download/patches.jso
 
 ## Releases
 
-The release workflow generates [GitHub build provenance attestations](https://docs.github.com/en/actions/how-tos/secure-your-work/use-artifact-attestations/use-artifact-attestations)
+The release workflow
+generates [GitHub build provenance attestations](https://docs.github.com/en/actions/how-tos/secure-your-work/use-artifact-attestations/use-artifact-attestations)
 for `madkarma-patches.reseam`, including stable releases,
 prereleases, and manual builds.
 
