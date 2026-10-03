@@ -22,7 +22,7 @@ permissions:
     issues: write
 
 env: # Must match the plugin version in settings.gradle.kts.
-    ENGINE_VERSION: v0.18.0
+    ENGINE_VERSION: v0.18.1
     RESEAM_BIN: engine/reseam-linux-x64
 
 jobs:
@@ -31,7 +31,7 @@ jobs:
         runs-on: ubuntu-latest
 
         env:
-            SNIFF_BASE_URL: https://sniff.madkarma.top
+            SNIFF_BASE_URL: https://sniff.madkarma.top/v2
             PACKAGE_NAME: ${{ inputs.package }}
 
         steps:
