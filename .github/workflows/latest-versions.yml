@@ -31,7 +31,7 @@ jobs:
         runs-on: ubuntu-latest
 
         env:
-            SNIFF_BASE_URL: https://sniff.madkarma.top
+            SNIFF_BASE_URL: https://sniff.madkarma.top/v2
             PACKAGE_NAME: ${{ inputs.package }}
 
         steps:

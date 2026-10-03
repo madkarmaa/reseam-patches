@@ -5,7 +5,7 @@
 """
 Usage:
     compatibility_bump_notifier.py [--dry-run] [--package <id>] [--channel stable]
-                         [--base-url https://sniff.madkarma.top]
+                         [--base-url https://sniff.madkarma.top/v2]
                          [--patches-json build/reseam/patches.json]
 
 The pinned versions are read from the release index written by the
@@ -13,7 +13,7 @@ The pinned versions are read from the release index written by the
 `./gradlew generatePatchesJson -PreleaseTag=v0.0.0-version-check`.
 
 Environment:
-    SNIFF_BASE_URL  API base URL (default https://sniff.madkarma.top).
+    SNIFF_BASE_URL  API base URL (default https://sniff.madkarma.top/v2).
     GH_TOKEN        token for `gh` (CI provides GITHUB_TOKEN).
 """
 
@@ -30,7 +30,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_PATCHES_JSON = REPO_ROOT / "build" / "reseam" / "patches.json"
-DEFAULT_BASE_URL = "https://sniff.madkarma.top"
+DEFAULT_BASE_URL = "https://sniff.madkarma.top/v2"
 DEFAULT_CHANNEL = "stable"
 ISSUE_LABEL = "app-update"
 UA = {"User-Agent": "Mozilla/5.0"}
@@ -85,7 +85,7 @@ def collect_pins(
 
 def sniff_latest(package: str, base_url: str, channel: str) -> tuple[str, str] | None:
     """Return (normalized version_name, app title) or None on 404."""
-    url = f"{base_url}/v1/details/{package}/{channel}"
+    url = f"{base_url.rstrip('/')}/download/{package}/{channel}"
     req = urllib.request.Request(url, headers=UA)
 
     try:

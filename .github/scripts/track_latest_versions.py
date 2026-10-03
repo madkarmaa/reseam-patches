@@ -5,7 +5,7 @@
 """
 Usage:
     track_latest_versions.py [--dry-run] [--package <id>] [--channel stable]
-                             [--base-url https://sniff.madkarma.top]
+                             [--base-url https://sniff.madkarma.top/v2]
                              [--patches-json build/reseam/patches.json]
                              [--issue-title "Latest upstream app versions"]
                              [--label app-latest]
@@ -13,15 +13,15 @@ Usage:
 Collects every package declared by the patches (pinned or not) from the
 release index written by the `:generatePatchesJson` Gradle task - run it
 first, e.g. `./gradlew generatePatchesJson -PreleaseTag=v0.0.0-latest-check` -
-queries the sniff API (see https://sniff.madkarma.top/docs,
-GET /v1/details/{package_name}/{channel}) for the latest stable release,
+queries the sniff API (see https://sniff.madkarma.top/v2,
+GET /v2/download/{package_name}/{channel}) for the latest stable release,
 and upserts a single sticky issue tracking the results.
 
 Packages with an empty version list are NOT
 skipped: the point is a daily re-patch checklist, including unpinned apps.
 
 Environment:
-    SNIFF_BASE_URL  API base URL (default https://sniff.madkarma.top).
+    SNIFF_BASE_URL  API base URL (default https://sniff.madkarma.top/v2).
     GH_TOKEN        token for `gh` (CI provides GITHUB_TOKEN).
 """
 
@@ -40,7 +40,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_PATCHES_JSON = REPO_ROOT / "build" / "reseam" / "patches.json"
-DEFAULT_BASE_URL = "https://sniff.madkarma.top"
+DEFAULT_BASE_URL = "https://sniff.madkarma.top/v2"
 DEFAULT_CHANNEL = "stable"
 STICKY_TITLE = "Latest upstream app versions"
 ISSUE_LABEL = "app-latest"
@@ -96,7 +96,7 @@ def collect_packages(
 
 def sniff_latest(package: str, base_url: str, channel: str) -> tuple[str, int | None, str] | None:
     """Return (normalized version_name, version_code or None, app title) or None on failure."""
-    url = f"{base_url}/v1/details/{package}/{channel}"
+    url = f"{base_url.rstrip('/')}/download/{package}/{channel}"
     req = urllib.request.Request(url, headers=UA)
 
     try:
