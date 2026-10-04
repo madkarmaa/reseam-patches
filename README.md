@@ -5,6 +5,87 @@ My patch bundle for Android apps I use, built with [Reseam](https://reseam.app).
 ## Patches
 
 <!-- PATCHES:START -->
+
+<details>
+<summary><strong>bitpit.launcher</strong></summary>
+
+| Name | Description | Supported versions |
+| --- | --- | --- |
+| Bug fixes | Fixes various app bugs. | Any version |
+| Disable analytics | Refuses and blocks analytics collection. | Any version |
+| Skip intro | Skips the promo and terms screens, landing directly on setup. | Any version |
+| Unlock Pro | Unlocks Pro-only features. | Any version |
+| Weather widget fix | Serves the weather widget from WeatherAPI.com instead of the Niagara backend. Enter your key in the weather settings sheet. | Any version |
+
+</details>
+
+<details>
+<summary><strong>com.adguard.android</strong></summary>
+
+| Name | Description | Supported versions |
+| --- | --- | --- |
+| Skip setup | Configure the app before installing it. Does NOT include the advanced filters available in the app settings. | 4.15.0 |
+| Unlock Lifetime premium | Unlocks premium-only features. | 4.15.0 |
+
+</details>
+
+<details>
+<summary><strong>com.alltrails.alltrails</strong></summary>
+
+| Name | Description | Supported versions |
+| --- | --- | --- |
+| Unlock Peak | Unlocks Peak-only features. | Any version |
+
+</details>
+
+<details>
+<summary><strong>com.arn.scrobble</strong></summary>
+
+| Name | Description | Supported versions |
+| --- | --- | --- |
+| Unlock Plus | Unlocks Plus-only features. | Any version |
+
+</details>
+
+<details>
+<summary><strong>com.gymbros.app</strong></summary>
+
+| Name | Description | Supported versions |
+| --- | --- | --- |
+| Unlock Pro | Unlocks Pro-only features, including shop items. | Any version |
+
+</details>
+
+<details>
+<summary><strong>com.shahzaman.pricetracker</strong></summary>
+
+| Name | Description | Supported versions |
+| --- | --- | --- |
+| Disable ads | Disables in-app ads | 2.2.1, 2.4.0, 2.4.1, 2.5.0, 2.5.1, 2.5.2 |
+| Skip onboarding | Skips the setup screens, landing directly on home. | 2.2.1, 2.4.0, 2.4.1, 2.5.0, 2.5.1, 2.5.2 |
+| Unlock Lifetime Premium | Unlocks Premium-only features. | 2.2.1, 2.4.0, 2.4.1, 2.5.0, 2.5.1, 2.5.2 |
+
+</details>
+
+<details>
+<summary><strong>com.yazio.android</strong></summary>
+
+| Name | Description | Supported versions |
+| --- | --- | --- |
+| Unlock Pro | Unlocks Pro-only features. | Any version |
+
+</details>
+
+<details>
+<summary><strong>Universal</strong></summary>
+
+| Name | Description | Supported versions |
+| --- | --- | --- |
+| Bypass signature checks | Spoofs the original app signature (port of ApkSignatureKillerEx). | Any version |
+| Force extract native libs | Sets android:extractNativeLibs to true when it is false. | Any version |
+
+</details>
+
 <!-- PATCHES:END -->
 
 ## Get updates in Reseam Manager
