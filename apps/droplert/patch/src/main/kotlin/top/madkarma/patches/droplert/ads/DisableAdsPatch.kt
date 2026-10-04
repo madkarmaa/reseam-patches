@@ -5,17 +5,13 @@
 
 package top.madkarma.patches.droplert.ads
 
-import app.reseam.patch.alwaysReturn
-import app.reseam.patch.alwaysReturnNull
-import app.reseam.patch.invoke
-import app.reseam.patch.patch
+import app.reseam.patch.*
 import top.madkarma.patches.shared.isPresent
-import top.madkarma.patches.universal.pairip.removePairip
 
 val disableAds = patch("Disable ads") {
     description("Disables in-app ads")
     compatibleWith("com.shahzaman.pricetracker"(*supportedVersions.toTypedArray()))
-    dependsOn(removePairip)
+    dependsOn(ExternalPatch("reseam-patches", "app.reseam.patches.universal.removePairip"))
 
     execute {
         interstitialLoader.alwaysReturn()
