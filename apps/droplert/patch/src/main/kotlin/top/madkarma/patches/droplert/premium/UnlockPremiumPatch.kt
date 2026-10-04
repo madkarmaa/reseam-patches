@@ -8,12 +8,11 @@ package top.madkarma.patches.droplert.premium
 import app.reseam.patch.*
 import top.madkarma.patches.droplert.Prefs
 import top.madkarma.patches.shared.isPresent
-import top.madkarma.patches.universal.pairip.removePairip
 
 val unlockPremium = patch("Unlock Lifetime Premium") {
     description("Unlocks Premium-only features.")
     compatibleWith("com.shahzaman.pricetracker"(*supportedVersions.toTypedArray()))
-    dependsOn(removePairip)
+    dependsOn(ExternalPatch("reseam-patches", "app.reseam.patches.universal.removePairip"))
 
     execute {
         isPremium.alwaysReturn(true)

@@ -2,6 +2,19 @@
 
 My patch bundle for Android apps I use, built with [Reseam](https://reseam.app).
 
+## Patches
+
+<!-- PATCHES:START -->
+<!-- PATCHES:END -->
+
+## Get updates in Reseam Manager
+
+Add this index URL in Reseam Manager:
+
+```text
+https://github.com/madkarmaa/reseam-patches/releases/latest/download/patches.json
+```
+
 ## Setup
 
 - JDK 17.
@@ -30,14 +43,6 @@ reseam patch app.apk \
   --output patched.apk
 ```
 
-## Get updates in Reseam Manager
-
-Add this index URL in Reseam Manager:
-
-```text
-https://github.com/madkarmaa/reseam-patches/releases/latest/download/patches.json
-```
-
 ## Releases
 
 The release workflow
@@ -45,7 +50,7 @@ generates [GitHub build provenance attestations](https://docs.github.com/en/acti
 for `madkarma-patches.reseam`, including stable releases,
 prereleases, and manual builds.
 
-After downloading assets from a release, verify them with the GitHub CLI:
+After downloading assets from a release, you can verify them with the GitHub CLI:
 
 ```shell
 gh attestation verify madkarma-patches.reseam --repo madkarmaa/reseam-patches \
