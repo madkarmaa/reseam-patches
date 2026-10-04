@@ -3,7 +3,10 @@
 
 package top.madkarma.patches.adguard.setup
 
-import app.reseam.patch.*
+import app.reseam.patch.Type
+import app.reseam.patch.fieldOfType
+import app.reseam.patch.klass
+import app.reseam.patch.method
 
 internal const val PRIVACY_LEVEL = "com.adguard.android.management.filtering.StealthModeLevel"
 internal const val FILTER_GROUP = "com.adguard.android.model.filter.FilterGroup"
@@ -51,41 +54,47 @@ private val applyConfiguration = method("applyConfiguration") {
     calls { params(PRIVACY_LEVEL) }
 }
 
-internal val setPrivacyLevel = applyConfiguration.point {
-    invokeInterface { params(PRIVACY_LEVEL) }
-}.callee("setPrivacyLevel")
-
-private val enableSecurityGroup = applyConfiguration.point {
-    field { owner(FILTER_GROUP); name("Security") }
-}.next {
-    invokeInterface { params(FILTER_GROUP) }
+internal val setPrivacyLevel = method("setPrivacyLevel") {
+    calledBy(applyConfiguration)
+    params(PRIVACY_LEVEL)
+    returns(Type.Void)
 }
 
-internal val enableFilterGroup = enableSecurityGroup.callee("enableFilterGroup")
+private val deviceLanguages = method("deviceLanguages") {
+    strings("getSystemLocales(...)")
+}
 
-// The next group call is the opposite branch of the same dangerous-sites choice.
-internal val disableFilterGroup = enableSecurityGroup.next {
-    invokeInterface { params(FILTER_GROUP) }
-}.callee("disableFilterGroup")
+internal val enableFilterGroup = method("enableFilterGroup") {
+    inClass(klass(filteringConstructor.owner))
+    params(FILTER_GROUP)
+    returns(Type.Void)
+    // Enabling a group selects recommended filters for the device's locales.
+    calls(deviceLanguages)
+}
 
-// The first setting written by the tuning flow is the inverse of "Block search ads".
-private val allowSearchAds = applyConfiguration.point {
-    invokeInterface { params(Type.Boolean) }
-}.callee("allowSearchAds")
+internal val disableFilterGroup = method("disableFilterGroup") {
+    inClass(klass(filteringConstructor.owner))
+    params(FILTER_GROUP)
+    returns(Type.Void)
+    custom { name != enableFilterGroup.name }
+}
 
 private val setSearchAds = method("setSearchAds") {
     inClass(klass(filteringConstructor.owner))
-    name(allowSearchAds.name)
     params(Type.Boolean)
+    literals(10) // Search-ad exceptions filter.
 }
 
-private val updateFilters = setSearchAds.point {
-    invokeVirtual { params(Type.List, Type.Boolean); returns(Type.Long) }
-}.callee("updateFilters")
+private val updateFilters = method("updateFilters") {
+    calledBy(setSearchAds)
+    params(Type.List, Type.Boolean)
+    returns(Type.Long)
+}
 
-internal val standardAdapter = updateFilters.point {
-    invokeVirtual { returns("com.adguard.flm.FlmAdapter") }
-}.callee("standardAdapter")
+internal val standardAdapter = method("standardAdapter") {
+    calledBy(updateFilters)
+    returns("com.adguard.flm.FlmAdapter")
+}
 
 internal val filterOperations = klass(filteringConstructor.owner).fieldOfType(updateFilters.owner)
 internal val filterAdapters = klass(updateFilters.owner).fieldOfType(standardAdapter.owner)
