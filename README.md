@@ -48,6 +48,15 @@ My patch bundle for Android apps I use, built with [Reseam](https://reseam.app).
 </details>
 
 <details>
+<summary><strong>com.frontrow.vlog</strong></summary>
+
+| Name | Description | Supported versions |
+| --- | --- | --- |
+| Unlock Pro | Unlocks Pro-only features | Any version |
+
+</details>
+
+<details>
 <summary><strong>com.gymbros.app</strong></summary>
 
 | Name | Description | Supported versions |
