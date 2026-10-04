@@ -12,7 +12,7 @@ permissions:
     attestations: write
 
 env: # Must match the plugin version in settings.gradle.kts.
-    ENGINE_VERSION: v0.18.2
+    ENGINE_VERSION: v0.18.3
     RESEAM_BIN: engine/reseam-linux-x64
 
 jobs:
