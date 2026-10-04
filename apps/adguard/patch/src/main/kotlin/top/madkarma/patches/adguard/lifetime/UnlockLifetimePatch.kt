@@ -7,30 +7,33 @@ package top.madkarma.patches.adguard.lifetime
 
 import app.reseam.patch.*
 
-val unlockLifetime =
-    patch("Unlock Lifetime premium") {
-        description("Unlocks premium-only features.")
-        compatibleWith("com.adguard.android"("4.15.0"))
+val unlockLifetime = patch("Unlock Lifetime premium") {
+    description("Unlocks premium-only features.")
+    compatibleWith("com.adguard.android"("4.15.0"))
 
-        execute {
-            initialCachedState.before { returnValue(lifetimeLicense()) }
-            fetchBackendState.before { returnValue(lifetimeLicense()) }
+    execute {
+        initialCachedState.before { returnValue(lifetimeLicense()) }
+        log.info("Lifetime: ${initialCachedState.descriptor} returns a Family lifetime license.")
 
-            // Keep the updater's storage writes and notifications using the normalized state.
-            updateLicenseState.before { param(0).assign(lifetimeLicense()) }
+        fetchBackendState.before { returnValue(lifetimeLicense()) }
+        log.info("Lifetime: ${fetchBackendState.descriptor} returns a Family lifetime license.")
 
-            maskLicenseKey.replace { returnValue(paramOfType(Type.String)) }
-        }
+        // Keep the updater's storage writes and notifications using the normalized state.
+        updateLicenseState.before { param(0).assign(lifetimeLicense()) }
+        log.info("Lifetime: ${updateLicenseState.descriptor} stores the normalized lifetime license.")
+
+        maskLicenseKey.replace { returnValue(paramOfType(Type.String)) }
+        log.info("Lifetime: ${maskLicenseKey.descriptor} displays the full license label.")
     }
+}
 
-private fun CodeScope.lifetimeLicense(): ValueRef =
-    newInstance(
-        paidLicenseState.descriptor,
-        paidLicenseConstructor.proto,
-        string("Patched with ❤ by MadKarma ;)"), // License key
-        staticField(familyLicense),
-        staticField(lifetimeInstance),
-        int(67), // Devices in use.
-        int(69), // Family license device limit.
-        string("You (maybe)"), // Account owner.
-    )
+private fun CodeScope.lifetimeLicense(): ValueRef = newInstance(
+    paidLicenseState.descriptor,
+    paidLicenseConstructor.proto,
+    string("Patched with ❤ by MadKarma ;)"), // License key
+    staticField(familyLicense),
+    staticField(lifetimeInstance),
+    int(67), // Devices in use.
+    int(69), // Family license device limit.
+    string("You (maybe)"), // Account owner.
+)
