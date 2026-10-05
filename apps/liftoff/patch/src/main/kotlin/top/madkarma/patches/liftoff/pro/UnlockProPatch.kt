@@ -6,6 +6,7 @@
 package top.madkarma.patches.liftoff.pro
 
 import app.reseam.patch.*
+import top.madkarma.patches.liftoff.ProEntitlements
 
 val unlockPro = patch("Unlock Pro") {
     description("Unlocks Pro-only features, including shop items.")
@@ -40,7 +41,3 @@ val unlockPro = patch("Unlock Pro") {
 
 private fun CodeScope.singletonSet(value: ValueRef): ValueRef =
     callStatic("java.util.Collections", "singleton", proto("java.util.Set", Type.Object), value)
-
-private object ProEntitlements : ExtClass("top.madkarma.liftoff.extensions.ProEntitlements") {
-    val applyProEntitlements = static("applyProEntitlements", "java.util.Map")
-}

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-package top.madkarma.patches.universal.signature
+package top.madkarma.patches.universal
 
 import app.reseam.patch.ExtClass
 import app.reseam.patch.Type
