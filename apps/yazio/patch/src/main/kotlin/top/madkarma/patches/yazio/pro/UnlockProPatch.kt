@@ -6,6 +6,7 @@
 package top.madkarma.patches.yazio.pro
 
 import app.reseam.patch.*
+import top.madkarma.patches.shared.PATCH_ATTRIBUTION
 
 private const val PREMIUM_TYPE = "yazio.user.api.PremiumType"
 private const val STORE_PREMIUM_STATUS = "yazio.payment.api.subscription.StorePremiumStatus"
@@ -17,7 +18,7 @@ val unlockPro =
         compatibleWith("com.yazio.android")
 
         execute {
-            check(resources.setString(SUBSCRIPTION_LABEL_KEY, "Patched with ❤ by MadKarma ;)")) {
+            check(resources.setString(SUBSCRIPTION_LABEL_KEY, PATCH_ATTRIBUTION)) {
                 "Unlock Pro: failed to rewrite string $SUBSCRIPTION_LABEL_KEY"
             }
 

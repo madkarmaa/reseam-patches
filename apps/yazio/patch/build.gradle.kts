@@ -4,3 +4,7 @@
 plugins {
     id("app.reseam.patches")
 }
+
+dependencies {
+    implementation(project(":apps:shared"))
+}

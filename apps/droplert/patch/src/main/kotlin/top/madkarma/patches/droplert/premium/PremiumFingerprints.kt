@@ -5,8 +5,6 @@ package top.madkarma.patches.droplert.premium
 
 import app.reseam.patch.*
 
-internal val supportedVersions = setOf("2.2.1", "2.4.0", "2.4.1", "2.5.0", "2.5.1", "2.5.2")
-
 internal val entitlementIsActive =
     klass("com.revenuecat.purchases.EntitlementInfo").method("isActive")
 
