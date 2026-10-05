@@ -7,5 +7,5 @@ import app.reseam.patch.ExtClass
 import app.reseam.patch.Type
 
 internal object Prefs : ExtClass("top.madkarma.droplert.extensions.Prefs") {
-    val putBoolean = static("putBoolean", Type.Context, Type.String, Type.Boolean)
+    val putBoolean by static(Type.Context, Type.String, Type.Boolean)
 }

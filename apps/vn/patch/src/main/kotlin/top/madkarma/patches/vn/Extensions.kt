@@ -9,13 +9,13 @@ import app.reseam.patch.ExtClass
 import app.reseam.patch.Type
 
 internal object Prefs : ExtClass("top.madkarma.vn.extensions.Prefs") {
-    val putBoolean = static("putBoolean", Type.Context, Type.String, Type.String, Type.Boolean)
+    val putBoolean by static(Type.Context, Type.String, Type.String, Type.Boolean)
 }
 
 internal object Pro : ExtClass("top.madkarma.vn.extensions.Pro") {
-    val initializePreferences = static("initializePreferences", Type.Context)
+    val initializePreferences by static(Type.Context)
 
-    val normalizeStartupConfiguration = static("normalizeStartupConfiguration", Type.Object)
+    val normalizeStartupConfiguration by static(Type.Object)
 
     const val PERSONALIZATION_ACTIVITY =
         $$"top.madkarma.vn.extensions.Pro$SkippedPersonalizationActivity"

@@ -6,5 +6,5 @@ import app.reseam.patch.Type
 internal object MembershipAttribution :
     ExtClass("top.madkarma.extensions.accuweather.MembershipAttribution") {
 
-    val install = static("install", "android.webkit.WebView", Type.String)
+    val install by static("android.webkit.WebView", Type.String)
 }

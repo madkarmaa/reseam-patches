@@ -7,32 +7,31 @@ import app.reseam.patch.ExtClass
 import app.reseam.patch.Type
 
 internal object AdGuardSetup : ExtClass("top.madkarma.extensions.adguard.AdGuardSetup") {
-    val create = static("create", Type.Context, "com.adguard.flm.FlmAdapter", returns = descriptor)
+    val create by static(Type.Context, "com.adguard.flm.FlmAdapter", returns = descriptor)
 
-    val needsSetup = method("needsSetup", returns = Type.Boolean)
+    val needsSetup by method(returns = Type.Boolean)
 
-    val approvedAnnoyanceFilters =
-        method("approvedAnnoyanceFilters", Type.Int, returns = "java.util.Set")
+    val approvedAnnoyanceFilters by method(Type.Int, returns = "java.util.Set")
 
-    val acceptTerms = method("acceptTerms")
-    val disableAutomaticCrashReporting = method("disableAutomaticCrashReporting")
-    val disableUsageTelemetry = method("disableUsageTelemetry")
+    val acceptTerms by method()
+    val disableAutomaticCrashReporting by method()
+    val disableUsageTelemetry by method()
 
-    val markFirstOnboardingShown = method("markFirstOnboardingShown")
-    val markSecondOnboardingShown = method("markSecondOnboardingShown")
+    val markFirstOnboardingShown by method()
+    val markSecondOnboardingShown by method()
 
-    val setNotificationPromptEnabled = method("setNotificationPromptEnabled", Type.Boolean)
+    val setNotificationPromptEnabled by method(Type.Boolean)
 
-    val setAnnoyanceBlockingEnabled = method("setAnnoyanceBlockingEnabled", Type.Boolean)
-    val setBrowsingSecurityEnabled = method("setBrowsingSecurityEnabled", Type.Boolean)
-    val setPrivacyProtectionEnabled = method("setPrivacyProtectionEnabled", Type.Boolean)
-    val setSearchAdsBlockingEnabled = method("setSearchAdsBlockingEnabled", Type.Boolean)
-    val setSocialMediaFilterEnabled = method("setSocialMediaFilterEnabled", Type.Boolean)
-    val setCookieNoticesFilterEnabled = method("setCookieNoticesFilterEnabled", Type.Boolean)
-    val setPopupsFilterEnabled = method("setPopupsFilterEnabled", Type.Boolean)
-    val setMobileAppBannersFilterEnabled = method("setMobileAppBannersFilterEnabled", Type.Boolean)
-    val setOtherAnnoyancesFilterEnabled = method("setOtherAnnoyancesFilterEnabled", Type.Boolean)
-    val setWidgetsFilterEnabled = method("setWidgetsFilterEnabled", Type.Boolean)
+    val setAnnoyanceBlockingEnabled by method(Type.Boolean)
+    val setBrowsingSecurityEnabled by method(Type.Boolean)
+    val setPrivacyProtectionEnabled by method(Type.Boolean)
+    val setSearchAdsBlockingEnabled by method(Type.Boolean)
+    val setSocialMediaFilterEnabled by method(Type.Boolean)
+    val setCookieNoticesFilterEnabled by method(Type.Boolean)
+    val setPopupsFilterEnabled by method(Type.Boolean)
+    val setMobileAppBannersFilterEnabled by method(Type.Boolean)
+    val setOtherAnnoyancesFilterEnabled by method(Type.Boolean)
+    val setWidgetsFilterEnabled by method(Type.Boolean)
 
-    val markSetupCompleted = method("markSetupCompleted")
+    val markSetupCompleted by method()
 }
