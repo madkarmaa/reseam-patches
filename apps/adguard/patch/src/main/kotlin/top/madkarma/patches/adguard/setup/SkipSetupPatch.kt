@@ -5,7 +5,10 @@
 
 package top.madkarma.patches.adguard.setup
 
-import app.reseam.patch.*
+import app.reseam.patch.Type
+import app.reseam.patch.after
+import app.reseam.patch.patch
+import app.reseam.patch.replace
 import top.madkarma.patches.adguard.AdGuardSetup
 import top.madkarma.patches.shared.isPresent
 
@@ -13,7 +16,7 @@ val skipSetup = patch("Skip setup") {
     description(
         "Configure the app before installing it. Does NOT include the advanced filters available in the app settings."
     )
-    compatibleWith("com.adguard.android"("4.15.0"))
+    compatibleWith("com.adguard.android")
 
     val blockSearchAds = boolOption(
         "blockSearchAds",
