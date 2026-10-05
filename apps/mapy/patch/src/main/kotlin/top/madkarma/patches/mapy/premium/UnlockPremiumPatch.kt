@@ -10,7 +10,7 @@ import top.madkarma.patches.mapy.Premium
 import top.madkarma.patches.shared.PATCH_ATTRIBUTION
 
 val unlockPremium = patch("Unlock Premium") {
-    description("Enables local Premium features and unlimited access, regardless of subscription updates.")
+    description("Unlocks Premium-only features.")
     compatibleWith("cz.seznam.mapy")
 
     execute {

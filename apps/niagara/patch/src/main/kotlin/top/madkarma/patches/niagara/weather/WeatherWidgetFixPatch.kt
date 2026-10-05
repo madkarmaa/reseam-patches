@@ -6,6 +6,8 @@
 package top.madkarma.patches.niagara.weather
 
 import app.reseam.patch.*
+import top.madkarma.patches.niagara.WeatherApi
+import top.madkarma.patches.niagara.WeatherApiKeyField
 import top.madkarma.patches.niagara.pro.unlockPro
 
 val weatherWidgetFix = patch("Weather widget fix") {
@@ -52,19 +54,9 @@ val weatherWidgetFix = patch("Weather widget fix") {
         log.info("Weather widget fix: fetch wired to WeatherAPI.com")
 
         weatherContentBind.after {
-            call(ApiKeyField.attach, lastParam)
+            call(WeatherApiKeyField.attach, lastParam)
         }
 
         log.info("Weather widget fix: key field added to weather sheet")
     }
-}
-
-private object WeatherApi : ExtClass("top.madkarma.extensions.WeatherApi") {
-    val create = static("create", Type.Context, returns = "top.madkarma.extensions.WeatherApi")
-    val fetch = method("fetch", returns = Type.String)
-    val now = method("now", returns = Type.Long)
-}
-
-private object ApiKeyField : ExtClass("top.madkarma.extensions.WeatherApiKeyField") {
-    val attach = static("attach", Type.Object)
 }
