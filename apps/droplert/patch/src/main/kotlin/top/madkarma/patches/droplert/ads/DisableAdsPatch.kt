@@ -10,7 +10,11 @@ import top.madkarma.patches.shared.isPresent
 
 val disableAds = patch("Disable ads") {
     description("Disables in-app ads")
-    compatibleWith("com.shahzaman.pricetracker"(*supportedVersions.toTypedArray()))
+    compatibleWith(
+        "com.shahzaman.pricetracker"(
+            "2.2.1", "2.4.0", "2.4.1", "2.5.0", "2.5.1", "2.5.2", "2.5.3"
+        )
+    )
     dependsOn(ExternalPatch("reseam-patches", "app.reseam.patches.universal.removePairip"))
 
     execute {
