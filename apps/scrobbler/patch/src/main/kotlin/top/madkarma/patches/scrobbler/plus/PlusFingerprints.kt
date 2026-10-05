@@ -3,22 +3,31 @@
 
 package top.madkarma.patches.scrobbler.plus
 
+import app.reseam.patch.Type
 import app.reseam.patch.klass
 import app.reseam.patch.method
-import app.reseam.patch.point
+import app.reseam.patch.methods
 
-private val licenseState =
-    klass("licenseState") {
-        strings("NO_LICENSE")
-    }
+internal val licenseState = klass("licenseState") {
+    strings("NO_LICENSE", "VALID")
+}
 
-internal val noLicense = licenseEntry("NO_LICENSE")
-internal val validLicense = licenseEntry("VALID")
+internal val licenseStateValueOf = licenseState.method("valueOf")
 
-// Field declarations lose the enum names; the initializer preserves each name before its field assignment.
-private fun licenseEntry(name: String) =
-    licenseState
-        .method("<clinit>")
-        .point { string(name) }
-        .next { field { type(licenseState.descriptor) } }
-        .field(name)
+private val jwtPurchaseVerifier = methods("jwtPurchaseVerifier") {
+    strings("pscrobbler_pro")
+    returns(Type.Boolean)
+}
+
+private val playPurchaseVerifier = methods("playPurchaseVerifier") {
+    strings("Error verifying purchase: ")
+}
+
+// Both billing variants evaluate receipts in a coroutine that takes an Object.
+internal val checkLicense = method("checkLicense") {
+    val verifier = (jwtPurchaseVerifier.all + playPurchaseVerifier.all).singleOrNull()
+        ?: error("Unlock Plus: expected exactly one purchase verifier")
+
+    calls(verifier)
+    params(Type.Object)
+}
