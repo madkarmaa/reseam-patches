@@ -52,7 +52,7 @@ My patch bundle for Android apps I use, built with [Reseam](https://reseam.app).
 
 | Name | Description | Supported versions |
 | --- | --- | --- |
-| Unlock Pro | Unlocks Pro-only features | Any version |
+| Unlock Pro | Unlocks Pro-only features. | Any version |
 
 </details>
 
@@ -70,9 +70,9 @@ My patch bundle for Android apps I use, built with [Reseam](https://reseam.app).
 
 | Name | Description | Supported versions |
 | --- | --- | --- |
-| Disable ads | Disables in-app ads | 2.2.1, 2.4.0, 2.4.1, 2.5.0, 2.5.1, 2.5.2 |
-| Skip onboarding | Skips the setup screens, landing directly on home. | 2.2.1, 2.4.0, 2.4.1, 2.5.0, 2.5.1, 2.5.2 |
-| Unlock Lifetime Premium | Unlocks Premium-only features. | 2.2.1, 2.4.0, 2.4.1, 2.5.0, 2.5.1, 2.5.2 |
+| Disable ads | Disables in-app ads | 2.2.1, 2.4.0, 2.4.1, 2.5.0, 2.5.1, 2.5.2, 2.5.3 |
+| Skip onboarding | Skips the setup screens, landing directly on home. | 2.2.1, 2.4.0, 2.4.1, 2.5.0, 2.5.1, 2.5.2, 2.5.3 |
+| Unlock Lifetime Premium | Unlocks Premium-only features. | 2.2.1, 2.4.0, 2.4.1, 2.5.0, 2.5.1, 2.5.2, 2.5.3 |
 
 </details>
 
@@ -82,6 +82,15 @@ My patch bundle for Android apps I use, built with [Reseam](https://reseam.app).
 | Name | Description | Supported versions |
 | --- | --- | --- |
 | Unlock Pro | Unlocks Pro-only features. | Any version |
+
+</details>
+
+<details>
+<summary><strong>cz.seznam.mapy</strong></summary>
+
+| Name | Description | Supported versions |
+| --- | --- | --- |
+| Unlock Premium | Enables local Premium features and unlimited access, regardless of subscription updates. | Any version |
 
 </details>
 
