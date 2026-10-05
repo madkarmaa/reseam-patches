@@ -75,6 +75,15 @@ My patch bundle for Android apps I use, built with [Reseam](https://reseam.app).
 </details>
 
 <details>
+<summary><strong>com.picsart.studio</strong></summary>
+
+| Name | Description | Supported versions |
+| --- | --- | --- |
+| Unlock Ultra | Unlocks Ultra-only features. Server credit balances remain unchanged. | Any version |
+
+</details>
+
+<details>
 <summary><strong>com.shahzaman.pricetracker</strong></summary>
 
 | Name | Description | Supported versions |
