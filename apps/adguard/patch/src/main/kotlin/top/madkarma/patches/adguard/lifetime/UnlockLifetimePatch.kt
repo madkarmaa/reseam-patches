@@ -9,7 +9,7 @@ import app.reseam.patch.*
 import top.madkarma.patches.shared.PATCH_ATTRIBUTION
 
 val unlockLifetime = patch("Unlock Lifetime premium") {
-    description("Unlocks premium-only features.")
+    description("Unlocks Premium-only features.")
     compatibleWith("com.adguard.android"("4.15.0"))
 
     execute {
