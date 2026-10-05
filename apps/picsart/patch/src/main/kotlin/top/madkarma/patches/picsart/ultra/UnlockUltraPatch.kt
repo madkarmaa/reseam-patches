@@ -12,7 +12,7 @@ import top.madkarma.patches.picsart.Ultra
 import top.madkarma.patches.universal.signature.bypassSignatureChecks
 
 val unlockUltra = patch("Unlock Ultra") {
-    description("Unlocks local Ultra features in Picsart; server credit balances remain unchanged.")
+    description("Unlocks Ultra-only features. Server credit balances remain unchanged.")
     compatibleWith("com.picsart.studio")
     dependsOn(bypassSignatureChecks)
 
