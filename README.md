@@ -20,12 +20,21 @@ My patch bundle for Android apps I use, built with [Reseam](https://reseam.app).
 </details>
 
 <details>
+<summary><strong>com.accuweather.android</strong></summary>
+
+| Name | Description | Supported versions |
+| --- | --- | --- |
+| Unlock Family Premium+ | Unlocks Premium-only features. | Any version |
+
+</details>
+
+<details>
 <summary><strong>com.adguard.android</strong></summary>
 
 | Name | Description | Supported versions |
 | --- | --- | --- |
-| Skip setup | Configure the app before installing it. Does NOT include the advanced filters available in the app settings. | 4.15.0 |
-| Unlock Lifetime premium | Unlocks premium-only features. | 4.15.0 |
+| Skip setup | Configure the app before installing it. Does NOT include the advanced filters available in the app settings. | Any version |
+| Unlock Lifetime premium | Unlocks Premium-only features. | Any version |
 
 </details>
 
