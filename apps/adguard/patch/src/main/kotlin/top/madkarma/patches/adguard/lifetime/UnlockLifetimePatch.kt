@@ -6,6 +6,7 @@
 package top.madkarma.patches.adguard.lifetime
 
 import app.reseam.patch.*
+import top.madkarma.patches.shared.PATCH_ATTRIBUTION
 
 val unlockLifetime = patch("Unlock Lifetime premium") {
     description("Unlocks premium-only features.")
@@ -30,7 +31,7 @@ val unlockLifetime = patch("Unlock Lifetime premium") {
 private fun CodeScope.lifetimeLicense(): ValueRef = newInstance(
     paidLicenseState.descriptor,
     paidLicenseConstructor.proto,
-    string("Patched with ❤ by MadKarma ;)"), // License key
+    string(PATCH_ATTRIBUTION), // License key
     staticField(familyLicense),
     staticField(lifetimeInstance),
     int(67), // Devices in use.

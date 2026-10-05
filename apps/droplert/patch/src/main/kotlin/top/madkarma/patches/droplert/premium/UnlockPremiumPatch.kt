@@ -7,6 +7,7 @@ package top.madkarma.patches.droplert.premium
 
 import app.reseam.patch.*
 import top.madkarma.patches.droplert.Prefs
+import top.madkarma.patches.shared.PATCH_ATTRIBUTION
 import top.madkarma.patches.shared.isPresent
 
 val unlockPremium = patch("Unlock Lifetime Premium") {
@@ -21,7 +22,7 @@ val unlockPremium = patch("Unlock Lifetime Premium") {
         playPurchaseCallback.promoteFreeTier()
 
         if (premiumCardStatus.replaceAllStrings(
-                "All features unlocked", "Patched with ❤ by MadKarma ;)"
+                "All features unlocked", PATCH_ATTRIBUTION
             ) == 0
         ) error("Premium: settings card status text not found")
 

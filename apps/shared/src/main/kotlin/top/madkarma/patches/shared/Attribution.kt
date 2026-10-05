@@ -1,10 +1,6 @@
 // SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-plugins {
-    id("app.reseam.patches")
-}
+package top.madkarma.patches.shared
 
-dependencies {
-    implementation(project(":apps:shared"))
-}
+const val PATCH_ATTRIBUTION = "Patched with ❤ by MadKarma ;)"
