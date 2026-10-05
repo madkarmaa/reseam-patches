@@ -90,7 +90,7 @@ My patch bundle for Android apps I use, built with [Reseam](https://reseam.app).
 
 | Name | Description | Supported versions |
 | --- | --- | --- |
-| Unlock Premium | Enables local Premium features and unlimited access, regardless of subscription updates. | Any version |
+| Unlock Premium | Unlocks Premium-only features. | Any version |
 
 </details>
 
