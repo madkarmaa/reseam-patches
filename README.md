@@ -66,6 +66,16 @@ My patch bundle for Android apps I use, built with [Reseam](https://reseam.app).
 </details>
 
 <details>
+<summary><strong>com.google.android.apps.photos</strong></summary>
+
+| Name | Description | Supported versions |
+| --- | --- | --- |
+| GmsCore support | Installs Google Photos alongside the original app and signs in through separately installed GmsCore. | Any version |
+| Unlimited backup storage | Unlocks unlimited Google Photos backup storage through Google's Pixel XL offer by spoofing the device as a Pixel XL. | Any version |
+
+</details>
+
+<details>
 <summary><strong>com.gymbros.app</strong></summary>
 
 | Name | Description | Supported versions |
