@@ -3,7 +3,7 @@
 
 @file:Suppress("unused")
 
-package top.madkarma.patches.googlephotos.spoof
+package top.madkarma.patches.googlephotos.unlimitedbackupstorage
 
 import app.reseam.patch.Type
 import app.reseam.patch.after
@@ -41,9 +41,9 @@ private val PIXEL_XL_FIELDS = mapOf(
     "USER" to "android-build",
 )
 
-val pixelXlSpoof = patch("Pixel XL spoof") {
-    description("Spoofs the Pixel XL device identity and original Pixel features in Google Photos.")
-    compatibleWith("com.google.android.apps.photos")
+val unlimitedBackupStorage = patch("Unlimited backup storage") {
+    description("Unlocks unlimited Google Photos backup storage through Google's Pixel XL offer by spoofing the device as a Pixel XL.")
+    compatibleWith(GOOGLE_PHOTOS)
 
     execute {
         val features =
@@ -60,8 +60,11 @@ val pixelXlSpoof = patch("Pixel XL spoof") {
         disabled.forEach { initializePixelFeatures.replaceAllStrings(it, "dummy") }
 
         // Override values at their read sites; Android 17 refuses reflective writes to final Build fields.
-        val identityReads = deviceIdentityReads.all.filter { it.field().name in PIXEL_XL_FIELDS }
-        check(identityReads.isNotEmpty()) { "No Google Photos device identity reads matched" }
+        val identityReads = deviceIdentityReads.flatMap { target ->
+            target.all.filter { it.field().name in PIXEL_XL_FIELDS }.also {
+                check(it.isNotEmpty()) { "No Google Photos device identity reads matched ${target.debugName}" }
+            }
+        }
 
         for (read in identityReads) {
             val value = PIXEL_XL_FIELDS.getValue(read.field().name)
@@ -76,6 +79,6 @@ val pixelXlSpoof = patch("Pixel XL spoof") {
             "android.os.SystemProperties", "get", PixelXlIdentity.getWithDefault,
         )
 
-        log.info("Pixel XL: spoofed ${identityReads.size} Build reads, enabled ${enabled.size}, disabled ${disabled.size} features; redirected ${properties + propertiesWithDefault} property reads.")
+        log.info("Unlimited backup storage: spoofed ${identityReads.size} Build reads, enabled ${enabled.size}, disabled ${disabled.size} features; redirected ${properties + propertiesWithDefault} property reads.")
     }
 }
