@@ -44,6 +44,17 @@ public class SignatureKiller {
     }
 
     /**
+     * Installs the spoof before the app attaches its context or initializes providers.
+     */
+    public static void initialize(Context context, String packageName, String signature, boolean spoofApkPath) {
+        Log.i(TAG, "Initializing in attachBaseContext");
+        checkSignatures(context, packageName, signature);
+        killSignature(packageName, signature);
+        checkSignatures(context, packageName, signature);
+        if (spoofApkPath) killApkPath(context, packageName);
+    }
+
+    /**
      * Fakes PackageManager signatures.
      */
     public static void killSignature(String packageName, String base64Sig) {

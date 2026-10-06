@@ -5,7 +5,7 @@
 
 package top.madkarma.patches.universal.signature
 
-import app.reseam.patch.appEntry
+import app.reseam.patch.before
 import app.reseam.patch.patch
 import top.madkarma.patches.universal.SignatureKiller
 import java.util.*
@@ -27,28 +27,7 @@ val bypassSignatureChecks = patch("Bypass signature checks") {
             manifest.packageName ?: error("SignatureKiller: manifest has no package name")
 
         val signers = files.signers()
-        val originalSignature = signers.firstOrNull()
-            ?: error("SignatureKiller: no v2/v3 signers found; unsigned or v1-only APKs are not supported")
-        val encodedSignature = Base64.getEncoder().encodeToString(originalSignature)
-
-        // Keep the before/after diagnostics and spoof in one ordered entry hook.
-        appEntry {
-            call(
-                SignatureKiller.checkSignatures,
-                application,
-                string(packageName),
-                string(encodedSignature)
-            )
-            call(
-                SignatureKiller.killSignature, string(packageName), string(encodedSignature)
-            )
-            call(
-                SignatureKiller.checkSignatures,
-                application,
-                string(packageName),
-                string(encodedSignature)
-            )
-        }
+        if (signers.isEmpty()) error("SignatureKiller: no v2/v3 signers found; unsigned or v1-only APKs are not supported")
 
         if (!options[spoofApkPath]) {
             log.info("SignatureKiller: hooked $packageName (signature only, ${signers.size} signer(s)).")
@@ -66,12 +45,32 @@ val bypassSignatureChecks = patch("Bypass signature checks") {
             files.write(path, bytes)
         }
 
-        appEntry {
-            call(SignatureKiller.killApkPath, application, string(packageName))
-        }
-
         log.info("SignatureKiller: hooked $packageName with APK-path spoofing (${originalApk.size} byte origin, ${signers.size} signer(s)).")
     }
+
+    // Resolve the Application after dependent patches have finished editing the manifest.
+    afterDependents {
+        val packageName =
+            manifest.packageName ?: error("SignatureKiller: manifest has no package name")
+
+        val originalSignature =
+            files.signers().firstOrNull() ?: error("SignatureKiller: no original signer")
+
+        val attachContext = signatureAttachContext()
+
+        attachContext.before {
+            call(
+                SignatureKiller.initialize,
+                param(0),
+                string(packageName),
+                string(Base64.getEncoder().encodeToString(originalSignature)),
+                bool(options[spoofApkPath])
+            )
+        }
+
+        log.info("SignatureKiller: startup hook ${attachContext.descriptor}")
+    }
+
 }
 
 private val NATIVE_ABIS = listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
