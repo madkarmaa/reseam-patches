@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
 // SPDX-FileCopyrightText: 2026 AunAli K. <hello@auna.li>
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Reseam-derived material: see NOTICE for applicable section 7 terms.
 
 package top.madkarma.patches.googlephotos.gms
 

@@ -1,0 +1,14 @@
+ApkSignatureKillerEx: upstream license unspecified
+
+Source: https://github.com/L-JINBIN/ApkSignatureKillerEx
+
+No upstream license or permission to redistribute or relicense the ported
+SignatureKiller.java and mt_jni.c files has been established. This also
+affects the libSignatureKiller.so binaries built from mt_jni.c.
+
+This file documents an unresolved licensing status. It is not a license
+grant, and the project's AGPL license does not grant rights to this
+third-party material.
+
+The separately licensed xHook, queue.h, and tree.h files retain their
+original MIT, BSD-3-Clause, and BSD-2-Clause licenses, respectively.

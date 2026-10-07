@@ -1,22 +1,13 @@
 version = 1
 
-# ── Project source (default) ────────────────────────────────────────────────
+# Project-owned files. Existing file headers retain their author attributions.
 
 [[annotations]]
-path = [
-    "manifest.toml",
-    "build.gradle.kts",
-    "settings.gradle.kts",
-    "android-extension-module.gradle.kts",
-    "apps/**",
-    "shared/**",
-    ".gitignore",
-    "LICENSE",
-]
-SPDX-FileCopyrightText = "2026 AunAli K. <hello@auna.li>"
-SPDX-License-Identifier = "GPL-3.0-or-later"
+path = ["**"]
+SPDX-FileCopyrightText = "2026 MadKarma <me@madkarma.top>"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
 
-# ── Gradle wrapper (Apache-2.0, from the Gradle project) ────────────────────
+# Gradle wrapper, from the Gradle project.
 
 [[annotations]]
 path = [
@@ -27,3 +18,48 @@ path = [
 ]
 SPDX-FileCopyrightText = "2015-2024 the original authors"
 SPDX-License-Identifier = "Apache-2.0"
+
+# Vendored xHook sources retain their MIT license.
+[[annotations]]
+path = ["apps/universal/extensions/signature-killer/src/main/cpp/xh*"]
+precedence = "override"
+SPDX-FileCopyrightText = "2018-present iQIYI, Inc."
+SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+path = ["apps/universal/extensions/signature-killer/src/main/cpp/queue.h"]
+precedence = "override"
+SPDX-FileCopyrightText = "1991, 1993 The Regents of the University of California"
+SPDX-License-Identifier = "BSD-3-Clause"
+
+[[annotations]]
+path = ["apps/universal/extensions/signature-killer/src/main/cpp/tree.h"]
+precedence = "override"
+SPDX-FileCopyrightText = "2002 Niels Provos <provos@citi.umich.edu>"
+SPDX-License-Identifier = "BSD-2-Clause"
+
+# No upstream license has been established for these ported files.
+# This identifier records the unresolved status; it grants no permissions.
+[[annotations]]
+path = [
+    "apps/universal/extensions/signature-killer/src/main/java/bin/mt/signature/SignatureKiller.java",
+    "apps/universal/extensions/signature-killer/src/main/cpp/mt_jni.c",
+]
+precedence = "override"
+SPDX-FileCopyrightText = [
+    "ApkSignatureKillerEx contributors <https://github.com/L-JINBIN/ApkSignatureKillerEx>",
+    "2026 MadKarma <me@madkarma.top>",
+]
+SPDX-License-Identifier = "LicenseRef-ApkSignatureKillerEx-Unspecified"
+
+# The native binaries combine the JNI port, xHook, and the BSD headers.
+[[annotations]]
+path = ["apps/universal/patch/src/main/resources/lib/**/libSignatureKiller.so"]
+precedence = "override"
+SPDX-FileCopyrightText = [
+    "ApkSignatureKillerEx contributors <https://github.com/L-JINBIN/ApkSignatureKillerEx>",
+    "2018-present iQIYI, Inc.",
+    "1991, 1993 The Regents of the University of California",
+    "2002 Niels Provos <provos@citi.umich.edu>",
+]
+SPDX-License-Identifier = "LicenseRef-ApkSignatureKillerEx-Unspecified AND MIT AND BSD-2-Clause AND BSD-3-Clause"
