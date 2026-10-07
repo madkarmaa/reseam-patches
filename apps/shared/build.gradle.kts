@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Shared Kotlin helpers for patch modules (NOT an app, NOT an extension:
 // the workspace plugin ignores this directory, so it is wired manually
@@ -19,5 +19,5 @@ kotlin {
 
 dependencies {
     // Must match the workspace plugin version in settings.gradle.kts.
-    implementation("app.reseam:reseam-patch-sdk:0.19.0")
+    implementation("app.reseam:reseam-patch-sdk:0.20.1")
 }

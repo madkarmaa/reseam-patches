@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 @file:Suppress("unused")
 
@@ -9,7 +9,6 @@ import app.reseam.patch.patch
 
 val forceExtractNativeLibs = patch("Force extract native libs") {
     description("Sets android:extractNativeLibs to true when it is false.")
-    enabledByDefault(true)
 
     execute {
         var flipped = false

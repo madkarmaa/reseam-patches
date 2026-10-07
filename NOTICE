@@ -1,0 +1,102 @@
+MadKarma patches NOTICE
+
+Copyright (C) 2026 MadKarma <me@madkarma.top>
+
+Project-owned material is licensed under AGPL-3.0-or-later. MadKarma patches
+is an independent, modified patch bundle and is not an official Reseam
+release. Existing author attributions are preserved in the source headers.
+
+The following upstream notice is reproduced verbatim. Its additional terms
+apply to the Reseam material used by this project, including the patch SDK;
+they do not relicense other third-party material.
+
+Reseam NOTICE
+
+This project is licensed under the GNU Affero General Public License,
+version 3 or later. The additional terms below apply under section 7 of
+that license. They cover only material copyrighted by Cossale and Reseam
+contributors. Files that name other copyright holders, in their headers
+or in REUSE.toml, are not covered.
+
+7(b) Author attributions
+
+Copies and modified versions must preserve the attribution
+"Copyright (C) 2026 Cossale and Reseam contributors" in the source and,
+where the program displays Appropriate Legal Notices, in those notices.
+
+7(c) Origin
+
+Modified versions must not be presented as the original and must be
+marked in reasonable ways as different from it, including by using a
+name other than "Reseam".
+
+7(e) Trademarks
+
+This license grants no rights under trademark law to use the name
+"Reseam" or its logos.
+
+Third-party material
+
+xHook (xhook.c, xhook.h, and xh_*):
+Copyright (c) 2018-present, iQIYI, Inc. All rights reserved.
+License: MIT; see LICENSES/MIT.txt. Original notices remain in the source.
+
+queue.h:
+Copyright (c) 1991, 1993 The Regents of the University of California.
+All rights reserved.
+License: BSD-3-Clause; see LICENSES/BSD-3-Clause.txt.
+
+tree.h:
+Copyright 2002 Niels Provos <provos@citi.umich.edu>. All rights reserved.
+License: BSD-2-Clause; see LICENSES/BSD-2-Clause.txt.
+
+Gradle wrapper:
+Copyright 2015-2024 the original authors.
+License: Apache-2.0; see LICENSES/Apache-2.0.txt.
+
+ApkSignatureKillerEx port (SignatureKiller.java and mt_jni.c), and the
+libSignatureKiller.so binaries containing it:
+Source: https://github.com/L-JINBIN/ApkSignatureKillerEx
+No upstream license has been established.
+These files are excluded from the project's AGPL grant. See
+LICENSES/LicenseRef-ApkSignatureKillerEx-Unspecified.txt.
+
+Bundled extension dependencies
+
+AndroidX DataStore preferences proto 1.2.1: Apache-2.0.
+Source: https://cs.android.com/androidx/platform/frameworks/support
+License: LICENSES/Apache-2.0.txt.
+
+AndroidHiddenApiBypass 6.1: Apache-2.0.
+Source: https://github.com/LSPosed/AndroidHiddenApiBypass
+License: LICENSES/Apache-2.0.txt.
+
+AndroidX DataStore preferences external protobuf 1.2.1: BSD-3-Clause.
+Source: https://cs.android.com/androidx/platform/frameworks/support
+The following notice is reproduced from the distributed Maven artifact:
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+    * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+    * Neither the name of the copyright holder nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

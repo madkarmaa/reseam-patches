@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
 // SPDX-FileCopyrightText: 2026 AunAli K. <hello@auna.li>
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Reseam-derived material: see NOTICE for applicable section 7 terms.
 
 pluginManagement {
     repositories {
@@ -17,7 +18,7 @@ pluginManagement {
 }
 
 plugins {
-    id("app.reseam.workspace") version "0.19.0"
+    id("app.reseam.workspace") version "0.20.1"
 }
 
 rootProject.name = "madkarma-patches"
