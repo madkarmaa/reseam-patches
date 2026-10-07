@@ -9,7 +9,6 @@ import app.reseam.patch.patch
 
 val forceExtractNativeLibs = patch("Force extract native libs") {
     description("Sets android:extractNativeLibs to true when it is false.")
-    enabledByDefault(true)
 
     execute {
         var flipped = false
