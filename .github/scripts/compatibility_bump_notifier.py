@@ -8,8 +8,7 @@ Usage:
                          [--base-url https://sniff.madkarma.top/v2]
                          [--patches-json build/reseam/patches.json]
 
-The pinned versions are read from the release index written by the
-`:generatePatchesJson` Gradle task - run it first, e.g.
+Reads pinned versions from the release index. Generate the index first with
 `./gradlew generatePatchesJson -PreleaseTag=v0.0.0-version-check`.
 
 Environment:
@@ -37,18 +36,18 @@ UA = {"User-Agent": "Mozilla/5.0"}
 
 
 def normalize_version_name(raw: str) -> str:
-    """Strip Play suffixes, e.g. '289.20 - Stable' -> '289.20'."""
+    """Remove Play suffixes, for example turning '289.20 - Stable' into '289.20'."""
     return raw.split(" - ")[0].strip().split()[0]
 
 
 def collect_pins(
     patches_json: Path,
 ) -> tuple[dict[str, set[str]], dict[str, dict[str, str]]]:
-    """Return (pinned versions per package, declaring patch names by id per package).
+    """Return pinned versions and patch names by ID, both grouped by package.
 
     Reads the newest release in the index written by `:generatePatchesJson`.
-    Packages declared with an empty version list are recorded with an empty
-    set and skipped by the caller; universal patches carry no packages.
+    Records unpinned packages with an empty set. The caller skips them.
+    Universal patches declare no packages.
     """
     try:
         index = json.loads(patches_json.read_text(encoding="utf-8"))
@@ -84,7 +83,7 @@ def collect_pins(
 
 
 def sniff_latest(package: str, base_url: str, channel: str) -> tuple[str, str] | None:
-    """Return (normalized version_name, app title) or None on 404."""
+    """Return the normalized version name and app title, or None on failure."""
     url = f"{base_url.rstrip('/')}/download/{package}/{channel}"
     req = urllib.request.Request(url, headers=UA)
 
@@ -141,7 +140,10 @@ def open_issue_titles() -> dict[str, int]:
 
 
 def issue_scope(package: str, declaring: dict[str, str]) -> str:
-    """Conventional-commit scope: the app segment of the patch ids when they agree."""
+    """Use the shared app segment of the patch IDs as the commit scope.
+
+    Fall back to the package name if the IDs do not identify one app.
+    """
     apps = set()
     for pid in declaring:
         parts = pid.split(".")
@@ -157,7 +159,7 @@ def issue_title(package: str, declaring: dict[str, str], latest: str) -> str:
 
 
 def ensure_label() -> bool:
-    """Best-effort: make sure ISSUE_LABEL exists. Return whether usable."""
+    """Create ISSUE_LABEL if missing. Return True if the label is available."""
     try:
         names = {entry["name"] for entry in json.loads(gh("label", "list", "--json", "name"))}
     except RuntimeError:

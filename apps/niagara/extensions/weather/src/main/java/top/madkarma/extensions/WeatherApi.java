@@ -23,9 +23,9 @@ import javax.net.ssl.HttpsURLConnection;
  * Serves Niagara's weather widget from WeatherAPI.com instead of the
  * Niagarald backend, which needs a server-issued session token.
  *
- * <p>Output is a JSON string in Niagara's own backend schema
- * ({@code WeatherResponse}: timestamp/provider/lat/long/lang/forecast),
- * so the app's parser, cache and UI models are reused untouched.
+ * <p>Returns JSON in Niagara's {@code WeatherResponse} schema, with timestamp,
+ * provider, lat, long, lang, and forecast fields. The app reads it through
+ * its existing parser, cache, and UI models.
  */
 @SuppressWarnings("unused")
 public final class WeatherApi {
@@ -74,8 +74,8 @@ public final class WeatherApi {
 
     private static final LangMapping[] LANG_MAP = {new LangMapping("ar"), new LangMapping("bn"), new LangMapping("bg"), new LangMapping("da"), new LangMapping("nl"), new LangMapping("fi"), new LangMapping("fr"), new LangMapping("de"), new LangMapping("el"), new LangMapping("hi"), new LangMapping("hu"), new LangMapping("it"), new LangMapping("ja"), new LangMapping("jv"), new LangMapping("ko"), new LangMapping("mr"), new LangMapping("pl"), new LangMapping("pt"), new LangMapping("pa"), new LangMapping("ro"), new LangMapping("ru"), new LangMapping("sr"), new LangMapping("si"), new LangMapping("sk"), new LangMapping("es"), new LangMapping("sv"), new LangMapping("ta"), new LangMapping("te"), new LangMapping("tr"), new LangMapping("uk"), new LangMapping("ur"), new LangMapping("vi"), new LangMapping("zh"), new LangMapping("zh_tw"), new LangMapping("cz", "cs"), new LangMapping("zh_cmn", "zh"),};
 
-    // Application-scoped: the worker always receives getApplicationContext(),
-    // and the reference is cleared when it finishes, so nothing leaks.
+    // The worker holds only the application context. It clears this reference
+    // when it finishes.
     @SuppressWarnings("StaticFieldLeak")
     private static FetchWorker inFlight;
 
@@ -86,8 +86,7 @@ public final class WeatherApi {
     }
 
     /**
-     * Single construction point: the key lives in settings now, so only
-     * the application context is needed.
+     * Creates a client with the application context. Fetches read the key from settings.
      */
     public static WeatherApi create(Context context) {
         return new WeatherApi(context);
@@ -99,7 +98,7 @@ public final class WeatherApi {
     }
 
     /**
-     * Hour of day in the given zone for epoch seconds.
+     * Returns the local hour for an epoch timestamp in seconds.
      */
     private static int localHour(long epochSeconds, TimeZone zone) {
         int hour = (int) (((epochSeconds + zone.getOffset(epochSeconds * 1000L) / 1000L) / 3600) % 24);
@@ -121,13 +120,10 @@ public final class WeatherApi {
     }
 
     /**
-     * Fetches current plus 3-day forecast weather and translates it into
-     * Niagara's backend JSON shape. Never blocks the calling thread on the
-     * network for longer than a short grace period: the fetch runs on a
-     * worker thread and the caller waits at most 2.5s (under the ANR
-     * threshold even on the main thread). If the worker is slower, a
-     * loading failure is thrown now and the worker still stores its result
-     * in the cache for the next call.
+     * Fetches current weather and a three-day forecast as Niagara backend JSON.
+     * A worker handles the network request. The caller waits up to 2.5 seconds,
+     * then throws a loading failure if the worker has not finished. The worker
+     * continues and caches a successful response for the next call.
      */
     public String fetch() {
         String cached = freshCache();
@@ -170,7 +166,7 @@ public final class WeatherApi {
     }
 
     /**
-     * Last good response younger than the TTL, so retries don't hammer the API.
+     * Returns the last successful response if its cache entry has not expired.
      */
     private String freshCache() {
         SharedPreferences prefs = prefs();
@@ -193,11 +189,10 @@ public final class WeatherApi {
     }
 
     /**
-     * Converts any worker failure into the app's own
-     * {@code NoWeatherDataException} so it lands in the widget's usual
-     * error card. Never throws itself: callers rethrow the result with a
-     * bare {@code throw sneakyThrow(...)} outside any try block (a sneaky
-     * throw inside a catch would be recaught and kill the thread).
+     * Returns the app's {@code NoWeatherDataException} for the widget's error card.
+     * Callers throw the result with {@code throw sneakyThrow(...)} outside the
+     * try block. Throwing inside it would let the catch intercept the exception
+     * and terminate the thread.
      */
     private Throwable asNoWeather(Throwable failure) {
         String message = failure.getMessage();
@@ -232,8 +227,8 @@ public final class WeatherApi {
         return new double[]{location.getLatitude(), location.getLongitude()};
     }
 
-    // Permission is checked by the caller via checkSelfPermission just above;
-    // the catch below stays as a second guard for revoked-while-running.
+    // Check permission before reading locations, and catch SecurityException
+    // in case Android revokes permission during the read.
     @SuppressWarnings("MissingPermission")
     private Location lastKnown() {
         if (Build.VERSION.SDK_INT >= 23 && appContext.checkSelfPermission(android.Manifest.permission.ACCESS_COARSE_LOCATION) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
@@ -276,7 +271,7 @@ public final class WeatherApi {
     }
 
     /**
-     * Maps Niagara/device language tags onto WeatherAPI codes, defaulting to English.
+     * Maps Niagara or device language tags to WeatherAPI codes. Defaults to English.
      */
     private String mapLang(String lang) {
         if (lang == null) {
@@ -327,8 +322,7 @@ public final class WeatherApi {
     }
 
     /**
-     * Key the next fetch uses: the settings-sheet value, or blank when
-     * none was entered yet.
+     * Returns the saved API key, or an empty string if none has been entered.
      */
     public String currentApiKey() {
         String saved = prefs().getString(KEY_API_RUNTIME, null);
@@ -339,8 +333,7 @@ public final class WeatherApi {
     }
 
     /**
-     * Persists a sheet-entered key and drops the cache so it takes
-     * effect on the next fetch.
+     * Saves the API key and clears the cache so the next fetch uses it.
      */
     public void saveApiKey(String key) {
         String value = key == null ? "" : key.trim();
@@ -463,7 +456,7 @@ public final class WeatherApi {
     }
 
     /**
-     * Averages one temperature slice (night/eve/morn) from the day's hourly points.
+     * Averages the day's hourly temperatures within the requested hour range.
      */
     private double meanForHours(JSONObject dayNode, String zoneId, int from, int to, double fallback) {
         try {
@@ -494,7 +487,8 @@ public final class WeatherApi {
     }
 
     /**
-     * Turns "hh:mm a" + date into epoch seconds in the location's time zone (0 = omit).
+     * Parses the date and "hh:mm a" time in the location's time zone as epoch seconds.
+     * Returns zero on failure so the caller can omit the value.
      */
     private long parseAstro(String date, String time, String zoneId) {
         try {
@@ -548,9 +542,9 @@ public final class WeatherApi {
     }
 
     /**
-     * One language rule: a Niagara/device tag plus its WeatherAPI code.
-     * Tags WeatherAPI understands directly use the single-arg constructor
-     * (result defaults to the tag itself); renamed tags pass both.
+     * Maps a Niagara or device language tag to a WeatherAPI code.
+     * The one-argument constructor uses the tag as the code. Pass both
+     * arguments when WeatherAPI uses a different code.
      */
     @SuppressWarnings("ClassCanBeRecord") // records aren't supported in older Android versions
     private static final class LangMapping {
@@ -572,9 +566,8 @@ public final class WeatherApi {
     }
 
     /**
-     * One row of the condition map: a WeatherAPI code plus its OpenWeather
-     * id and icon prefix, which is what Niagara's icon mapper accepts
-     * (id ranges plus a {@code d}/{@code n} suffix).
+     * Maps a WeatherAPI code to the OpenWeather ID and icon prefix Niagara expects.
+     * Niagara selects icons by ID range and a {@code d} or {@code n} suffix.
      */
     @SuppressWarnings("ClassCanBeRecord") // records aren't supported in older Android versions
     private static final class ConditionMapping {

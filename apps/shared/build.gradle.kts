@@ -1,15 +1,13 @@
 // SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-// Shared Kotlin helpers for patch modules (NOT an app, NOT an extension:
-// the workspace plugin ignores this directory, so it is wired manually
-// below in settings.gradle.kts). Compiled into each consumer's patches jar
-// through normal project dependencies; nothing is staged into the bundle.
+// settings.gradle.kts includes this module because the workspace plugin
+// only discovers apps and extensions. Project dependencies compile these
+// helpers into each consumer's patches JAR, without a separate bundle entry.
 
 plugins {
-    // Version omitted on purpose: the Kotlin plugin is already on the
-    // classpath through the engine checkout, and requesting a version
-    // fails resolution. Matches the engine's KGP (2.4.10).
+    // The engine checkout supplies Kotlin Gradle plugin 2.4.10 on the
+    // classpath. Specifying a version here causes resolution to fail.
     kotlin("jvm")
 }
 

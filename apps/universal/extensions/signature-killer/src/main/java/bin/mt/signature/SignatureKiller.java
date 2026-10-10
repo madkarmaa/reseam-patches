@@ -21,14 +21,14 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 /**
- * Spoofs the app's own signature at runtime (ApkSignatureKillerEx).
+ * Spoofs the app's signature at runtime using ApkSignatureKillerEx.
  *
  * <ul>
- *   <li>{@link #killSignature} fakes {@link PackageInfo} signatures, for apps
- *   that merely ask the package manager for the signature.</li>
- *   <li>{@link #killApkPath} additionally redirects raw reads of the installed
- *   APK file to the pristine copy embedded as {@value #ORIGIN_ASSET_PATH}, for
- *   apps that verify the APK file itself.</li>
+ *   <li>{@link #killSignature} fakes {@link PackageInfo} signatures returned
+ *   by the package manager.</li>
+ *   <li>{@link #killApkPath} redirects reads of the installed APK to the
+ *   original copy embedded as {@value #ORIGIN_ASSET_PATH}. This handles apps
+ *   that verify the APK file itself.</li>
  * </ul>
  */
 @SuppressWarnings("unused")
@@ -63,7 +63,7 @@ public class SignatureKiller {
     }
 
     /**
-     * Redirects reads of the installed APK to the embedded pristine copy.
+     * Redirects reads of the installed APK to the embedded original copy.
      * Takes the application context to resolve its data directory.
      */
     public static void killApkPath(Context context, String packageName) {
@@ -72,9 +72,9 @@ public class SignatureKiller {
     }
 
     /**
-     * Logs the signature the app is currently installed with (read here,
-     * before any spoofing) next to the spoofed one, and whether they match.
-     * Must run before {@link #killSignature}.
+     * Logs the signature the package manager returns, the intended spoofed signature,
+     * and whether they match. Call before {@link #killSignature} to see the installed
+     * signature, or after it to check the spoof.
      */
     public static void checkSignatures(Context context, String packageName, String base64Sig) {
         String real;
@@ -91,9 +91,9 @@ public class SignatureKiller {
     }
 
     /**
-     * Short digest of the first certificate-history entry (entry count
-     * appended), as the app would read it right now: unspoofed before {@link
-     * #killSignature}, spoofed after.
+     * Returns a short digest of the first certificate-history entry and the entry count.
+     * Reads the installed certificate before {@link #killSignature} and the spoofed
+     * certificate after it.
      */
     private static String historySig(Context context, String packageName) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
@@ -198,11 +198,9 @@ public class SignatureKiller {
     }
 
     /**
-     * Reads PackageInfo.signatures reflectively instead of touching the
-     * deprecated field, so no deprecation suppression is needed. The field
-     * still exists (and is still populated for compatibility) on every API
-     * level, which is also what keeps this working on pre-P devices that
-     * have no signingInfo.
+     * Reads PackageInfo.signatures through reflection without a deprecation suppression.
+     * Android still populates this legacy field for compatibility. It also works
+     * on devices before Android P, which have no signingInfo.
      */
     private static Signature[] getLegacySignatures(PackageInfo packageInfo) {
         try {
@@ -279,10 +277,9 @@ public class SignatureKiller {
     }
 
     /**
-     * Copies the pristine APK embedded in this APK to the app's data
+     * Copies the original APK embedded in this APK to the app's data
      * directory. Returns the copy, or null when the embedded entry is absent.
-     * Uses the authoritative data directory (API 24+; reseam targets 26+)
-     * instead of guessing it from storage paths.
+     * Uses Context.getDataDir(), available since API 24. Reseam targets API 26 or later.
      */
     private static File extractOriginApk(File apkFile, Context context) throws IOException {
         File repFile = new File(context.getDataDir(), ORIGIN_FILE_NAME);
@@ -349,28 +346,28 @@ public class SignatureKiller {
     }
 
     /**
-     * /data/app/&lt;dir&gt;/base.apk, where the dir may carry split suffixes.
+     * Matches /data/app/&lt;dir&gt;/base.apk, including directories with split suffixes.
      */
     private static boolean isInstalledBaseApk(String packageName, String[] segments) {
         return segments[0].equals("data") && segments[1].equals("app") && segments[segments.length - 1].equals("base.apk") && segments[segments.length - 2].startsWith(packageName);
     }
 
     /**
-     * /mnt/asec/&lt;dir&gt;/pkg.apk (forward-locked apps on ancient releases).
+     * Matches /mnt/asec/&lt;dir&gt;/pkg.apk for forward-locked apps on older Android releases.
      */
     private static boolean isAsecPackageApk(String packageName, String[] segments) {
         return segments[0].equals("mnt") && segments[1].equals("asec") && segments[segments.length - 1].equals("pkg.apk") && segments[segments.length - 2].startsWith(packageName);
     }
 
     /**
-     * /data/app/&lt;package&gt;.apk (pre-split install layout).
+     * Matches /data/app/&lt;package&gt;.apk, the install layout before split APKs.
      */
     private static boolean isLegacyAppApk(String packageName, String[] segments) {
         return segments[0].equals("data") && segments[1].equals("app") && segments[2].startsWith(packageName);
     }
 
     /**
-     * /mnt/expand/&lt;uuid&gt;/app/&lt;dir&gt;/base.apk (adopted storage).
+     * Matches /mnt/expand/&lt;uuid&gt;/app/&lt;dir&gt;/base.apk on adopted storage.
      */
     private static boolean isAdoptedStorageApk(String packageName, String[] segments) {
         return segments[0].equals("mnt") && segments[1].equals("expand") && segments[3].equals("app") && segments[5].equals("base.apk") && segments[4].endsWith(packageName);
@@ -379,7 +376,7 @@ public class SignatureKiller {
     private static native void hookApkPath(String apkPath, String repPath);
 
     /**
-     * A reflective cache clear that must never break startup.
+     * Clears the cache through reflection. Ignores failures so startup can continue.
      */
     private interface QuietAction {
         void run() throws ReflectiveOperationException;

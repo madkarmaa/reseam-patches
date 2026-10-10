@@ -23,8 +23,8 @@ plugins {
 
 rootProject.name = "madkarma-patches"
 
-// Shared patch helpers. Not an app or extension, so the workspace plugin
-// above ignores it; wired manually like any plain Gradle module.
+// The workspace plugin only discovers apps and extensions, so include
+// the shared patch helpers here.
 include("apps:shared")
 
 dependencyResolutionManagement {

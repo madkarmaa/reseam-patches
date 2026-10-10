@@ -15,10 +15,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 /**
- * Adds the WeatherAPI key field to the weather settings sheet, right
- * below the temperature-units button. The sheet's content callback is
- * shared with other dialogs, so anything that isn't the weather sheet
- * (no temperature-units button) is left alone.
+ * Adds the WeatherAPI key field below the temperature-units button.
+ * The content callback also handles other dialogs. The button identifies
+ * the weather settings sheet, so dialogs without it receive no field.
  */
 @SuppressWarnings("unused")
 public final class WeatherApiKeyField {
@@ -42,9 +41,8 @@ public final class WeatherApiKeyField {
     }
 
     /**
-     * Injects the key row into the inflated sheet content, once.
-     * Content is the {@code weather_dialog_content} root on the weather
-     * sheet and something else on the sibling dialogs.
+     * Adds the key row once to the weather sheet's {@code weather_dialog_content} root.
+     * Ignores content from other dialogs.
      */
     public static void attach(Object content) {
         if (!(content instanceof LinearLayout sheet)) {
@@ -65,7 +63,7 @@ public final class WeatherApiKeyField {
     }
 
     /**
-     * Resource id by name, or 0 when the app has no such entry.
+     * Returns the resource ID by name, or zero if the resource is missing.
      */
     @SuppressWarnings("DiscouragedApi")
     private static int resId(Context context, String name, String type) {
@@ -73,7 +71,7 @@ public final class WeatherApiKeyField {
     }
 
     /**
-     * View by resource name, or null when it is missing.
+     * Returns the view by resource name, or null if it is missing.
      */
     private static View findByName(View root, String name) {
         int id = resId(root.getContext(), name, "id");
@@ -85,23 +83,22 @@ public final class WeatherApiKeyField {
     }
 
     /**
-     * Header text of the temperature-units button, or null when the app
-     * layout no longer has one.
+     * Returns the temperature-units button's header view, or null if it is missing.
      */
     private static TextView headerSample(View metricButton) {
         return sampleText(metricButton, HEADER_TEXT);
     }
 
     /**
-     * Value text of the temperature-units button (like "Celsius", same
-     * style as "Berlin"), or null when the app layout no longer has one.
+     * Returns the temperature-units button's value view, such as "Celsius".
+     * Returns null if the view is missing.
      */
     private static TextView contentSample(View metricButton) {
         return sampleText(metricButton, CONTENT_TEXT);
     }
 
     /**
-     * Sample text by view name, or null when it is missing.
+     * Returns the text view by resource name, or null if it is missing.
      */
     private static TextView sampleText(View metricButton, String name) {
         View sample = findByName(metricButton, name);
@@ -121,8 +118,8 @@ public final class WeatherApiKeyField {
     }
 
     /**
-     * Lock icon plus label, key input and safety note, mirroring the tile
-     * rows above.
+     * Builds a row with a lock icon, label, key input, and safety note.
+     * Uses the layout of the existing settings rows.
      */
     private static LinearLayout buildRow(LinearLayout sheet, View metricButton, WeatherApi api) {
         Context context = sheet.getContext();
@@ -148,8 +145,8 @@ public final class WeatherApiKeyField {
     }
 
     /**
-     * Lock glyph sized and tinted like the tile icons, or null when the
-     * drawable is gone.
+     * Builds a lock icon with the settings icons' size and color.
+     * Returns null if the drawable is missing.
      */
     private static ImageView buildIcon(Context context, View metricButton) {
         int iconId = resId(context, LOCK_ICON, "drawable");
@@ -170,8 +167,7 @@ public final class WeatherApiKeyField {
     }
 
     /**
-     * Vertical label, input and note stack, starting where the tile texts
-     * start.
+     * Stacks the label, input, and note vertically, aligned with the settings text.
      */
     private static LinearLayout buildBody(Context context, boolean hasIcon) {
         int iconWidth = hasIcon ? dimenPx(context, ICON_SIZE_DIMEN, 24) : 0;
@@ -187,7 +183,7 @@ public final class WeatherApiKeyField {
     }
 
     /**
-     * Row label in the tile header's size and color.
+     * Builds the row label with the settings header's text size and color.
      */
     @SuppressWarnings("SetTextI18n")
     private static TextView buildLabel(Context context, View metricButton) {
@@ -203,7 +199,7 @@ public final class WeatherApiKeyField {
     }
 
     /**
-     * Safety note in the tile value's size and color.
+     * Builds the safety note with the settings value's text size and color.
      */
     @SuppressWarnings("SetTextI18n")
     private static TextView buildNote(Context context, View metricButton) {
@@ -219,8 +215,8 @@ public final class WeatherApiKeyField {
     }
 
     /**
-     * Censored monospace key input, saving to settings on every edit. The
-     * text is set before the watcher is added, so prefilling never writes.
+     * Builds a masked monospace key input that saves each edit to settings.
+     * Sets the saved key before adding the watcher, so prefilling does not write.
      */
     @SuppressWarnings("SetTextI18n")
     private static EditText buildInput(Context context, WeatherApi api) {
@@ -241,7 +237,7 @@ public final class WeatherApiKeyField {
     }
 
     /**
-     * Same width as the temperature-units button, with a small top gap.
+     * Copies the temperature-units button's dimensions and adds a top gap.
      */
     private static LinearLayout.LayoutParams rowParams(Context context, View metricButton) {
         ViewGroup.LayoutParams source = metricButton.getLayoutParams();
@@ -255,14 +251,14 @@ public final class WeatherApiKeyField {
     }
 
     /**
-     * Small spacing step both rows use.
+     * Returns the spacing used by both rows in pixels.
      */
     private static int gapPx(Context context) {
         return dimenPx(context, SPACING_DIMEN, 8);
     }
 
     /**
-     * Dimen by name, with a dp fallback so a missing entry can't break the row.
+     * Returns a named dimension in pixels, or converts the fallback from dp.
      */
     private static int dimenPx(Context context, String name, int fallbackDp) {
         int id = resId(context, name, "dimen");
@@ -278,8 +274,8 @@ public final class WeatherApiKeyField {
     }
 
     /**
-     * Siblings tint their glyphs with the theme's background-on color,
-     * else the tile header's color.
+     * Uses the theme's onBackgroundColor for the icon, as the other rows do.
+     * Falls back to the settings header's color.
      */
     private static int iconColor(Context context, View metricButton) {
         int attrId = resId(context, ON_BACKGROUND_ATTR, "attr");
@@ -291,7 +287,7 @@ public final class WeatherApiKeyField {
     }
 
     /**
-     * Tile header's color, or the theme's own text color.
+     * Returns the settings header's color, or the theme's primary text color.
      */
     private static int headerColor(Context context, View metricButton) {
         TextView sample = headerSample(metricButton);
@@ -303,14 +299,14 @@ public final class WeatherApiKeyField {
     }
 
     /**
-     * Framework primary text color, readable in either theme.
+     * Returns the theme's primary text color.
      */
     private static int themeTextColor(Context context) {
         return themeColor(context, android.R.attr.textColorPrimary, 0xFFFFFFFF);
     }
 
     /**
-     * Theme color for an attr, or the fallback when it can't resolve.
+     * Returns the theme attribute's color, or the fallback if resolution fails.
      */
     private static int themeColor(Context context, int attrId, int fallback) {
         TypedValue value = new TypedValue();
@@ -330,7 +326,7 @@ public final class WeatherApiKeyField {
     }
 
     /**
-     * Text watcher with only the save hook left to implement.
+     * Provides empty callbacks so subclasses only need to implement afterTextChanged.
      */
     private abstract static class KeySaver implements TextWatcher {
         @Override
