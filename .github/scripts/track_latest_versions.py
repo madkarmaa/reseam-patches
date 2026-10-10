@@ -10,15 +10,13 @@ Usage:
                              [--issue-title "Latest upstream app versions"]
                              [--label app-latest]
 
-Collects every package declared by the patches (pinned or not) from the
-release index written by the `:generatePatchesJson` Gradle task - run it
-first, e.g. `./gradlew generatePatchesJson -PreleaseTag=v0.0.0-latest-check` -
-queries the sniff API (see https://sniff.madkarma.top/v2,
-GET /v2/download/{package_name}/{channel}) for the latest stable release,
-and upserts a single sticky issue tracking the results.
+Reads every package declared in the release index, including unpinned apps.
+Generate the index first with
+`./gradlew generatePatchesJson -PreleaseTag=v0.0.0-latest-check`.
 
-Packages with an empty version list are NOT
-skipped: the point is a daily re-patch checklist, including unpinned apps.
+Queries GET /v2/download/{package_name}/{channel} on https://sniff.madkarma.top
+for the latest release. The default channel is stable. Creates or updates
+one tracking issue as a daily checklist for patching the latest app versions.
 
 Environment:
     SNIFF_BASE_URL  API base URL (default https://sniff.madkarma.top/v2).
@@ -48,18 +46,18 @@ UA = {"User-Agent": "Mozilla/5.0"}
 
 
 def normalize_version_name(raw: str) -> str:
-    """Strip Play suffixes, e.g. '289.20 - Stable' -> '289.20'."""
+    """Remove Play suffixes, for example turning '289.20 - Stable' into '289.20'."""
     return raw.split(" - ")[0].strip().split()[0]
 
 
 def collect_packages(
     patches_json: Path,
 ) -> tuple[dict[str, dict[str, str]], dict[str, list[str]]]:
-    """Return (declaring patch names by id per package, sorted pinned versions per package).
+    """Return patch names by ID and sorted pinned versions, both grouped by package.
 
     Reads the newest release in the index written by `:generatePatchesJson`.
-    Every package with kind == "packages" is included, even when its version
-    list is empty (unpinned). Universal patches carry no packages.
+    Includes every package from compatibility entries with kind "packages",
+    even when its version list is empty. Universal patches declare no packages.
     """
     try:
         index = json.loads(patches_json.read_text(encoding="utf-8"))
@@ -95,7 +93,10 @@ def collect_packages(
 
 
 def sniff_latest(package: str, base_url: str, channel: str) -> tuple[str, int | None, str] | None:
-    """Return (normalized version_name, version_code or None, app title) or None on failure."""
+    """Return the normalized version name, optional version code, and app title.
+
+    Return None on failure.
+    """
     url = f"{base_url.rstrip('/')}/download/{package}/{channel}"
     req = urllib.request.Request(url, headers=UA)
 
@@ -158,7 +159,7 @@ def find_sticky_issue(title: str) -> int | None:
 
 
 def ensure_label(label: str) -> bool:
-    """Best-effort: make sure the sticky label exists. Return whether usable."""
+    """Create the tracking label if missing. Return True if the label is available."""
     try:
         names = {entry["name"] for entry in json.loads(gh("label", "list", "--json", "name"))}
     except RuntimeError:
