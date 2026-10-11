@@ -123,6 +123,15 @@ My patch bundle for Android apps I use, built with [Reseam](https://reseam.app).
 </details>
 
 <details>
+<summary><strong>org.kustom.widget</strong></summary>
+
+| Name | Description | Supported versions |
+| --- | --- | --- |
+| Unlock Pro | Unlocks Pro-only features. | Any version |
+
+</details>
+
+<details>
 <summary><strong>Universal</strong></summary>
 
 | Name | Description | Supported versions |
