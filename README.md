@@ -98,9 +98,9 @@ My patch bundle for Android apps I use, built with [Reseam](https://reseam.app).
 
 | Name | Description | Supported versions |
 | --- | --- | --- |
-| Disable ads | Disables in-app ads | 2.2.1, 2.4.0, 2.4.1, 2.5.0, 2.5.1, 2.5.2, 2.5.3 |
-| Skip onboarding | Skips the setup screens, landing directly on home. | 2.2.1, 2.4.0, 2.4.1, 2.5.0, 2.5.1, 2.5.2, 2.5.3 |
-| Unlock Lifetime Premium | Unlocks Premium-only features. | 2.2.1, 2.4.0, 2.4.1, 2.5.0, 2.5.1, 2.5.2, 2.5.3 |
+| Disable ads | Disables in-app ads | 2.2.1, 2.4.0, 2.4.1, 2.5.0, 2.5.1, 2.5.2, 2.5.3, 2.5.4 |
+| Skip onboarding | Skips the setup screens, landing directly on home. | 2.2.1, 2.4.0, 2.4.1, 2.5.0, 2.5.1, 2.5.2, 2.5.3, 2.5.4 |
+| Unlock Lifetime Premium | Unlocks Premium-only features. | 2.2.1, 2.4.0, 2.4.1, 2.5.0, 2.5.1, 2.5.2, 2.5.3, 2.5.4 |
 
 </details>
 
