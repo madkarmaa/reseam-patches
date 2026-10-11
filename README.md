@@ -127,6 +127,7 @@ My patch bundle for Android apps I use, built with [Reseam](https://reseam.app).
 
 | Name | Description | Supported versions |
 | --- | --- | --- |
+| Allow locked preset export | Allows exporting author-locked KWGT presets. | Any version |
 | Unlock Pro | Unlocks Pro-only features. | Any version |
 
 </details>
