@@ -50,8 +50,8 @@ internal val tamperCheck = method("tamperCheck") {
 }
 
 private val premiumTier = klass("premiumTier") {
-    strings("PREMIUM")
-    extends("java.lang.Enum")
+    enumConstants("FREE", "PREMIUM")
 }
 
-internal val premium = premiumTier.field("PREMIUM")
+internal val premium = premiumTier.enumConstant("PREMIUM")
+internal val freeTier = premiumTier.enumConstant("FREE")

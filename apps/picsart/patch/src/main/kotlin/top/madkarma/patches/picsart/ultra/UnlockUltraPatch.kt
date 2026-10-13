@@ -17,8 +17,6 @@ val unlockUltra = patch("Unlock Ultra") {
     dependsOn(bypassSignatureChecks)
 
     execute {
-        if (ultraTier.type != tierType.type) error("Ultra tier does not match the plan's tier type")
-
         // Normalize every new snapshot, including defaults and refreshed account state.
         subscriptionConstructor.before {
             param(0).assign(call(Ultra.isUserSubscribed))
@@ -30,7 +28,7 @@ val unlockUltra = patch("Unlock Ultra") {
         }
 
         planConstructor.after {
-            thisObject.set(tierType, call(Ultra.tier))
+            thisObject.set(tierType, staticField(ultraTier))
             thisObject.set(
                 permissions, call(Ultra.addPremiumPermissions, thisObject.field(permissions))
             )

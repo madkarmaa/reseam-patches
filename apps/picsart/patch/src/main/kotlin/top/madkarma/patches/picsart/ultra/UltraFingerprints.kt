@@ -23,13 +23,12 @@ internal val planConstructor = planMetadata.method("<init>") {
     param(0, Type.Int)
 }
 
-internal val tierType = planMetadata.fieldOfType(
-    "com.picsart.payment.api.subscription.tiers.domain.TierType"
-)
+private val subscriptionTiers = klass("subscriptionTiers") {
+    enumConstants("ULTRA", "MAX")
+}
+
+internal val tierType = planMetadata.fieldOfType(subscriptionTiers.descriptor)
 
 internal val permissions = planMetadata.fieldOfType(Type.List)
 
-// Validate the retained enum member used by the compile-only extension stub.
-internal val ultraTier = klass(
-    "com.picsart.payment.api.subscription.tiers.domain.TierType"
-).field("ULTRA")
+internal val ultraTier = subscriptionTiers.enumConstant("ULTRA")

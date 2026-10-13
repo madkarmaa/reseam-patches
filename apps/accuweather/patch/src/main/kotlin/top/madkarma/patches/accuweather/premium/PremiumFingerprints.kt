@@ -9,7 +9,7 @@ import app.reseam.patch.klass
 import app.reseam.patch.method
 
 private val userEntitlement = klass("userEntitlement") {
-    strings("FAMILY_PREMIUM_PLUS", "SMB")
+    enumConstants("FAMILY_PREMIUM_PLUS", "SMB")
 }
 
 private val userEntitlementValueOf = userEntitlement.method("valueOf")

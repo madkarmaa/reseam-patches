@@ -4,7 +4,7 @@
 package top.madkarma.patches.adguard.lifetime
 
 import app.reseam.patch.dex.ref
-import app.reseam.patch.field
+import app.reseam.patch.enumConstant
 import app.reseam.patch.fieldTarget
 import app.reseam.patch.klass
 import app.reseam.patch.method
@@ -27,11 +27,11 @@ internal val lifetimeInstance = fieldTarget("lifetimeInstance") {
 
 // Both license and subscription enums contain "Family"; only the license enum is a constructor input.
 private val licenseTypes = klass("licenseTypes") {
-    strings("Family")
+    enumConstants("Family")
     custom { descriptor in paidLicenseConstructor.parameterTypes }
 }
 
-internal val familyLicense = licenseTypes.field("Family")
+internal val familyLicense = licenseTypes.enumConstant("Family")
 
 internal val maskLicenseKey = method("maskLicenseKey") {
     inClass(klass("licenseScreen") { strings("\$licenseKeyLayout") })

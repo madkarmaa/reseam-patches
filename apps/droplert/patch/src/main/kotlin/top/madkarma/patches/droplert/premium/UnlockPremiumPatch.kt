@@ -49,8 +49,8 @@ val unlockPremium = patch("Unlock Lifetime Premium") {
 private fun MethodTarget.promoteFreeTier() {
     val freeReads = points("freeTierReads") {
         field {
-            owner(premium.owner)
-            name("FREE")
+            owner(freeTier.owner)
+            name(freeTier.name)
         }
     }.all
     if (freeReads.isEmpty()) error("Premium: $descriptor reads no FREE tier")

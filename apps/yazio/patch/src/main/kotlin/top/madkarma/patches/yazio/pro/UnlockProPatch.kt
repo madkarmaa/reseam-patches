@@ -5,11 +5,12 @@
 
 package top.madkarma.patches.yazio.pro
 
-import app.reseam.patch.*
+import app.reseam.patch.alwaysReturn
+import app.reseam.patch.before
+import app.reseam.patch.patch
+import app.reseam.patch.replace
 import top.madkarma.patches.shared.PATCH_ATTRIBUTION
 
-private const val PREMIUM_TYPE = "yazio.user.api.PremiumType"
-private const val STORE_PREMIUM_STATUS = "yazio.payment.api.subscription.StorePremiumStatus"
 private const val SUBSCRIPTION_LABEL_KEY = "user.settings.label.subscription"
 
 val unlockPro =
@@ -27,22 +28,18 @@ val unlockPro =
             gates.forEach { it.alwaysReturn(true) }
 
             // paramOfType selects the first match, so require one premium parameter.
-            check(userModelConstructor.parameterTypes.count { it == descriptor(PREMIUM_TYPE) } == 1) {
+            check(userModelConstructor.parameterTypes.count { it == premiumType.descriptor } == 1) {
                 "Unlock Pro: expected one user premium parameter"
             }
             userModelConstructor.before {
-                val premium = paramOfType(PREMIUM_TYPE)
+                val premium = paramOfType(premiumType.descriptor)
                 whenNull(premium) {
-                    premium.assign(enumByName(PREMIUM_TYPE, "Subscription"))
+                    premium.assign(staticField(subscriptionPremium))
                 }
             }
 
             storePremiumStatus.replace {
-                returnValue(enumByName(STORE_PREMIUM_STATUS, "Pro"))
+                returnValue(staticField(proStorePremium))
             }
         }
     }
-
-// R8 renames the fields of both enums; valueOf retains their readable entry names.
-private fun CodeScope.enumByName(type: String, name: String): ValueRef =
-    callStatic(type, "valueOf", proto(type, Type.String), string(name))
