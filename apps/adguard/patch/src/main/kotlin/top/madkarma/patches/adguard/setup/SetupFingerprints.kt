@@ -3,13 +3,16 @@
 
 package top.madkarma.patches.adguard.setup
 
-import app.reseam.patch.Type
-import app.reseam.patch.fieldOfType
-import app.reseam.patch.klass
-import app.reseam.patch.method
+import app.reseam.patch.*
 
 internal const val PRIVACY_LEVEL = "com.adguard.android.management.filtering.StealthModeLevel"
 internal const val FILTER_GROUP = "com.adguard.android.model.filter.FilterGroup"
+
+private val filterGroups = klass(FILTER_GROUP)
+internal val annoyancesGroup = filterGroups.enumConstant("Annoyances")
+internal val privacyGroup = filterGroups.enumConstant("Privacy")
+internal val securityGroup = filterGroups.enumConstant("Security")
+internal val privacyLevels = klass(PRIVACY_LEVEL)
 
 internal val basePreferences = method("basePreferences") {
     strings("storageFactory", "base")
@@ -43,7 +46,7 @@ internal val approvedAnnoyanceFilters = method("approvedAnnoyanceFilters") {
     returns("java.util.Set")
 }
 
-internal val filterGroupCode = klass(FILTER_GROUP).method("getCode")
+internal val filterGroupCode = filterGroups.method("getCode")
 
 private val onboardingConstructor = method("onboardingConstructor") {
     strings("onboarding-view-model")

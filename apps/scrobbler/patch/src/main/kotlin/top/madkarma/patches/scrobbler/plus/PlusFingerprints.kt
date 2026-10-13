@@ -3,16 +3,13 @@
 
 package top.madkarma.patches.scrobbler.plus
 
-import app.reseam.patch.Type
-import app.reseam.patch.klass
-import app.reseam.patch.method
-import app.reseam.patch.methods
+import app.reseam.patch.*
 
 internal val licenseState = klass("licenseState") {
-    strings("NO_LICENSE", "VALID")
+    enumConstants("VALID")
 }
 
-internal val licenseStateValueOf = licenseState.method("valueOf")
+internal val validLicense = licenseState.enumConstant("VALID")
 
 private val jwtPurchaseVerifier = methods("jwtPurchaseVerifier") {
     strings("pscrobbler_pro")

@@ -5,8 +5,6 @@ package top.madkarma.picsart.ultra;
 
 import android.util.Log;
 
-import com.picsart.payment.api.subscription.tiers.domain.TierType;
-
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -25,10 +23,6 @@ public final class Ultra {
     public static int accessLevel() {
         // Custom tool gates compare the level against server-configured minimums.
         return Integer.MAX_VALUE;
-    }
-
-    public static TierType tier() {
-        return TierType.ULTRA;
     }
 
     public static synchronized List<String> addPremiumPermissions(List<String> original) {

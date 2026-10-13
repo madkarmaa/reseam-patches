@@ -15,7 +15,7 @@ val unlockPlus = patch("Unlock Plus") {
     execute {
         checkLicense.after {
             whenInstanceOf(capture("result"), licenseState.descriptor) {
-                returnValue(call(licenseStateValueOf, string("VALID")))
+                returnValue(staticField(validLicense))
             }
         }
         log.info("Plus: unlocked via ${checkLicense.descriptor}.")

@@ -54,7 +54,10 @@ public class SignatureKiller {
         if (spoofApkPath) killApkPath(context, packageName);
     }
 
-    /** Installs the spoof before protection launched from class initializers. */
+    /**
+     * Installs the spoof before protection launched from class initializers.
+     */
+    @SuppressWarnings("PrivateApi")
     public static void initializeEarly(String packageName, String signature, boolean spoofApkPath) {
         killSignature(packageName, signature);
         if (!spoofApkPath) return;
@@ -66,7 +69,8 @@ public class SignatureKiller {
             Context systemContext = (Context) activityThread.getMethod("getSystemContext").invoke(thread);
             Context context = systemContext.createPackageContext(packageName, Context.CONTEXT_IGNORE_SECURITY);
             killApkPath(context, packageName);
-        } catch (ReflectiveOperationException | PackageManager.NameNotFoundException | RuntimeException e) {
+        } catch (ReflectiveOperationException | PackageManager.NameNotFoundException |
+                 RuntimeException e) {
             Log.e(TAG, "Early APK-path spoof failed", e);
         }
     }

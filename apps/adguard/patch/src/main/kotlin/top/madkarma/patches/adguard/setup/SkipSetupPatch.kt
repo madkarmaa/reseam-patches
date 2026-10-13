@@ -5,10 +5,7 @@
 
 package top.madkarma.patches.adguard.setup
 
-import app.reseam.patch.Type
-import app.reseam.patch.after
-import app.reseam.patch.patch
-import app.reseam.patch.replace
+import app.reseam.patch.*
 import top.madkarma.patches.adguard.AdGuardSetup
 import top.madkarma.patches.shared.isPresent
 
@@ -85,7 +82,7 @@ val skipSetup = patch("Skip setup") {
                 returnValue(
                     setup.call(
                         AdGuardSetup.approvedAnnoyanceFilters,
-                        enumValue(FILTER_GROUP, "Annoyances").call(filterGroupCode)
+                        staticField(annoyancesGroup).call(filterGroupCode)
                     )
                 )
             }
@@ -135,20 +132,21 @@ val skipSetup = patch("Skip setup") {
 
                 thisObject.call(
                     if (privacyEnabled) enableFilterGroup else disableFilterGroup,
-                    enumValue(FILTER_GROUP, "Privacy")
+                    staticField(privacyGroup)
                 )
                 log.info("Setup: privacy filter group enabled=$privacyEnabled.")
 
                 if (privacyEnabled) {
                     thisObject.call(
-                        setPrivacyLevel, enumValue(PRIVACY_LEVEL, selectedPrivacyLevel)
+                        setPrivacyLevel,
+                        staticField(privacyLevels.enumConstant(selectedPrivacyLevel))
                     )
                     log.info("Setup: privacy level set to $selectedPrivacyLevel.")
                 }
 
                 thisObject.call(
                     if (securityEnabled) enableFilterGroup else disableFilterGroup,
-                    enumValue(FILTER_GROUP, "Security")
+                    staticField(securityGroup)
                 )
                 log.info("Setup: security filter group enabled=$securityEnabled.")
 
