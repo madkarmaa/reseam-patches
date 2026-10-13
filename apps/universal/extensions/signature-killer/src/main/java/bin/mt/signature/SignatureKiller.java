@@ -54,6 +54,23 @@ public class SignatureKiller {
         if (spoofApkPath) killApkPath(context, packageName);
     }
 
+    /** Installs the spoof before protection launched from class initializers. */
+    public static void initializeEarly(String packageName, String signature, boolean spoofApkPath) {
+        killSignature(packageName, signature);
+        if (!spoofApkPath) return;
+
+        try {
+            HiddenApiBypass.addHiddenApiExemptions("Landroid/app/ActivityThread;");
+            Class<?> activityThread = Class.forName("android.app.ActivityThread");
+            Object thread = activityThread.getMethod("currentActivityThread").invoke(null);
+            Context systemContext = (Context) activityThread.getMethod("getSystemContext").invoke(thread);
+            Context context = systemContext.createPackageContext(packageName, Context.CONTEXT_IGNORE_SECURITY);
+            killApkPath(context, packageName);
+        } catch (ReflectiveOperationException | PackageManager.NameNotFoundException | RuntimeException e) {
+            Log.e(TAG, "Early APK-path spoof failed", e);
+        }
+    }
+
     /**
      * Fakes PackageManager signatures.
      */

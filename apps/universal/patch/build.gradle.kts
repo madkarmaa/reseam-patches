@@ -5,6 +5,10 @@ plugins {
     id("app.reseam.patches")
 }
 
+dependencies {
+    implementation(project(":apps:shared"))
+}
+
 // To rebuild the native libs, run this from the repo root:
 //
 // On Windows or without make, swap

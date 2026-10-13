@@ -17,5 +17,5 @@ kotlin {
 
 dependencies {
     // Must match the workspace plugin version in settings.gradle.kts.
-    implementation("app.reseam:reseam-patch-sdk:0.20.2")
+    implementation("app.reseam:reseam-patch-sdk:0.22.0")
 }

@@ -18,7 +18,7 @@ pluginManagement {
 }
 
 plugins {
-    id("app.reseam.workspace") version "0.20.2"
+    id("app.reseam.workspace") version "0.22.0"
 }
 
 rootProject.name = "madkarma-patches"
