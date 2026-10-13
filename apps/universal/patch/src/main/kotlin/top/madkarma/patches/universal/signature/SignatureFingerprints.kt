@@ -8,8 +8,11 @@ import app.reseam.patch.dex.AccessFlags
 import app.reseam.patch.dex.buildInstructions
 import app.reseam.patch.dex.isSet
 import app.reseam.patch.klass
+import app.reseam.patch.method
 import app.reseam.patch.methodTarget
 import app.reseam.patch.types.NewMethod
+
+internal val pairipStartup = klass("com.pairip.StartupLauncher").method("launch")
 
 internal fun signatureAttachContext(): MethodTarget = methodTarget("signatureAttachContext") {
     val applicationName =

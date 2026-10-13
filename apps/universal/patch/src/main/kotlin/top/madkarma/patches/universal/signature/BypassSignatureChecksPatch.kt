@@ -7,6 +7,7 @@ package top.madkarma.patches.universal.signature
 
 import app.reseam.patch.before
 import app.reseam.patch.patch
+import top.madkarma.patches.shared.isPresent
 import top.madkarma.patches.universal.SignatureKiller
 import java.util.*
 
@@ -37,7 +38,17 @@ val bypassSignatureChecks = patch("Bypass signature checks") {
         val originalApk = files.sourceStream().use { it.readBytes() }
         files.writeStored("assets/SignatureKiller/origin.apk", originalApk)
 
-        for (abi in NATIVE_ABIS) {
+        val nativeLibraries = files.components().flatMap { files.component(it).list() }
+            .filter { it.startsWith("lib/") && it.endsWith(".so") }
+
+        // Adding another ABI can make Android stop extracting the app's own native libraries.
+        val nativeAbis = if (nativeLibraries.isEmpty()) NATIVE_ABIS else NATIVE_ABIS.filter { abi ->
+            nativeLibraries.any { it.startsWith("lib/$abi/") }
+        }
+
+        if (nativeAbis.isEmpty()) error("SignatureKiller: no supported native ABI in the app")
+
+        for (abi in nativeAbis) {
             val path = "lib/$abi/libSignatureKiller.so"
             val bytes = SignatureResources.javaClass.classLoader.getResourceAsStream(path)
                 ?.use { it.readBytes() }
@@ -56,8 +67,21 @@ val bypassSignatureChecks = patch("Bypass signature checks") {
         val originalSignature =
             files.signers().firstOrNull() ?: error("SignatureKiller: no original signer")
 
-        val attachContext = signatureAttachContext()
+        // Pairip signature checker can launch from a component class initializer, before attachBaseContext.
+        if (isPresent(pairipStartup)) {
+            pairipStartup.before {
+                call(
+                    SignatureKiller.initializeEarly,
+                    string(packageName),
+                    string(Base64.getEncoder().encodeToString(originalSignature)),
+                    bool(options[spoofApkPath])
+                )
+            }
 
+            log.info("SignatureKiller: early hook ${pairipStartup.descriptor}")
+        }
+
+        val attachContext = signatureAttachContext()
         attachContext.before {
             call(
                 SignatureKiller.initialize,

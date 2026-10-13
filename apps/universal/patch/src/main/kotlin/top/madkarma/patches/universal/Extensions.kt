@@ -9,6 +9,7 @@ import app.reseam.patch.ExtClass
 import app.reseam.patch.Type
 
 internal object SignatureKiller : ExtClass("bin.mt.signature.SignatureKiller") {
+    val initializeEarly by static(Type.String, Type.String, Type.Boolean)
     val initialize by static(Type.Context, Type.String, Type.String, Type.Boolean)
     val killSignature by static(Type.String, Type.String)
     val killApkPath by static(Type.Context, Type.String)
