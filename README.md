@@ -138,6 +138,7 @@ My patch bundle for Android apps I use, built with [Reseam](https://reseam.app).
 | Name | Description | Supported versions |
 | --- | --- | --- |
 | Bypass signature checks | Spoofs the original app signature (port of ApkSignatureKillerEx). | Any version |
+| Disable Play Store updates | Hides the app from Google Play's pending updates. | Any version |
 | Force extract native libs | Sets android:extractNativeLibs to true when it is false. | Any version |
 
 </details>
