@@ -68,7 +68,7 @@ class WeatherApi private constructor(context: Context) {
         return json
     }
 
-    @SuppressWarnings("UseKtx")
+    @Suppress("UseKtx")
     private fun storeCache(json: String) {
         prefs().edit().putString(KEY_CACHE_JSON, json).putLong(KEY_CACHE_TIME, now()).apply()
     }
@@ -186,7 +186,7 @@ class WeatherApi private constructor(context: Context) {
     fun currentApiKey(): String =
         prefs().getString(KEY_API_RUNTIME, null)?.takeIf { it.isNotEmpty() } ?: ""
 
-    @SuppressWarnings("UseKtx")
+    @Suppress("UseKtx")
     fun saveApiKey(key: String?) {
         val value = key?.trim { it <= ' ' } ?: ""
         prefs().edit().putString(KEY_API_RUNTIME, value).remove(KEY_CACHE_JSON)

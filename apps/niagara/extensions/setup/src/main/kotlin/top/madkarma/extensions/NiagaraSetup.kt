@@ -24,25 +24,25 @@ private const val ANALYTICS_REFUSAL =
 
 private fun prefs(context: Context) = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
-@SuppressWarnings("UseKtx")
+@Suppress("UseKtx")
 @Export
 fun skipToFavoritesSetup(context: Context) {
     prefs(context).edit().putString(KEY_BLOCK, BLOCK_SELECT_FAVORITES).apply()
 }
 
-@SuppressWarnings("UseKtx")
+@Suppress("UseKtx")
 @Export
 fun acceptTerms(context: Context) {
     prefs(context).edit().putInt(KEY_TERMS_VERSION, TERMS_VERSION).apply()
 }
 
-@SuppressWarnings("UseKtx")
+@Suppress("UseKtx")
 @Export
 fun refuseAnalytics(context: Context) {
     prefs(context).edit().putString(KEY_ANALYTICS_SELECTION, ANALYTICS_REFUSAL).apply()
 }
 
-@SuppressWarnings("UseKtx")
+@Suppress("UseKtx")
 @Export
 fun disableAnalyticsFlags(context: Context) {
     prefs(context).edit().putBoolean(KEY_MARKETING_ANALYTICS_ENABLED, false)

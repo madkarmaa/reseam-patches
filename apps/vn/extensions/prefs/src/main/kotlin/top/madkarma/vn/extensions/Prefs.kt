@@ -11,7 +11,7 @@ import app.reseam.runtime.Export
 
 private const val TAG = "Prefs"
 
-@SuppressWarnings("UseKtx")
+@Suppress("UseKtx")
 @Export
 fun putBoolean(context: Context, store: String, key: String, value: Boolean) {
     try {

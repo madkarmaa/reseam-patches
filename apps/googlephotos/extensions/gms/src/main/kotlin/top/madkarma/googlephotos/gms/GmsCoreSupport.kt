@@ -65,7 +65,7 @@ fun withPackageName(context: Context, packageName: String): Context =
         override fun getPackageName(): String = packageName
     }
 
-@SuppressWarnings("UseKtx")
+@Suppress("UseKtx")
 @Export
 fun check(activity: Activity, packageName: String, vendor: String) {
     foregroundActivity = WeakReference(activity)
@@ -276,7 +276,7 @@ private fun requestAccountPermission(activity: Activity, vendor: String) {
     )
 }
 
-@SuppressWarnings("UseKtx")
+@Suppress("UseKtx")
 @Export
 fun onAccountPermissionResult(
     activity: Activity,

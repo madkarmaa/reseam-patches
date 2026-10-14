@@ -38,28 +38,14 @@ precedence = "override"
 SPDX-FileCopyrightText = "2002 Niels Provos <provos@citi.umich.edu>"
 SPDX-License-Identifier = "BSD-2-Clause"
 
-# No upstream license has been established for these ported files.
-# This identifier records the unresolved status; it grants no permissions.
-[[annotations]]
-path = [
-    "apps/universal/extensions/signature-killer/src/main/java/bin/mt/signature/SignatureKiller.java",
-    "apps/universal/extensions/signature-killer/src/main/cpp/mt_jni.c",
-]
-precedence = "override"
-SPDX-FileCopyrightText = [
-    "ApkSignatureKillerEx contributors <https://github.com/L-JINBIN/ApkSignatureKillerEx>",
-    "2026 MadKarma <me@madkarma.top>",
-]
-SPDX-License-Identifier = "LicenseRef-ApkSignatureKillerEx-Unspecified"
-
-# The native binaries combine the JNI port, xHook, and the BSD headers.
+# The native binaries combine project-owned JNI code, xHook, and the BSD headers.
 [[annotations]]
 path = ["apps/universal/patch/src/main/resources/lib/**/libSignatureKiller.so"]
 precedence = "override"
 SPDX-FileCopyrightText = [
-    "ApkSignatureKillerEx contributors <https://github.com/L-JINBIN/ApkSignatureKillerEx>",
+    "2026 MadKarma <me@madkarma.top>",
     "2018-present iQIYI, Inc.",
     "1991, 1993 The Regents of the University of California",
     "2002 Niels Provos <provos@citi.umich.edu>",
 ]
-SPDX-License-Identifier = "LicenseRef-ApkSignatureKillerEx-Unspecified AND MIT AND BSD-2-Clause AND BSD-3-Clause"
+SPDX-License-Identifier = "AGPL-3.0-or-later AND MIT AND BSD-2-Clause AND BSD-3-Clause"
