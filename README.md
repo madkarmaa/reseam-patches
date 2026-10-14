@@ -146,13 +146,9 @@ My patch bundle for Android apps I use, built with [Reseam](https://reseam.app).
 
 <!-- PATCHES:END -->
 
-## Get updates in Reseam Manager
+## Add in Reseam Manager
 
-Add this index URL in Reseam Manager:
-
-```text
-https://github.com/madkarmaa/reseam-patches/releases/latest/download/patches.json
-```
+Click this link: **https://reseam.app/add/?url=https://github.com/madkarmaa/reseam-patches**
 
 ## Setup
 
