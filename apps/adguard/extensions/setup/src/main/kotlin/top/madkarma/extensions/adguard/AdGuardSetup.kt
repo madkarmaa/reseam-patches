@@ -27,6 +27,7 @@ private constructor(private val context: Context, private val adapter: FlmAdapte
         return approved
     }
 
+    @SuppressWarnings("UseKtx")
     private fun setBooleanPreference(key: String, value: Boolean) {
         try {
             prefs().edit().putBoolean(key, value).apply()
@@ -70,7 +71,8 @@ private constructor(private val context: Context, private val adapter: FlmAdapte
         if (filterSetupFailed) return
         try {
             if (adapter.enableFilterLists(
-                    listOf(filterId), enabled
+                    listOf(filterId),
+                    enabled,
                 ) == null
             ) throw IllegalStateException("Filter database did not accept setup")
         } catch (exception: Exception) {
@@ -100,6 +102,7 @@ private constructor(private val context: Context, private val adapter: FlmAdapte
     @Export
     fun setWidgetsFilterEnabled(enabled: Boolean) = setFilterEnabled(22, enabled)
 
+    @SuppressWarnings("UseKtx")
     @Export
     fun markSetupCompleted() {
         if (filterSetupFailed) return

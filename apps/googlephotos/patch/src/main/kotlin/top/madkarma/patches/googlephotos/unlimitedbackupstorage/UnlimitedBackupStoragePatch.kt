@@ -10,8 +10,8 @@ import app.reseam.patch.after
 import app.reseam.patch.dex.stringValue
 import app.reseam.patch.patch
 import app.reseam.patch.replaceAllStrings
-import top.madkarma.patches.googlephotos.GOOGLE_PHOTOS
 import top.madkarma.googlephotos.spoof.bindings.PixelXlIdentity
+import top.madkarma.patches.googlephotos.GOOGLE_PHOTOS
 
 private val ORIGINAL_PIXEL_FEATURES = setOf(
     "$GOOGLE_PHOTOS.NEXUS_PRELOAD",

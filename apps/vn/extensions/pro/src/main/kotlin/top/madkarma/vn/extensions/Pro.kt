@@ -15,9 +15,9 @@ object Pro {
     @Export
     @JvmStatic
     fun initializePreferences(context: Context) {
-        Prefs.putBoolean(context, "devices", "KEY_LAST_SHOW_PRO_FEATURE", false)
-        Prefs.putBoolean(context, "debug", "ENABLE_SHOW_STORE", false)
-        Prefs.putBoolean(context, "debug", "SHOW_AD_ALWAYS", false)
+        putBoolean(context, "devices", "KEY_LAST_SHOW_PRO_FEATURE", false)
+        putBoolean(context, "debug", "ENABLE_SHOW_STORE", false)
+        putBoolean(context, "debug", "SHOW_AD_ALWAYS", false)
     }
 
     @Export

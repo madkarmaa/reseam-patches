@@ -68,6 +68,7 @@ class WeatherApi private constructor(context: Context) {
         return json
     }
 
+    @SuppressWarnings("UseKtx")
     private fun storeCache(json: String) {
         prefs().edit().putString(KEY_CACHE_JSON, json).putLong(KEY_CACHE_TIME, now()).apply()
     }
@@ -95,7 +96,8 @@ class WeatherApi private constructor(context: Context) {
         val preferences = prefs()
 
         if (!preferences.getBoolean(
-                KEY_DYNAMIC, false
+                KEY_DYNAMIC,
+                false,
             ) && preferences.contains(KEY_LAT) && preferences.contains(KEY_LONG)
         ) return doubleArrayOf(
             preferences.getFloat(KEY_LAT, 0f).toDouble(),
@@ -153,7 +155,9 @@ class WeatherApi private constructor(context: Context) {
         try {
             connection = URL(
                 requestUrl(
-                    latitude, longitude, language
+                    latitude,
+                    longitude,
+                    language,
                 )
             ).openConnection() as HttpsURLConnection
             connection.connectTimeout = CONNECT_TIMEOUT_MS
@@ -182,6 +186,7 @@ class WeatherApi private constructor(context: Context) {
     fun currentApiKey(): String =
         prefs().getString(KEY_API_RUNTIME, null)?.takeIf { it.isNotEmpty() } ?: ""
 
+    @SuppressWarnings("UseKtx")
     fun saveApiKey(key: String?) {
         val value = key?.trim { it <= ' ' } ?: ""
         prefs().edit().putString(KEY_API_RUNTIME, value).remove(KEY_CACHE_JSON)
@@ -337,7 +342,9 @@ class WeatherApi private constructor(context: Context) {
         try {
             val format = SimpleDateFormat("yyyy-MM-dd hh:mm a", Locale.US)
             format.timeZone = TimeZone.getTimeZone(zoneId)
-            return format.parse("$date $time")!!.time / 1000
+            return checkNotNull(format.parse("$date $time")) {
+                "Weather timestamp could not be parsed"
+            }.time / 1000
         } catch (exception: Exception) {
             return 0
         }

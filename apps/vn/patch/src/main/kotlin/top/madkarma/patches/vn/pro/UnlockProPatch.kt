@@ -49,11 +49,13 @@ val unlockPro = patch("Unlock Pro") {
         }
 
         manifest.redirectActivity(
-            className(personalizationActivity.descriptor), className(Pro.SkippedPersonalizationActivity.descriptor)
+            className(personalizationActivity.descriptor),
+            className(Pro.SkippedPersonalizationActivity.descriptor)
         )
 
         manifest.redirectActivity(
-            className(subscriptionActivity.descriptor), className(Pro.SkippedSubscriptionActivity.descriptor)
+            className(subscriptionActivity.descriptor),
+            className(Pro.SkippedSubscriptionActivity.descriptor)
         )
 
         check(resources.setString("frv_help_center", PATCH_ATTRIBUTION)) {

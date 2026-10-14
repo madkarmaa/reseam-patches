@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-@file:Suppress("unused")
+@file:JvmName("MembershipAttribution") @file:Suppress("unused")
 
 package top.madkarma.extensions.accuweather
 
@@ -10,59 +10,56 @@ import android.webkit.WebView
 import app.reseam.runtime.Export
 import org.json.JSONObject
 
-object MembershipAttribution {
-    @Export
-    @JvmStatic
-    fun install(webView: WebView?, attribution: String?) {
-        if (webView == null) return
+@Export
+fun install(webView: WebView?, attribution: String?) {
+    if (webView == null) return
 
-        try {
-            val script = """
-                (() => {
-                  if (window.reseamMembershipAttribution) return;
+    try {
+        val script = """
+            (() => {
+              if (window.reseamMembershipAttribution) return;
 
-                  const attribution = %s;
-                  const original = 'Enjoy no ads, advanced forecasts & priority alerts';
-                  const matches = element => element.textContent.replace(/\s+/g, ' ').trim() === original;
+              const attribution = %s;
+              const original = 'Enjoy no ads, advanced forecasts & priority alerts';
+              const matches = element => element.textContent.replace(/\s+/g, ' ').trim() === original;
 
-                  function replaceMessage(root) {
-                    if (!root || root.nodeType !== Node.ELEMENT_NODE) return;
+              function replaceMessage(root) {
+                if (!root || root.nodeType !== Node.ELEMENT_NODE) return;
 
-                    if (matches(root)) {
-                      root.textContent = attribution;
-                      return;
-                    }
+                if (matches(root)) {
+                  root.textContent = attribution;
+                  return;
+                }
 
-                    const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT);
-                    while (walker.nextNode()) {
-                      if (!matches(walker.currentNode)) continue;
+                const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT);
+                while (walker.nextNode()) {
+                  if (!matches(walker.currentNode)) continue;
 
-                      walker.currentNode.textContent = attribution;
-                      return;
+                  walker.currentNode.textContent = attribution;
+                  return;
+                }
+              }
+
+              const observer = new MutationObserver(records => {
+                for (const record of records) {
+                  if (record.type === 'characterData') replaceMessage(record.target.parentElement);
+                  else {
+                    for (const node of record.addedNodes) {
+                      replaceMessage(node.nodeType === Node.TEXT_NODE ? node.parentElement : node);
                     }
                   }
+                }
+              });
 
-                  const observer = new MutationObserver(records => {
-                    for (const record of records) {
-                      if (record.type === 'characterData') replaceMessage(record.target.parentElement);
-                      else {
-                        for (const node of record.addedNodes) {
-                          replaceMessage(node.nodeType === Node.TEXT_NODE ? node.parentElement : node);
-                        }
-                      }
-                    }
-                  });
+              observer.observe(document.documentElement, {childList: true, characterData: true, subtree: true});
 
-                  observer.observe(document.documentElement, {childList: true, characterData: true, subtree: true});
+              window.reseamMembershipAttribution = observer;
 
-                  window.reseamMembershipAttribution = observer;
-
-                  replaceMessage(document.body);
-                })();
-                """.trimIndent().format(JSONObject.quote(attribution)) + "\n"
-            webView.evaluateJavascript(script, null)
-        } catch (exception: RuntimeException) {
-            Log.w("ReseamAccuWeather", "Could not install membership attribution", exception)
-        }
+              replaceMessage(document.body);
+            })();
+            """.trimIndent().format(JSONObject.quote(attribution)) + "\n"
+        webView.evaluateJavascript(script, null)
+    } catch (exception: RuntimeException) {
+        Log.w("ReseamAccuWeather", "Could not install membership attribution", exception)
     }
 }
