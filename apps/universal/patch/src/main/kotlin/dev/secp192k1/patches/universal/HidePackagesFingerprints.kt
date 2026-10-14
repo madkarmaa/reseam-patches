@@ -10,6 +10,7 @@ import app.reseam.patch.dex.parameterTypes
 import app.reseam.patch.dex.returnType
 import app.reseam.patch.methods
 import app.reseam.patch.points
+import dev.secp192k1.universal.hidepackages.bindings.HiddenPackages
 
 private val extensionDescriptorPrefix = HiddenPackages.descriptor.substringBeforeLast('/') + "/"
 

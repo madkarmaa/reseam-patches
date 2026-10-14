@@ -9,7 +9,7 @@ package top.madkarma.patches.googlephotos.gms
 
 import app.reseam.patch.*
 import top.madkarma.patches.googlephotos.GOOGLE_PHOTOS
-import top.madkarma.patches.googlephotos.GmsCoreSupport
+import top.madkarma.googlephotos.gms.bindings.GmsCoreSupport
 
 private const val MARS_AUTHORITY = "com.google.android.libraries.photos.api.mars"
 

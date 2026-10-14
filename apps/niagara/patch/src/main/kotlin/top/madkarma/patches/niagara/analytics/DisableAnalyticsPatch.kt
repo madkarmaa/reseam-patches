@@ -7,7 +7,7 @@ package top.madkarma.patches.niagara.analytics
 
 import app.reseam.patch.appEntry
 import app.reseam.patch.patch
-import top.madkarma.patches.niagara.NiagaraSetup
+import top.madkarma.extensions.bindings.NiagaraSetup
 
 val disableAnalytics = patch("Disable analytics") {
     description("Refuses and blocks analytics collection.")

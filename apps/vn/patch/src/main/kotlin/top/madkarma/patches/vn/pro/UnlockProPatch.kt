@@ -7,7 +7,7 @@ package top.madkarma.patches.vn.pro
 
 import app.reseam.patch.*
 import top.madkarma.patches.shared.PATCH_ATTRIBUTION
-import top.madkarma.patches.vn.Pro
+import top.madkarma.vn.extensions.bindings.Pro
 
 val unlockPro = patch("Unlock Pro") {
     description("Unlocks Pro-only features.")
@@ -49,11 +49,11 @@ val unlockPro = patch("Unlock Pro") {
         }
 
         manifest.redirectActivity(
-            className(personalizationActivity.descriptor), Pro.PERSONALIZATION_ACTIVITY
+            className(personalizationActivity.descriptor), className(Pro.SkippedPersonalizationActivity.descriptor)
         )
 
         manifest.redirectActivity(
-            className(subscriptionActivity.descriptor), Pro.SUBSCRIPTION_ACTIVITY
+            className(subscriptionActivity.descriptor), className(Pro.SkippedSubscriptionActivity.descriptor)
         )
 
         check(resources.setString("frv_help_center", PATCH_ATTRIBUTION)) {

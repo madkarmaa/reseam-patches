@@ -6,7 +6,7 @@
 package top.madkarma.patches.mapy.premium
 
 import app.reseam.patch.*
-import top.madkarma.patches.mapy.Premium
+import top.madkarma.extensions.mapy.bindings.Premium
 import top.madkarma.patches.shared.PATCH_ATTRIBUTION
 
 val unlockPremium = patch("Unlock Premium") {

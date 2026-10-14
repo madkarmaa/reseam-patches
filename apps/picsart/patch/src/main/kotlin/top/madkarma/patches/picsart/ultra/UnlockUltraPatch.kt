@@ -8,7 +8,7 @@ package top.madkarma.patches.picsart.ultra
 import app.reseam.patch.after
 import app.reseam.patch.before
 import app.reseam.patch.patch
-import top.madkarma.patches.picsart.Ultra
+import top.madkarma.picsart.ultra.bindings.Ultra
 import top.madkarma.patches.universal.signature.bypassSignatureChecks
 
 val unlockUltra = patch("Unlock Ultra") {

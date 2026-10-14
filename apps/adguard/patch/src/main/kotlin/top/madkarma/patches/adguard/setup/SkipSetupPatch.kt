@@ -6,7 +6,7 @@
 package top.madkarma.patches.adguard.setup
 
 import app.reseam.patch.*
-import top.madkarma.patches.adguard.AdGuardSetup
+import top.madkarma.extensions.adguard.bindings.AdGuardSetup
 import top.madkarma.patches.shared.isPresent
 
 val skipSetup = patch("Skip setup") {
