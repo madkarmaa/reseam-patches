@@ -6,7 +6,7 @@
 package top.madkarma.patches.liftoff.pro
 
 import app.reseam.patch.*
-import top.madkarma.patches.liftoff.ProEntitlements
+import top.madkarma.liftoff.extensions.bindings.ProEntitlements
 
 val unlockPro = patch("Unlock Pro") {
     description("Unlocks Pro-only features, including shop items.")

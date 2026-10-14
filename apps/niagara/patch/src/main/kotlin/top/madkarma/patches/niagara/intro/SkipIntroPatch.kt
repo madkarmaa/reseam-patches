@@ -7,7 +7,7 @@ package top.madkarma.patches.niagara.intro
 
 import app.reseam.patch.appEntry
 import app.reseam.patch.patch
-import top.madkarma.patches.niagara.NiagaraSetup
+import top.madkarma.extensions.bindings.NiagaraSetup
 
 val skipIntro = patch("Skip intro") {
     description("Skips the promo and terms screens, landing directly on setup.")

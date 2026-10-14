@@ -9,7 +9,7 @@ import app.reseam.patch.ExternalPatch
 import app.reseam.patch.appEntry
 import app.reseam.patch.invoke
 import app.reseam.patch.patch
-import top.madkarma.patches.droplert.Prefs
+import top.madkarma.droplert.extensions.bindings.Prefs
 
 val skipOnboarding = patch("Skip onboarding") {
     description("Skips the setup screens, landing directly on home.")

@@ -6,8 +6,8 @@
 package top.madkarma.patches.niagara.weather
 
 import app.reseam.patch.*
-import top.madkarma.patches.niagara.WeatherApi
-import top.madkarma.patches.niagara.WeatherApiKeyField
+import top.madkarma.extensions.bindings.WeatherApi
+import top.madkarma.extensions.bindings.WeatherApiKeyField
 import top.madkarma.patches.niagara.pro.unlockPro
 
 val weatherWidgetFix = patch("Weather widget fix") {

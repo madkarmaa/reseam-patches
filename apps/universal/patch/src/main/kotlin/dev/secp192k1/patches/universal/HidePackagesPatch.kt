@@ -9,6 +9,7 @@ package dev.secp192k1.patches.universal
 import app.reseam.patch.before
 import app.reseam.patch.patch
 import app.reseam.patch.redirectTo
+import dev.secp192k1.universal.hidepackages.bindings.HiddenPackages
 
 private val packageNamePattern = Regex("^[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z][A-Za-z0-9_]*)+$")
 

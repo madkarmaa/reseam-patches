@@ -7,8 +7,8 @@ package top.madkarma.patches.universal.signature
 
 import app.reseam.patch.before
 import app.reseam.patch.patch
+import bin.mt.signature.bindings.SignatureKiller
 import top.madkarma.patches.shared.isPresent
-import top.madkarma.patches.universal.SignatureKiller
 import java.util.*
 
 val bypassSignatureChecks = patch("Bypass signature checks") {

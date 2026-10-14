@@ -7,7 +7,7 @@ package top.madkarma.patches.accuweather.premium
 
 import app.reseam.patch.before
 import app.reseam.patch.patch
-import top.madkarma.patches.accuweather.MembershipAttribution
+import top.madkarma.extensions.accuweather.bindings.MembershipAttribution
 import top.madkarma.patches.shared.PATCH_ATTRIBUTION
 
 val unlockFamilyPremium = patch("Unlock Family Premium+") {

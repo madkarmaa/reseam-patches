@@ -6,7 +6,7 @@
 package top.madkarma.patches.droplert.premium
 
 import app.reseam.patch.*
-import top.madkarma.patches.droplert.Prefs
+import top.madkarma.droplert.extensions.bindings.Prefs
 import top.madkarma.patches.shared.PATCH_ATTRIBUTION
 import top.madkarma.patches.shared.isPresent
 
