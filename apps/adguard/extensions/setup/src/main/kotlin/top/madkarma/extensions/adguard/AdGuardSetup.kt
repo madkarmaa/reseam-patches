@@ -27,7 +27,7 @@ private constructor(private val context: Context, private val adapter: FlmAdapte
         return approved
     }
 
-    @SuppressWarnings("UseKtx")
+    @Suppress("UseKtx")
     private fun setBooleanPreference(key: String, value: Boolean) {
         try {
             prefs().edit().putBoolean(key, value).apply()
@@ -102,7 +102,7 @@ private constructor(private val context: Context, private val adapter: FlmAdapte
     @Export
     fun setWidgetsFilterEnabled(enabled: Boolean) = setFilterEnabled(22, enabled)
 
-    @SuppressWarnings("UseKtx")
+    @Suppress("UseKtx")
     @Export
     fun markSetupCompleted() {
         if (filterSetupFailed) return

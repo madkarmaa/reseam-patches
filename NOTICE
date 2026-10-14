@@ -54,13 +54,6 @@ Gradle wrapper:
 Copyright 2015-2024 the original authors.
 License: Apache-2.0; see LICENSES/Apache-2.0.txt.
 
-ApkSignatureKillerEx port (SignatureKiller.java and mt_jni.c), and the
-libSignatureKiller.so binaries containing it:
-Source: https://github.com/L-JINBIN/ApkSignatureKillerEx
-No upstream license has been established.
-These files are excluded from the project's AGPL grant. See
-LICENSES/LicenseRef-ApkSignatureKillerEx-Unspecified.txt.
-
 Bundled extension dependencies
 
 AndroidX DataStore preferences proto 1.2.1: Apache-2.0.

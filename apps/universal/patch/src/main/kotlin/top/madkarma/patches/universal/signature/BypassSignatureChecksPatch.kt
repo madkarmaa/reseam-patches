@@ -7,19 +7,17 @@ package top.madkarma.patches.universal.signature
 
 import app.reseam.patch.before
 import app.reseam.patch.patch
-import bin.mt.signature.bindings.SignatureKiller
 import top.madkarma.patches.shared.isPresent
+import top.madkarma.universal.signature.bindings.SignatureKiller
 import java.util.*
 
 val bypassSignatureChecks = patch("Bypass signature checks") {
-    description(
-        "Spoofs the original app signature (port of ApkSignatureKillerEx).",
-    )
+    description("Spoofs the original app signature and optionally redirects installed-file reads to the original app files.")
 
     val spoofApkPath = boolOption(
         "spoofApkPath",
         title = "Spoof APK file access",
-        description = "Also embeds the original APK and redirects reads of the installed APK file to it. Only enable this for apps that verify the APK file itself; most apps merely ask for the signature. Leave off unless the app needs it.",
+        description = "Also embeds the original APK components and redirects reads of the installed APK files to them. Only enable this for apps that verify the APK files themselves; most apps merely ask for the signature. Leave off unless the app needs it.",
         default = false,
     )
 
@@ -35,8 +33,25 @@ val bypassSignatureChecks = patch("Bypass signature checks") {
             return@execute
         }
 
-        val originalApk = files.sourceStream().use { it.readBytes() }
-        files.writeStored("assets/SignatureKiller/origin.apk", originalApk)
+        var originalSize = 0L
+        val assetPaths = mutableSetOf<String>()
+
+        for (component in files.components()) {
+            val splitName = manifest.component(component).splitName
+
+            if (splitName != null && (splitName.isEmpty() || '/' in splitName || '\\' in splitName)) error(
+                "SignatureKiller: invalid split name: $splitName"
+            )
+
+            val assetPath = if (splitName == null) "assets/SignatureKiller/origin.apk"
+            else "assets/SignatureKiller/splits/$splitName.apk"
+
+            if (!assetPaths.add(assetPath)) error("SignatureKiller: duplicate original component: $component")
+
+            val original = files.component(component).sourceStream().use { it.readBytes() }
+            files.writeStored(assetPath, original)
+            originalSize += original.size
+        }
 
         val nativeLibraries = files.components().flatMap { files.component(it).list() }
             .filter { it.startsWith("lib/") && it.endsWith(".so") }
@@ -56,7 +71,7 @@ val bypassSignatureChecks = patch("Bypass signature checks") {
             files.write(path, bytes)
         }
 
-        log.info("SignatureKiller: hooked $packageName with APK-path spoofing (${originalApk.size} byte origin, ${signers.size} signer(s)).")
+        log.info("SignatureKiller: hooked $packageName with APK-path spoofing (${assetPaths.size} original component(s), $originalSize bytes, ${signers.size} signer(s)).")
     }
 
     // Resolve the Application after dependent patches have finished editing the manifest.
