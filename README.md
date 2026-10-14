@@ -85,6 +85,15 @@ My patch bundle for Android apps I use, built with [Reseam](https://reseam.app).
 </details>
 
 <details>
+<summary><strong>com.paypal.android.p2pmobile</strong></summary>
+
+| Name | Description | Supported versions |
+| --- | --- | --- |
+| Disable startup checks | Prevents local integrity and emulator checks from crashing the app at startup. | Any version |
+
+</details>
+
+<details>
 <summary><strong>com.picsart.studio</strong></summary>
 
 | Name | Description | Supported versions |
