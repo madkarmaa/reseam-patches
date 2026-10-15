@@ -30,7 +30,6 @@ private fun property(key: String): String? {
     var product = key
     for (partition in arrayOf("system", "vendor", "odm")) {
         val prefix = "ro.product.$partition."
-
         if (product.startsWith(prefix)) product = "ro.product." + product.substring(prefix.length)
     }
 
@@ -38,7 +37,6 @@ private fun property(key: String): String? {
         "ro.product.brand" -> "google"
         "ro.product.manufacturer" -> "Google"
         "ro.product.device", "ro.product.name" -> "marlin"
-
         "ro.product.model" -> "Pixel XL"
         else -> null
     }
