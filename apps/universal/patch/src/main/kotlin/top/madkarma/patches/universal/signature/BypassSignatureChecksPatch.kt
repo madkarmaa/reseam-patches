@@ -8,6 +8,8 @@ package top.madkarma.patches.universal.signature
 import app.reseam.patch.before
 import app.reseam.patch.patch
 import top.madkarma.patches.shared.isPresent
+import top.madkarma.universal.signature.bindings.SignatureChecks
+import top.madkarma.universal.signature.bindings.SignatureChecksApi33
 import top.madkarma.universal.signature.bindings.SignatureKiller
 import java.util.*
 
@@ -21,12 +23,36 @@ val bypassSignatureChecks = patch("Bypass signature checks") {
         default = false,
     )
 
+    val diagnostics = boolOption(
+        "diagnostics",
+        title = "Log signature API diagnostics",
+        description = "Log useful data under the SignatureKiller log tag.",
+        default = false,
+    )
+
     execute {
         val packageName =
             manifest.packageName ?: error("SignatureKiller: manifest has no package name")
 
         val signers = files.signers()
         if (signers.isEmpty()) error("SignatureKiller: no v2/v3 signers found; unsigned or v1-only APKs are not supported")
+
+        // These APIs bypass PackageInfo.CREATOR. Redirect direct app calls; extension calls stay original.
+        val manager = "android.content.pm.PackageManager"
+
+        val certificateChecks = bytecode.redirectCalls(
+            manager, "hasSigningCertificate", SignatureChecks.hasSigningCertificate,
+        ) + bytecode.redirectCalls(
+            manager, "hasSigningCertificate", SignatureChecks.hasSigningCertificateForUid,
+        )
+
+        val archiveReads = bytecode.redirectCalls(
+            manager, "getPackageArchiveInfo", SignatureChecks.getPackageArchiveInfo,
+        ) + bytecode.redirectCalls(
+            manager, "getPackageArchiveInfo", SignatureChecksApi33.getPackageArchiveInfoWithFlags,
+        )
+
+        log.info("SignatureKiller: redirected $certificateChecks certificate check(s), $archiveReads archive read(s); reflection and JNI calls are not redirected.")
 
         if (!options[spoofApkPath]) {
             log.info("SignatureKiller: hooked $packageName (signature only, ${signers.size} signer(s)).")
@@ -105,6 +131,8 @@ val bypassSignatureChecks = patch("Bypass signature checks") {
                 string(Base64.getEncoder().encodeToString(originalSignature)),
                 bool(options[spoofApkPath])
             )
+
+            if (options[diagnostics]) call(SignatureChecks.checkSignatureApis, param(0))
         }
 
         log.info("SignatureKiller: startup hook ${attachContext.descriptor}")

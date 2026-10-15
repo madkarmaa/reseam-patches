@@ -76,6 +76,7 @@ fun initializeEarly(packageName: String, signature: String, spoofApkPath: Boolea
 @Export
 fun killSignature(packageName: String, base64Sig: String) {
     Log.i(TAG, "killSignature: $packageName (sig ${base64Sig.length} chars)")
+    configureSignatureChecks(packageName, base64Sig)
     killPM(packageName, base64Sig)
 }
 
@@ -216,7 +217,7 @@ private fun getCreator(
 }
 
 @Suppress("UNCHECKED_CAST")
-private fun getLegacySignatures(info: PackageInfo): Array<Signature>? {
+internal fun getLegacySignatures(info: PackageInfo): Array<Signature>? {
     try {
         return findField(PackageInfo::class.java, "signatures").get(info) as Array<Signature>?
     } catch (exception: ReflectiveOperationException) {
@@ -228,7 +229,7 @@ private fun getLegacySignatures(info: PackageInfo): Array<Signature>? {
     }
 }
 
-private fun replaceFirstSignature(signatures: Array<Signature>?, fakeSignature: Signature) {
+internal fun replaceFirstSignature(signatures: Array<Signature>?, fakeSignature: Signature) {
     if (!signatures.isNullOrEmpty()) signatures[0] = fakeSignature
 }
 
