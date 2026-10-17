@@ -1,0 +1,79 @@
+name: Bump Reseam engine
+
+on:
+    schedule: # Every 6 hours.
+        -   cron: "0 */6 * * *"
+    workflow_dispatch:
+
+permissions:
+    contents: write
+    actions: write
+
+concurrency:
+    group: bump-reseam
+    cancel-in-progress: false
+
+jobs:
+    bump:
+        runs-on: ubuntu-latest
+        steps:
+            -   name: Checkout main
+                uses: actions/checkout@v7
+                with:
+                    ref: main
+                    fetch-depth: 0
+
+            -   name: Check latest engine release
+                id: versions
+                run: |
+                    LATEST_TAG="$(curl -fsSL https://git.reseam.app/api/v1/repos/reseam/reseam/releases/latest | jq -r .tag_name)"
+                    if [ -z "$LATEST_TAG" ] || [ "$LATEST_TAG" = "null" ]; then
+                        echo "Empty tag from Forgejo API." >&2
+                        exit 1
+                    fi
+                    LATEST="${LATEST_TAG#v}"
+                    CURRENT="$(python3 -c 'import json; print(json.load(open("package.json"))["reseam"]["engine"])')"
+                    echo "latest=$LATEST" >> "$GITHUB_OUTPUT"
+                    echo "current=$CURRENT" >> "$GITHUB_OUTPUT"
+                    if [ "$LATEST" = "$CURRENT" ]; then
+                        echo "update=false" >> "$GITHUB_OUTPUT"
+                    else
+                        echo "update=true" >> "$GITHUB_OUTPUT"
+                    fi
+                    echo "Latest: $LATEST_TAG, current: $CURRENT"
+
+            -   name: Bump engine version
+                if: steps.versions.outputs.update == 'true'
+                run: |
+                    LATEST="${{ steps.versions.outputs.latest }}"
+                    python3 - "$LATEST" <<'EOF'
+                    import json, sys
+                    latest = sys.argv[1]
+                    with open("package.json") as f:
+                        data = json.load(f)
+                    data["reseam"]["engine"] = latest
+                    with open("package.json", "w") as f:
+                        json.dump(data, f, indent=4)
+                        f.write("\n")
+                    EOF
+                    sed -i -E "s/(id\(\"app\.reseam\.workspace\"\) version \")[^\"]+(\")/\1$LATEST\2/" settings.gradle.kts
+                    sed -i -E "s#(app\.reseam:reseam-patch-sdk:)[^\"]+#\1$LATEST#" apps/shared/build.gradle.kts
+                    grep -rl 'ENGINE_VERSION: ' .github/workflows/ | xargs sed -i -E "s/(ENGINE_VERSION: )v[0-9][0-9.]*/\1v$LATEST/"
+                    git diff --stat
+
+            -   name: Commit and push to main
+                if: steps.versions.outputs.update == 'true'
+                run: |
+                    LATEST="${{ steps.versions.outputs.latest }}"
+                    git config user.name "github-actions[bot]"
+                    git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+                    git add settings.gradle.kts .github/workflows/ apps/shared/ package.json
+                    git diff --cached --quiet && echo "Nothing to commit." && exit 0
+                    git commit -m "feat: bump to reseam $LATEST"
+                    git push origin HEAD:main
+
+            -   name: Run release workflow
+                if: steps.versions.outputs.update == 'true'
+                env:
+                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                run: gh workflow run release.yml --ref main
