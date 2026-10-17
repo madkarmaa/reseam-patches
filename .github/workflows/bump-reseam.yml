@@ -76,7 +76,10 @@ jobs:
                     git add settings.gradle.kts .github/workflows/ apps/shared/ package.json
                     git diff --cached --quiet && echo "Nothing to commit." && exit 0
                     git commit -m "feat: bump to reseam $LATEST"
-                    git push "https://x-access-token:$BUMP_PAT@github.com/${{ github.repository }}.git" HEAD:main
+                    # actions/checkout injects an extraheader with GITHUB_TOKEN for all
+                    # github.com requests, which would override the PAT below. Clear it
+                    # so the push authenticates as the PAT, not the GitHub App.
+                    git -c http.https://github.com/.extraheader= push "https://x-access-token:$BUMP_PAT@github.com/${{ github.repository }}.git" HEAD:main
 
             -   name: Run release workflow
                 if: steps.versions.outputs.update == 'true'
