@@ -1,0 +1,42 @@
+name: Patch request
+description: Request patches for a new app or new patches for a supported app.
+title: "request: "
+labels: [ "app-request" ]
+body:
+    -   type: markdown
+        attributes:
+            value: |
+                Thanks for the suggestion. One app per issue, please.
+    -   type: input
+        id: app
+        attributes:
+            label: App name
+            description: Display name of the app.
+            placeholder: Example app
+        validations:
+            required: true
+    -   type: input
+        id: store
+        attributes:
+            label: Play Store link
+            description: Link to the app listing.
+            placeholder: https://play.google.com/store/apps/details?id=com.example.app
+        validations:
+            required: true
+    -   type: textarea
+        id: patches
+        attributes:
+            label: Requested patches
+            description: What should the patch(es) do? Be specific (e.g. unlock X, remove Y ads).
+            placeholder: |
+                - Unlock ...
+                - Remove ...
+        validations:
+            required: true
+    -   type: textarea
+        id: context
+        attributes:
+            label: Additional context
+            description: Anything else. Note if the app is free or paid, if it needs login, and what you tried already.
+        validations:
+            required: false

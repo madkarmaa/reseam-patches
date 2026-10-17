@@ -1,0 +1,97 @@
+name: Bug report
+description: Report a broken patch or bundle problem.
+title: "bug: "
+labels: [ "bug" ]
+body:
+    -   type: markdown
+        attributes:
+            value: |
+                Thanks for reporting. Fill in what you can. App and bundle versions plus logs help most.
+    -   type: input
+        id: app
+        attributes:
+            label: Affected app
+            description: Package name, e.g. com.example.app.
+            placeholder: com.example.app
+        validations:
+            required: true
+    -   type: input
+        id: app-version
+        attributes:
+            label: App version
+            description: versionName / versionCode you patched, and where the APK came from.
+            placeholder: "2.5.4 (Play Store)"
+        validations:
+            required: true
+    -   type: input
+        id: patches
+        attributes:
+            label: Patch names enabled
+            description: Which patches were enabled when the bug happened?
+            placeholder: Example patch
+        validations:
+            required: true
+    -   type: input
+        id: bundle
+        attributes:
+            label: Bundle version
+            description: Copy the release tag from Reseam Manager, e.g. v0.26.1.
+            placeholder: v0.0.0
+        validations:
+            required: true
+    -   type: input
+        id: device
+        attributes:
+            label: Device / Android version
+            description: Device model, Android version, rooted or not.
+            placeholder: Pixel 7, Android 15, unrooted
+        validations:
+            required: false
+    -   type: textarea
+        id: description
+        attributes:
+            label: What happened?
+            description: What you expected vs what actually happened, plus steps to reproduce.
+            placeholder: |
+                Expected: ...
+                Actual: ...
+                Steps:
+                1. ...
+                2. ...
+        validations:
+            required: true
+    -   type: markdown
+        attributes:
+            value: |
+                ## How to get logs
+                
+                Patch any supported app with Reseam Manager (https://reseam.app/). If something breaks, first update Reseam Manager and the app to the latest versions, then retest.
+                
+                For crashes, attach a LogFox export. LogFox records app crashes on the device. It reads logs through Shizuku, which gives log access without a PC.
+                
+                1. Install Shizuku from https://github.com/thejaustin/ShizukuPlus/releases/latest.
+                2. Turn on developer options. Open Settings, then About phone, then tap Build number 10 times. On some phones the entry sits under Software information.
+                3. Open Shizuku.
+                4. Start pairing. In Shizuku choose Start via wireless debugging, then Pair, then open Developer options.
+                5. Turn on Wireless debugging. Allow the network if the phone asks.
+                6. Pair the device. Shizuku posts a notification that asks for the pairing code. Enter the code there.
+                7. Go back to Shizuku and choose Start via wireless debugging, then Start.
+                8. Install LogFox from https://github.com/F0x1d/LogFox/releases/latest.
+                9. Open LogFox, select Shizuku mode, and grant the permissions it requests.
+                10. Retest the app. LogFox records crashes automatically. Paste the export under Logs.
+    -   type: textarea
+        id: logs
+        attributes:
+            label: Logs
+            description: Paste relevant logcat lines, Reseam Manager output, or the LogFox export. Wrap in triple backticks.
+            render: shell
+        validations:
+            required: false
+    -   type: checkboxes
+        id: checks
+        attributes:
+            label: Checks
+            options:
+                -   label: I tested the latest bundle release.
+                -   label: I tested a clean install (uninstalled first, no backup restore).
+                -   label: I tested with only the affected patches enabled.
