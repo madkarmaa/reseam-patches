@@ -18,7 +18,11 @@ pluginManagement {
 }
 
 plugins {
+<<<<<<< Updated upstream
     id("app.reseam.workspace") version "0.26.4"
+=======
+    id("app.reseam.workspace") version "0.27.0"
+>>>>>>> Stashed changes
 }
 
 rootProject.name = "madkarma-patches"
