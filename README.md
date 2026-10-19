@@ -57,6 +57,15 @@ My patch bundle for Android apps I use, built with [Reseam](https://reseam.app).
 </details>
 
 <details>
+<summary><strong>com.cloudflare.onedotonedotonedotone</strong></summary>
+
+| Name | Description | Supported versions |
+| --- | --- | --- |
+| Unlock WARP+ Unlimited | Unlocks the local WARP+ Unlimited account state. Does not unlock server-side WARP+. | Any version |
+
+</details>
+
+<details>
 <summary><strong>com.frontrow.vlog</strong></summary>
 
 | Name | Description | Supported versions |
@@ -146,10 +155,10 @@ My patch bundle for Android apps I use, built with [Reseam](https://reseam.app).
 
 | Name | Description | Supported versions |
 | --- | --- | --- |
-| Bypass signature checks | Spoofs the original app signature and optionally redirects installed-file reads to the original app files. | Any version |
 | Disable Play Store updates | Hides the app from Google Play's pending updates. | Any version |
 | Force extract native libs | Sets android:extractNativeLibs to true when it is false. | Any version |
 | Hide packages | Hides the chosen packages from the app's PackageManager queries, as if they were not installed. | Any version |
+| Signature killer | Spoofs the original app signature and optionally redirects installed-file reads to the original app files. | Any version |
 
 </details>
 
