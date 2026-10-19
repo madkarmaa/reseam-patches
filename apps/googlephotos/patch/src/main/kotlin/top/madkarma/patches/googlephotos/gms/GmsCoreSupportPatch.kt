@@ -20,13 +20,14 @@ private val PERMISSION_ATTRIBUTES =
     listOf("android:permission", "android:readPermission", "android:writePermission")
 
 val gmsCoreSupport = patch("GmsCore support") {
-    description("Installs Google Photos alongside the original app and signs in through separately installed GmsCore.")
+    description("Installs Google Photos alongside the original app and signs in through separately installed Reseam GmsCore.")
     compatibleWith(GOOGLE_PHOTOS)
 
     val vendorGroupId = stringOption(
         "gmsCoreVendorGroupId",
         title = "GmsCore vendor group ID",
-        default = "app.revanced",
+        description = "The group ID the installed GmsCore build was published under",
+        default = "app.reseam",
         required = true,
     )
 
@@ -43,7 +44,7 @@ val gmsCoreSupport = patch("GmsCore support") {
         val packagePattern = Regex("[A-Za-z][A-Za-z0-9_]*(?:\\.[A-Za-z][A-Za-z0-9_]*)+")
 
         require(packagePattern.matches(vendor) && !vendor.endsWith(".android.gms")) {
-            "gmsCoreVendorGroupId must be a vendor group such as app.revanced"
+            "gmsCoreVendorGroupId must be a vendor group such as app.reseam"
         }
 
         require(packagePattern.matches(newPackage) && newPackage != GOOGLE_PHOTOS) {
