@@ -13,6 +13,7 @@ import app.reseam.patch.methodTarget
 import app.reseam.patch.types.NewMethod
 
 internal val pairipStartup = klass("com.pairip.StartupLauncher").method("launch")
+internal val pairipInitialization = klass("com.pairip.VMRunner").method("<clinit>")
 
 internal fun signatureAttachContext(): MethodTarget = methodTarget("signatureAttachContext") {
     val applicationName =

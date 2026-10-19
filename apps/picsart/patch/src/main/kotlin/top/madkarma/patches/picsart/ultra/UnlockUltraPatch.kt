@@ -8,13 +8,13 @@ package top.madkarma.patches.picsart.ultra
 import app.reseam.patch.after
 import app.reseam.patch.before
 import app.reseam.patch.patch
-import top.madkarma.patches.universal.signature.bypassSignatureChecks
+import top.madkarma.patches.universal.signature.signatureKiller
 import top.madkarma.picsart.ultra.bindings.Ultra
 
 val unlockUltra = patch("Unlock Ultra") {
     description("Unlocks Ultra-only features. Server credit balances remain unchanged.")
     compatibleWith("com.picsart.studio")
-    dependsOn(bypassSignatureChecks)
+    dependsOn(signatureKiller)
 
     execute {
         // Normalize every new snapshot, including defaults and refreshed account state.
