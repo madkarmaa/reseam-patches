@@ -151,6 +151,16 @@ My patch bundle for Android apps I use, built with [Reseam](https://reseam.app).
 </details>
 
 <details>
+<summary><strong>pe.tumicro.android</strong></summary>
+
+| Name | Description | Supported versions |
+| --- | --- | --- |
+| GmsCore support | Signs in through separately installed Reseam GmsCore. | Any version |
+| Unlock Lifetime Premium | Unlocks Premium-only features. | Any version |
+
+</details>
+
+<details>
 <summary><strong>Universal</strong></summary>
 
 | Name | Description | Supported versions |
@@ -158,7 +168,7 @@ My patch bundle for Android apps I use, built with [Reseam](https://reseam.app).
 | Disable Play Store updates | Hides the app from Google Play's pending updates. | Any version |
 | Force extract native libs | Sets android:extractNativeLibs to true when it is false. | Any version |
 | Hide packages | Hides the chosen packages from the app's PackageManager queries, as if they were not installed. | Any version |
-| Signature killer | Spoofs the original app signature and optionally redirects installed-file reads to the original app files. | Any version |
+| Signature Killer | Spoofs the original app signature and optionally redirects installed-file reads to the original app files. | Any version |
 
 </details>
 
