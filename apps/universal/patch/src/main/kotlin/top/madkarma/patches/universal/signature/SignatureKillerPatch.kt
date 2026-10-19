@@ -14,7 +14,7 @@ import top.madkarma.universal.signature.bindings.SignatureChecksApi33
 import top.madkarma.universal.signature.bindings.SignatureKiller
 import java.util.*
 
-val signatureKiller = patch("Signature killer") {
+val signatureKiller = patch("Signature Killer") {
     description("Spoofs the original app signature and optionally redirects installed-file reads to the original app files.")
 
     val spoofApkPath = boolOption(
