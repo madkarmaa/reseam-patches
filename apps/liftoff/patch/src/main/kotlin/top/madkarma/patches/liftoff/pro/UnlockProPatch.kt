@@ -17,7 +17,7 @@ val unlockPro = patch("Unlock Pro") {
 
         // Empty accounts need entries in both maps consumed by the React Native UI.
         revenueCatEntitlementsMapper.after {
-            call(ProEntitlements.applyProEntitlements, capture("result"))
+            call(ProEntitlements.applyProEntitlements, result)
         }
 
         revenueCatActiveSubscriptions.replace {

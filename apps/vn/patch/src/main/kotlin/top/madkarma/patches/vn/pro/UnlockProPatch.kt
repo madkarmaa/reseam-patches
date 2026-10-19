@@ -28,7 +28,7 @@ val unlockPro = patch("Unlock Pro") {
 
         // Normalize cached configuration as well as each server response, before flags are applied or saved.
         cachedStartupConfiguration.after {
-            call(Pro.normalizeStartupConfiguration, capture("result"))
+            call(Pro.normalizeStartupConfiguration, result)
         }
         applyStartupConfiguration.before {
             call(Pro.normalizeStartupConfiguration, paramOfType(Type.Object))
