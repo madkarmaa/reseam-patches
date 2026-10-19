@@ -87,6 +87,14 @@ fun killApkPath(context: Context, packageName: String) {
 }
 
 @Export
+@Synchronized
+fun refreshApkFileHooks() {
+    if (!fileRedirectionInstalled) return
+    check(refreshApkPaths()) { "Refreshing original APK file redirection failed" }
+    Log.i(TAG, "Refreshed original APK file hooks for newly loaded libraries")
+}
+
+@Export
 fun checkSignatures(context: Context, packageName: String, base64Sig: String) {
     val real = try {
         val current = currentSignatures(context, packageName)

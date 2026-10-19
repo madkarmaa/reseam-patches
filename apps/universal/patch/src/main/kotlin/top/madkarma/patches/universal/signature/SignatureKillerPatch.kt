@@ -5,6 +5,7 @@
 
 package top.madkarma.patches.universal.signature
 
+import app.reseam.patch.after
 import app.reseam.patch.before
 import app.reseam.patch.patch
 import top.madkarma.patches.shared.isPresent
@@ -13,7 +14,7 @@ import top.madkarma.universal.signature.bindings.SignatureChecksApi33
 import top.madkarma.universal.signature.bindings.SignatureKiller
 import java.util.*
 
-val bypassSignatureChecks = patch("Bypass signature checks") {
+val signatureKiller = patch("Signature killer") {
     description("Spoofs the original app signature and optionally redirects installed-file reads to the original app files.")
 
     val spoofApkPath = boolOption(
@@ -120,6 +121,11 @@ val bypassSignatureChecks = patch("Bypass signature checks") {
             }
 
             log.info("SignatureKiller: early hook ${pairipStartup.descriptor}")
+
+            // VMRunner loads its native library after the early startup hook has installed redirection.
+            if (options[spoofApkPath] && isPresent(pairipInitialization)) pairipInitialization.after {
+                call(SignatureKiller.refreshApkFileHooks)
+            }
         }
 
         val attachContext = signatureAttachContext()
@@ -136,6 +142,7 @@ val bypassSignatureChecks = patch("Bypass signature checks") {
         }
 
         log.info("SignatureKiller: startup hook ${attachContext.descriptor}")
+
     }
 
 }
