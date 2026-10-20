@@ -21,6 +21,7 @@ val unlockUltra = patch("Unlock Ultra") {
         subscriptionConstructor.before {
             param(0).assign(call(Ultra.isUserSubscribed))
         }
+        log.info("Ultra: ${subscriptionConstructor.descriptor} reports an active subscription.")
 
         // Custom tool gates compare this level against a configured minimum.
         planConstructor.before {
@@ -34,6 +35,6 @@ val unlockUltra = patch("Unlock Ultra") {
             )
         }
 
-        log.info("Ultra: normalized subscription snapshots and plan permissions.")
+        log.info("Ultra: ${planConstructor.descriptor} sets the Ultra access level, tier, and permissions.")
     }
 }

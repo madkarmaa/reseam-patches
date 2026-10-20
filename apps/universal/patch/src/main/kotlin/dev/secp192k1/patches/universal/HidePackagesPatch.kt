@@ -43,6 +43,8 @@ val hidePackages = patch("Hide packages") {
                 callSite.before { call(HiddenPackages.initialize, string(hiddenPackageNames)) }
                 callSite.redirectTo(wrapper)
             }
+            for (target in callSites.map { it.method.descriptor }
+                .distinct()) log.info("Hide packages: $target filters PackageManager.${wrapper.name} results.")
 
             redirectedCallSites += callSites.size
         }

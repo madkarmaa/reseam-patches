@@ -21,6 +21,7 @@ val unlockPremium = patch("Unlock Premium") {
                 )
             )
         }
+        log.info("Premium: ${composeStringValueConstructor.descriptor} adds attribution to premium titles.")
 
         val supportedTypes = setOf(
             Type.Boolean,
@@ -38,7 +39,10 @@ val unlockPremium = patch("Unlock Premium") {
                 staticField(unlimitedFeatureAccessInstance)
             )
         }
+        log.info("Premium: ${premiumFeaturesConstructor.descriptor} enables premium features and unlimited offline maps.")
+
         premiumFeatureGate.alwaysReturn(true)
+        log.info("Premium: ${premiumFeatureGate.descriptor} grants access before account data is available.")
 
         // Signed-out custom speeds have their own flow, independent of the feature gate.
         customSpeedConstructor.before {
@@ -46,5 +50,6 @@ val unlockPremium = patch("Unlock Premium") {
                 call(customSpeedReadOnlyFlow, call(customSpeedStateFlow, call(Premium.enabled)))
             )
         }
+        log.info("Premium: ${customSpeedConstructor.descriptor} enables custom speeds while signed out.")
     }
 }

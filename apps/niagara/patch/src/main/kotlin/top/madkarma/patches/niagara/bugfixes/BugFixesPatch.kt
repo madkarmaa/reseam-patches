@@ -9,7 +9,7 @@ import app.reseam.patch.alwaysReturn
 import app.reseam.patch.patch
 
 val bugFixes = patch("Bug fixes") {
-    description("Fixes various app bugs.")
+    description("Fixes app bugs.")
     compatibleWith("bitpit.launcher")
 
     execute {

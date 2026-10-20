@@ -29,5 +29,6 @@ val unlockFamilyPremium = patch("Unlock Family Premium+") {
                 string(PATCH_ATTRIBUTION)
             )
         }
+        log.info("Family Premium+: ${weatherPageFinished.descriptor} adds the membership card attribution.")
     }
 }
