@@ -48,6 +48,7 @@ jobs:
                 uses: astral-sh/setup-uv@v10.1.0
                 with:
                     python-version: "3.14"
+                    ignore-nothing-to-cache: true
 
             -   name: Release
                 if: (github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch') || (github.ref == 'refs/heads/dev' && github.event_name == 'push')
