@@ -4,9 +4,31 @@
 package top.madkarma.patches.droplert.ads
 
 import app.reseam.patch.Type
+import app.reseam.patch.dex.AccessFlags
 import app.reseam.patch.klass
 import app.reseam.patch.method
 import app.reseam.patch.methods
+
+internal val consentFormShow = method("consentFormShow") {
+    strings("ConsentForm#show can only be invoked once.")
+}
+
+// The presenter calls one abstract method, its dismissal listener.
+internal val consentFormDismissed = method("consentFormDismissed") {
+    calledBy(consentFormShow)
+    flags(AccessFlags.ABSTRACT)
+}
+
+private val adInitialization = method("adInitialization") {
+    strings("MobileAdsSettingManager initialization failed")
+    returns(Type.Object)
+}
+
+// Earlier builds start ads directly in onCreate and do not include the consent SDK.
+internal val adStartupWithoutConsent = method("adStartupWithoutConsent") {
+    inClass(klass("com.shahzaman.pricetracker.MainActivity"))
+    calls { owner(adInitialization.owner); name("<init>") }
+}
 
 internal val interstitialLoader = method("interstitialLoader") {
     strings("Loading on UI thread")
