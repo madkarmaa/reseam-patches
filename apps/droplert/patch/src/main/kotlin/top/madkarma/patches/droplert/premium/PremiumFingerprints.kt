@@ -54,4 +54,11 @@ private val premiumTier = klass("premiumTier") {
 }
 
 internal val premium = premiumTier.enumConstant("PREMIUM")
-internal val freeTier = premiumTier.enumConstant("FREE")
+private val freeTier = premiumTier.enumConstant("FREE")
+
+internal fun MethodTarget.freeTierReads() = points("freeTierReads") {
+    field {
+        owner(freeTier.owner)
+        name(freeTier.name)
+    }
+}.all

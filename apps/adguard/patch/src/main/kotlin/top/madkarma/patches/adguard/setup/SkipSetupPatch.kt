@@ -11,7 +11,7 @@ import top.madkarma.patches.shared.isPresent
 
 val skipSetup = patch("Skip setup") {
     description(
-        "Configure the app before installing it. Does NOT include the advanced filters available in the app settings."
+        "Skips onboarding and applies the selected setup options on first startup. Configure advanced filters in the app settings."
     )
     compatibleWith("com.adguard.android")
 
@@ -185,5 +185,6 @@ val skipSetup = patch("Skip setup") {
                 log.info("Setup: completion marked to preserve later manual changes.")
             }
         }
+        log.info("Setup: ${filteringConstructor.descriptor} applies the selected configuration on first startup.")
     }
 }

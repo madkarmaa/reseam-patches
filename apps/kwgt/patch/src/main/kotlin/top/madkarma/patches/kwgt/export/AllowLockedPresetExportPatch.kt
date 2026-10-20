@@ -15,5 +15,6 @@ val allowLockedPresetExport = patch("Allow locked preset export") {
     execute {
         // Bypass the export guard without changing how locked presets load or serialize.
         presetExportReadOnlyCheck.after { capture("isReadOnly").assign(bool(false)) }
+        log.info("Export: ${presetExportReadOnlyCheck.method.descriptor} allows exporting locked presets.")
     }
 }
