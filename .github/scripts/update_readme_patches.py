@@ -42,12 +42,12 @@ def render_patches(patches: list[dict]) -> str:
         title = html.escape(package or "Universal")
         summary = f"<strong>{title}</strong>"
         lines = ["<details>", f"<summary>{summary}</summary>", "",
-                 "| Name | Description | Supported versions |", "| --- | --- | --- |", ]
+                 "| Name | Description | Version pins |", "| --- | --- | --- |", ]
         for patch, versions in sorted(groups[package],
                                       key=lambda entry: (entry[0]["name"].casefold(),
                                                          entry[0]["id"]), ):
             cells = [patch["name"], patch["description"],
-                     ", ".join(versions) if versions else "Any version", ]
+                     ", ".join(versions) if versions else "None", ]
             lines.append("| " + " | ".join(table_cell(cell) for cell in cells) + " |")
         sections.append("\n".join([*lines, "", "</details>"]))
     return "\n\n".join(sections)
