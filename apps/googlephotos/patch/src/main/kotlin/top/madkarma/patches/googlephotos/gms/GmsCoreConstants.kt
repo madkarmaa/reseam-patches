@@ -3,7 +3,8 @@
 
 package top.madkarma.patches.googlephotos.gms
 
-// Google service protocol constants
+// Google service protocol constants to rename. GmsCore's PeopleService still registers
+// com.google.android.gms.people.service.START, so preserve that action while renaming its package.
 internal val GMS_CONSTANTS = setOf(
     "com.google",
     "com.google.android.gms",
@@ -83,7 +84,6 @@ internal val GMS_CONSTANTS = setOf(
     "com.google.android.gms.nearby.connection.service.START",
     "com.google.android.gms.nearby.messages.service.NearbyMessagesService.START",
     "com.google.android.gms.notifications.service.START",
-    "com.google.android.gms.people.service.START",
     "com.google.android.gms.phenotype.service.START",
     "com.google.android.gms.safetynet.service.START",
     "com.google.android.gms.signin.service.START",
