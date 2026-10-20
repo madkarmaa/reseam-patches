@@ -1,6 +1,6 @@
 {
     "name": "madkarma-patches",
-    "version": "0.34.1",
+    "version": "0.35.0",
     "reseam": {
         "engine": "0.28.0"
     },
