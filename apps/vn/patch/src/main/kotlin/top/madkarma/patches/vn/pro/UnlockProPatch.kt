@@ -15,6 +15,7 @@ val unlockPro = patch("Unlock Pro") {
 
     execute {
         proGate.alwaysReturn(true)
+        log.info("Pro: ${proGate.descriptor} enables Pro features.")
 
         // The extension uses these retained fields; fail here if the app model changes.
         check(
@@ -25,14 +26,17 @@ val unlockPro = patch("Unlock Pro") {
         premiumManagerConstructor.before {
             call(Pro.initializePreferences, paramOfType(Type.Context))
         }
+        log.info("Pro: ${premiumManagerConstructor.descriptor} initializes premium preferences.")
 
         // Normalize cached configuration as well as each server response, before flags are applied or saved.
         cachedStartupConfiguration.after {
             call(Pro.normalizeStartupConfiguration, result)
         }
+        log.info("Pro: ${cachedStartupConfiguration.descriptor} disables ads in cached startup configuration.")
         applyStartupConfiguration.before {
             call(Pro.normalizeStartupConfiguration, paramOfType(Type.Object))
         }
+        log.info("Pro: ${applyStartupConfiguration.descriptor} disables ads in refreshed startup configuration.")
 
         // Both Boolean inputs control export banners: ads and guidance.
         val bannerFlags = exportAdSectionConstructor.parameterTypes.withIndex()
@@ -43,10 +47,12 @@ val unlockPro = patch("Unlock Pro") {
         exportAdSectionConstructor.before {
             bannerFlags.forEach { (index, _) -> param(index).assign(bool(false)) }
         }
+        log.info("Pro: ${exportAdSectionConstructor.descriptor} disables export banners.")
 
         startupSurveyDecisionConstructor.before {
             paramOfType(Type.Boolean).assign(bool(false))
         }
+        log.info("Pro: ${startupSurveyDecisionConstructor.descriptor} skips the startup survey.")
 
         manifest.redirectActivity(
             className(personalizationActivity.descriptor),
@@ -61,8 +67,6 @@ val unlockPro = patch("Unlock Pro") {
         check(resources.setString("frv_help_center", PATCH_ATTRIBUTION)) {
             "Help Center attribution string is missing"
         }
-
-        log.info("Pro: ${proGate.descriptor} forced true.")
     }
 }
 

@@ -10,7 +10,7 @@ import app.reseam.patch.patch
 import top.madkarma.extensions.bindings.NiagaraSetup
 
 val skipIntro = patch("Skip intro") {
-    description("Skips the promo and terms screens, landing directly on setup.")
+    description("Skips the promo and terms screens and opens favorites setup.")
     compatibleWith("bitpit.launcher")
 
     val acceptTermsOption = boolOption(

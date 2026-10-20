@@ -23,12 +23,13 @@ val unlockUnlimited = patch("Unlock WARP+ Unlimited") {
                 accountType.assign(staticField(unlimitedAccount))
             }
         }
+        log.info("WARP+: ${accountConstructor.descriptor} reports UNLIMITED for consumer accounts and preserves TEAM accounts.")
 
         accountSettingsConstructor.before {
             // The display model takes the license key immediately after the app state.
             param(1).assign(string(PATCH_ATTRIBUTION))
         }
 
-        log.info("WARP+: consumer account snapshots report UNLIMITED; TEAM accounts are preserved.")
+        log.info("WARP+: ${accountSettingsConstructor.descriptor} displays the patch attribution as the license key.")
     }
 }

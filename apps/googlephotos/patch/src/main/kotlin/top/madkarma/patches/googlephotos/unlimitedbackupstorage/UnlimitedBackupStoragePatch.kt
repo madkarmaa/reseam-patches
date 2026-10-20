@@ -42,7 +42,7 @@ private val PIXEL_XL_FIELDS = mapOf(
 )
 
 val unlimitedBackupStorage = patch("Unlimited backup storage") {
-    description("Unlocks unlimited Google Photos backup storage through Google's Pixel XL offer by spoofing the device as a Pixel XL.")
+    description("Reports a Pixel XL device identity to request Google's unlimited backup storage offer.")
     compatibleWith(GOOGLE_PHOTOS)
 
     execute {
@@ -58,6 +58,7 @@ val unlimitedBackupStorage = patch("Unlimited backup storage") {
 
         enabled.forEach { initializePixelFeatures.replaceAllStrings(it, "android.hardware.wifi") }
         disabled.forEach { initializePixelFeatures.replaceAllStrings(it, "dummy") }
+        log.info("Unlimited backup storage: ${initializePixelFeatures.descriptor} selects the original Pixel offer.")
 
         // Override values at their read sites; Android 17 refuses reflective writes to final Build fields.
         val identityReads = deviceIdentityReads.flatMap { target ->
@@ -71,6 +72,8 @@ val unlimitedBackupStorage = patch("Unlimited backup storage") {
             read.captureAs("identity", Type.String)
                 .after { capture("identity").assign(string(value)) }
         }
+        for (target in identityReads.map { it.method.descriptor }.distinct())
+            log.info("Unlimited backup storage: $target reads the Pixel XL identity.")
 
         val properties =
             bytecode.redirectCalls("android.os.SystemProperties", "get", PixelXlIdentity.get)

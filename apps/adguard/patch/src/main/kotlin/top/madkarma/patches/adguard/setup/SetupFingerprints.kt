@@ -85,6 +85,7 @@ internal val disableFilterGroup = method("disableFilterGroup") {
 private val setSearchAds = method("setSearchAds") {
     inClass(klass(filteringConstructor.owner))
     params(Type.Boolean)
+    returns(Type.Void) // The other Boolean method using filter 10 builds a diagnostic map.
     literals(10) // Search-ad exceptions filter.
 }
 

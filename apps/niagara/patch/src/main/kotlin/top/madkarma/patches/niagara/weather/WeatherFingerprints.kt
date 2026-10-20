@@ -4,12 +4,15 @@
 package top.madkarma.patches.niagara.weather
 
 import app.reseam.patch.Type
+import app.reseam.patch.fieldOfType
 import app.reseam.patch.klass
 import app.reseam.patch.method
 
-internal val weatherRepository = klass("weatherRepository") {
+private val weatherRepository = klass("weatherRepository") {
     strings("Weather not fetched yet")
 }
+
+internal val weatherContext = weatherRepository.fieldOfType(Type.Context)
 
 internal val weatherFetch = method("weatherFetch") {
     strings("location missing")

@@ -21,38 +21,51 @@ val unlockPremium = patch("Unlock Lifetime Premium") {
 
     execute {
         isPremium.alwaysReturn(true)
+        log.info("Premium: ${isPremium.descriptor} enables premium features.")
+
         entitlementIsActive.alwaysReturn(true)
+        log.info("Premium: ${entitlementIsActive.descriptor} reports an active entitlement.")
+
         revenueCatStateUpdater.promoteFreeTier()
+        log.info("Premium: ${revenueCatStateUpdater.descriptor} stores the premium tier.")
+
         playPurchaseCallback.promoteFreeTier()
+        log.info("Premium: ${playPurchaseCallback.descriptor} preserves the premium tier after purchase checks.")
 
         if (premiumCardStatus.replaceAllStrings(
                 "All features unlocked", PATCH_ATTRIBUTION
             ) == 0
         ) error("Premium: settings card status text not found")
+        log.info("Premium: ${premiumCardStatus.descriptor} displays the patch attribution.")
 
         appEntry {
             call(Prefs.putBoolean, application, string("has_seen_paywall"), bool(true))
         }
 
         val hasDirectCheck = isPresent(customerInfoIsPremiumActive)
-        if (hasDirectCheck) customerInfoIsPremiumActive.alwaysReturn(true)
+        if (hasDirectCheck) {
+            customerInfoIsPremiumActive.alwaysReturn(true)
+            log.info("Premium: ${customerInfoIsPremiumActive.descriptor} reports an active premium account.")
+        }
 
         val cachedWriters = unconfiguredFallbacks.all + cachedStatusLoaders.all
         if (!hasDirectCheck && cachedWriters.isEmpty()) error("Premium: unsupported app version")
-        cachedWriters.forEach { it.promoteFreeTier() }
 
-        if (isPresent(tamperCheck)) tamperCheck.alwaysReturn(false)
+        cachedWriters.forEach {
+            it.promoteFreeTier()
+            log.info("Premium: ${it.descriptor} preserves the premium tier in cached state.")
+        }
+
+        if (isPresent(tamperCheck)) {
+            tamperCheck.alwaysReturn(false)
+            log.info("Premium: ${tamperCheck.descriptor} reports no tampering.")
+        }
     }
 }
 
 // Keep each updater's original side effects while replacing the FREE values it consumes.
 private fun MethodTarget.promoteFreeTier() {
-    val freeReads = points("freeTierReads") {
-        field {
-            owner(freeTier.owner)
-            name(freeTier.name)
-        }
-    }.all
+    val freeReads = freeTierReads()
     if (freeReads.isEmpty()) error("Premium: $descriptor reads no FREE tier")
 
     freeReads.forEach {

@@ -20,7 +20,7 @@ private val PERMISSION_ATTRIBUTES =
     listOf("android:permission", "android:readPermission", "android:writePermission")
 
 val gmsCoreSupport = patch("GmsCore support") {
-    description("Installs Google Photos alongside the original app and signs in through separately installed Reseam GmsCore.")
+    description("Installs Google Photos alongside the original app. Uses a separate Reseam GmsCore installation for sign-in.")
     compatibleWith(GOOGLE_PHOTOS)
 
     val vendorGroupId = stringOption(
@@ -62,6 +62,7 @@ val gmsCoreSupport = patch("GmsCore support") {
                 )
             )
         }
+        log.info("GmsCore: ${googleAccounts.descriptor} reads GmsCore accounts.")
 
         // Reuse Photos' account-visibility task without generating extension method bodies.
         appEntry {
@@ -85,6 +86,7 @@ val gmsCoreSupport = patch("GmsCore support") {
                 paramOfType("android.accounts.OnAccountsUpdateListener")
             )
         }
+        log.info("GmsCore: ${registerAccountsListener.descriptor} registers the account refresh listener.")
 
         accountPermissionResult.before {
             whenTrue(
@@ -100,6 +102,7 @@ val gmsCoreSupport = patch("GmsCore support") {
                 returnVoid()
             }
         }
+        log.info("GmsCore: ${accountPermissionResult.descriptor} handles GmsCore account access results.")
 
         fun renameAppName(value: String): String? = when {
             value == MARS_AUTHORITY -> marsAuthority
@@ -228,10 +231,13 @@ val gmsCoreSupport = patch("GmsCore support") {
         }
 
         playServicesCheck.alwaysReturn()
+        log.info("GmsCore: ${playServicesCheck.descriptor} skips the Play Services requirement.")
 
         playServicesAvailability.alwaysReturn(0)
+        log.info("GmsCore: ${playServicesAvailability.descriptor} reports services available.")
 
         checkAccountValidity.alwaysReturn()
+        log.info("GmsCore: ${checkAccountValidity.descriptor} skips account validation through Play Services.")
 
         frictionlessEligibility.replace {
             whenTrue(thisObject.field(loginServices).call(frictionlessServicesAvailable)) {
@@ -240,17 +246,20 @@ val gmsCoreSupport = patch("GmsCore support") {
             thisObject.field(loginAccountHandler).call(restoreSelectedAccount)
             returnFalse()
         }
+        log.info("GmsCore: ${frictionlessEligibility.descriptor} restores the saved account when frictionless login is unavailable.")
 
         notificationRegistrationConstructor.before {
             val context = paramOfType(Type.Context)
             context.assign(call(GmsCoreSupport.withPackageName, context, string(GOOGLE_PHOTOS)))
         }
+        log.info("GmsCore: ${notificationRegistrationConstructor.descriptor} registers notifications with the original package identity.")
 
         homeActivityOnStart.after {
             call(
                 GmsCoreSupport.check, thisObject, string(gmsCorePackage), string(vendor)
             )
         }
+        log.info("GmsCore: ${homeActivityOnStart.descriptor} checks GmsCore installation and account access.")
 
         log.info("GmsCore: rewrote $constants constants and $uris URIs; package=$newPackage, vendor=$vendor.")
     }

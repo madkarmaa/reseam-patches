@@ -123,8 +123,11 @@ val signatureKiller = patch("Signature Killer") {
             log.info("SignatureKiller: early hook ${pairipStartup.descriptor}")
 
             // VMRunner loads its native library after the early startup hook has installed redirection.
-            if (options[spoofApkPath] && isPresent(pairipInitialization)) pairipInitialization.after {
-                call(SignatureKiller.refreshApkFileHooks)
+            if (options[spoofApkPath] && isPresent(pairipInitialization)) {
+                pairipInitialization.after {
+                    call(SignatureKiller.refreshApkFileHooks)
+                }
+                log.info("SignatureKiller: ${pairipInitialization.descriptor} refreshes APK file hooks after native initialization.")
             }
         }
 
@@ -140,11 +143,8 @@ val signatureKiller = patch("Signature Killer") {
 
             if (options[diagnostics]) call(SignatureChecks.checkSignatureApis, param(0))
         }
-
         log.info("SignatureKiller: startup hook ${attachContext.descriptor}")
-
     }
-
 }
 
 private val NATIVE_ABIS = listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")

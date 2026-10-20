@@ -5,14 +5,17 @@
 
 package top.madkarma.patches.niagara.weather
 
-import app.reseam.patch.*
+import app.reseam.patch.after
+import app.reseam.patch.patch
+import app.reseam.patch.replace
+import app.reseam.patch.replaceAllStrings
 import top.madkarma.extensions.bindings.WeatherApi
 import top.madkarma.extensions.bindings.WeatherApiKeyField
 import top.madkarma.patches.niagara.pro.unlockPro
 
 val weatherWidgetFix = patch("Weather widget fix") {
     description(
-        "Serves the weather widget from WeatherAPI.com instead of the Niagara backend. Enter your key in the weather settings sheet.",
+        "Replaces the Niagara weather service with WeatherAPI.com. Enter your API key in the weather settings.",
     )
     compatibleWith("bitpit.launcher")
 
@@ -35,11 +38,10 @@ val weatherWidgetFix = patch("Weather widget fix") {
         )
         if (links != 1) error("Weather widget fix: expected 1 help link, rewrote $links")
 
-        log.info("Weather widget fix: sheets updated")
+        log.info("Weather widget fix: ${weatherSheet.descriptor} links to the WeatherAPI.com terms.")
 
-        val appContext = weatherRepository.fieldOfType(Type.Context)
         weatherFetch.replace {
-            val context = thisObject.field(appContext)
+            val context = thisObject.field(weatherContext)
             val api = call(WeatherApi.create, context)
             val json = api.call(WeatherApi.fetch)
             val timestamp = api.call(WeatherApi.now)
@@ -50,13 +52,11 @@ val weatherWidgetFix = patch("Weather widget fix") {
 
             returnValue(forecast)
         }
-
-        log.info("Weather widget fix: fetch wired to WeatherAPI.com")
+        log.info("Weather widget fix: ${weatherFetch.descriptor} fetches and caches WeatherAPI.com forecasts.")
 
         weatherContentBind.after {
             call(WeatherApiKeyField.attach, lastParam)
         }
-
-        log.info("Weather widget fix: key field added to weather sheet")
+        log.info("Weather widget fix: ${weatherContentBind.descriptor} adds the API key field to weather settings.")
     }
 }
