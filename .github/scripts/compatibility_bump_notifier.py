@@ -6,10 +6,10 @@
 Usage:
     compatibility_bump_notifier.py [--dry-run] [--package <id>] [--channel stable]
                          [--base-url https://sniff.madkarma.top/v2]
-                         [--patches-json build/reseam/patches.json]
+                         [--patches-json build/reseam/release/patches.json]
 
 Reads pinned versions from the release index. Generate the index first with
-`./gradlew generatePatchesJson -PreleaseTag=v0.0.0-version-check`.
+`just index`.
 
 Environment:
     SNIFF_BASE_URL  API base URL (default https://sniff.madkarma.top/v2).
@@ -28,7 +28,7 @@ import urllib.request
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_PATCHES_JSON = REPO_ROOT / "build" / "reseam" / "patches.json"
+DEFAULT_PATCHES_JSON = REPO_ROOT / "build" / "reseam" / "release" / "patches.json"
 DEFAULT_BASE_URL = "https://sniff.madkarma.top/v2"
 DEFAULT_CHANNEL = "stable"
 ISSUE_LABEL = "app-update"
@@ -45,7 +45,7 @@ def collect_pins(
 ) -> tuple[dict[str, set[str]], dict[str, dict[str, str]]]:
     """Return pinned versions and patch names by ID, both grouped by package.
 
-    Reads the newest release in the index written by `:generatePatchesJson`.
+    Reads the newest release in the index written by `just index`.
     Records unpinned packages with an empty set. The caller skips them.
     Universal patches declare no packages.
     """
@@ -54,7 +54,7 @@ def collect_pins(
     except FileNotFoundError:
         raise SystemExit(
             f"error: {patches_json} not found; run "
-            "'./gradlew generatePatchesJson -PreleaseTag=vX.Y.Z' first"
+            "'just index' first"
         )
     except ValueError as e:
         raise SystemExit(f"error: could not parse {patches_json}: {e}")
@@ -232,7 +232,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--patches-json",
         default=str(DEFAULT_PATCHES_JSON),
-        help="release index written by :generatePatchesJson",
+        help="release index written by just index",
     )
     return parser.parse_args(argv)
 
