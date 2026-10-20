@@ -56,7 +56,6 @@ jobs:
                     EOF
                     sed -i -E "s/(id\(\"app\.reseam\.workspace\"\) version \")[^\"]+(\")/\1$LATEST\2/" settings.gradle.kts
                     sed -i -E "s#(app\.reseam:reseam-patch-sdk:)[^\"]+#\1$LATEST#" apps/shared/build.gradle.kts
-                    grep -rl 'ENGINE_VERSION: ' .github/workflows/ | xargs sed -i -E "s/(ENGINE_VERSION: )v[0-9][0-9.]*/\1v$LATEST/"
                     git diff --stat
 
             -   name: Commit and push to main
@@ -66,7 +65,7 @@ jobs:
                 run: |
                     LATEST="${{ steps.versions.outputs.latest }}"
                     if [ -z "$BUMP_PAT" ]; then
-                        echo "BUMP_PAT secret is not set. Create a token with contents and workflows write access and store it as BUMP_PAT." >&2
+                        echo "BUMP_PAT secret is not set. Create a token with contents write access and store it as BUMP_PAT." >&2
                         exit 1
                     fi
                     git config user.name "github-actions[bot]"
