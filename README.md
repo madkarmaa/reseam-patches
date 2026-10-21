@@ -144,6 +144,15 @@ My patch bundle for Android apps I use, built with [Reseam](https://reseam.app).
 </details>
 
 <details>
+<summary><strong>ginlemon.flowerfree</strong></summary>
+
+| Name | Description | Version pins |
+| --- | --- | --- |
+| Unlock Lifetime premium | Unlocks Premium-only features. | None |
+
+</details>
+
+<details>
 <summary><strong>org.kustom.widget</strong></summary>
 
 | Name | Description | Version pins |
