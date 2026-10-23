@@ -173,6 +173,15 @@ My patch bundle for Android apps I use, built with [Reseam](https://reseam.app).
 </details>
 
 <details>
+<summary><strong>video.player.videoplayer</strong></summary>
+
+| Name | Description | Version pins |
+| --- | --- | --- |
+| Unlock premium | Unlocks Premium-only features. | None |
+
+</details>
+
+<details>
 <summary><strong>Universal</strong></summary>
 
 | Name | Description | Version pins |
@@ -180,6 +189,7 @@ My patch bundle for Android apps I use, built with [Reseam](https://reseam.app).
 | Disable Play Store updates | Hides the app from Google Play's pending updates. | None |
 | Force extract native libs | Sets android:extractNativeLibs to true when it is false. | None |
 | Hide packages | Hides the chosen packages from the app's PackageManager queries, as if they were not installed. | None |
+| Remove unused native libraries | Removes native libraries for every CPU architecture except the selected one to shrink the APK. | None |
 | Signature Killer | Spoofs the original app signature and optionally redirects installed-file reads to the original app files. | None |
 
 </details>
