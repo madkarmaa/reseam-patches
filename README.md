@@ -1,6 +1,8 @@
 # MadKarma Reseam patches
 
-My patch bundle for Android apps I use, built with [Reseam](https://reseam.app).
+A [Reseam](https://reseam.app) patch bundle covering many Android apps, plus
+universal patches that work on any app. Want an app supported?
+[Open a patch request](https://github.com/madkarmaa/reseam-patches/issues/new?template=patch_request.yml).
 
 [![Add to Reseam Manager](https://img.shields.io/badge/Add_to_Reseam_Manager-51AE79?style=for-the-badge&logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI%2BPHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xMC41IDNoM3Y3LjVIMjF2M2gtNy41VjIxaC0zdi03LjVIM3YtM2g3LjV6Ii8%2BPC9zdmc%2B)](https://reseam.app/add/?url=https://github.com/madkarmaa/reseam-patches)
 
