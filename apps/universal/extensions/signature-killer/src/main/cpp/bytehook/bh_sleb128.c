@@ -1,4 +1,4 @@
-// Copyright (c) 2018-present, iQIYI, Inc. All rights reserved.
+// Copyright (c) 2020-2022 ByteDance, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -19,38 +19,36 @@
 // SOFTWARE.
 //
 
-// Created by caikelun on 2018-04-11.
+// Created by Kelun Cai (caikelun@bytedance.com) on 2020-06-02.
 
-#include "xh_core.h"
-#include "xhook.h"
+#include "bh_sleb128.h"
 
-int xhook_register(const char *pathname_regex_str, const char *symbol,
-                   void *new_func, void **old_func)
-{
-    return xh_core_register(pathname_regex_str, symbol, new_func, old_func);
+#include <stddef.h>
+#include <stdint.h>
+
+void bh_sleb128_decoder_init(bh_sleb128_decoder_t *self, uint8_t *data, size_t data_sz) {
+    self->cur = data;
+    self->end = data + data_sz;
 }
 
-int xhook_ignore(const char *pathname_regex_str, const char *symbol)
-{
-    return xh_core_ignore(pathname_regex_str, symbol);
-}
+int bh_sleb128_decoder_next(bh_sleb128_decoder_t *self, size_t *ret) {
+    size_t value = 0;
+    static const size_t size = 8 * sizeof(value);
+    size_t shift = 0;
+    uint8_t byte;
 
-int xhook_refresh(int async)
-{
-    return xh_core_refresh(async);
-}
+    do {
+        if (self->cur >= self->end) return -1;
 
-void xhook_clear()
-{
-    return xh_core_clear();
-}
+        byte = *(self->cur)++;
+        value |= ((size_t)(byte & 127) << shift);
+        shift += 7;
+    } while (byte & 128);
 
-void xhook_enable_debug(int flag)
-{
-    return xh_core_enable_debug(flag);
-}
+    if (shift < size && (byte & 64)) {
+        value |= -((size_t)(1) << shift);
+    }
 
-void xhook_enable_sigsegv_protection(int flag)
-{
-    return xh_core_enable_sigsegv_protection(flag);
+    *ret = value;
+    return 0;
 }

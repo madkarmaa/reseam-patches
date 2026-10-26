@@ -1,4 +1,4 @@
-// Copyright (c) 2018-present, iQIYI, Inc. All rights reserved.
+// Copyright (c) 2020-2022 ByteDance, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -19,19 +19,28 @@
 // SOFTWARE.
 //
 
-// Created by caikelun on 2018-04-11.
+// Created by Kelun Cai (caikelun@bytedance.com) on 2020-06-02.
 
-#ifndef XH_ERRNO_H
-#define XH_ERRNO_H 1
+#pragma once
+#include <stdbool.h>
 
-#define XH_ERRNO_UNKNOWN 1001
-#define XH_ERRNO_INVAL   1002
-#define XH_ERRNO_NOMEM   1003
-#define XH_ERRNO_REPEAT  1004
-#define XH_ERRNO_NOTFND  1005
-#define XH_ERRNO_BADMAPS 1006
-#define XH_ERRNO_FORMAT  1007
-#define XH_ERRNO_ELFINIT 1008
-#define XH_ERRNO_SEGVERR 1009
+#include "bh_elf.h"
 
-#endif
+typedef struct bh_elf_manager bh_elf_manager_t;
+
+bh_elf_manager_t *bh_elf_manager_create(void);
+
+int bh_elf_manager_add_ignore(bh_elf_manager_t *self, const char *caller_path_name);
+
+typedef void (*bh_elf_manager_post_add_cb_t)(bh_elf_t *elf, void *arg);
+void bh_elf_manager_refresh(bh_elf_manager_t *self, bool sync_clean,
+                            bh_elf_manager_post_add_cb_t cb, void *cb_arg);
+
+typedef bool (*bh_elf_manager_iterate_cb_t)(bh_elf_t *elf, void *arg);
+void bh_elf_manager_iterate(bh_elf_manager_t *self, bh_elf_manager_iterate_cb_t cb, void *cb_arg);
+
+bh_elf_t *bh_elf_manager_find_elf(bh_elf_manager_t *self, const char *pathname);
+
+// similar to dlsym(), but search .dynsym
+void *bh_elf_manager_find_export_addr(bh_elf_manager_t *self, const char *pathname,
+                                      const char *sym_name);

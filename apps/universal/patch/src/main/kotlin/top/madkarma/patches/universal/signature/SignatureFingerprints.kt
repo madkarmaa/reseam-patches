@@ -13,7 +13,6 @@ import app.reseam.patch.methodTarget
 import app.reseam.patch.types.NewMethod
 
 internal val pairipStartup = klass("com.pairip.StartupLauncher").method("launch")
-internal val pairipInitialization = klass("com.pairip.VMRunner").method("<clinit>")
 
 internal fun signatureAttachContext(): MethodTarget = methodTarget("signatureAttachContext") {
     val applicationName =
@@ -23,17 +22,24 @@ internal fun signatureAttachContext(): MethodTarget = methodTarget("signatureAtt
 
     val prototype = "(Landroid/content/Context;)V"
 
-    application.method("attachBaseContext", prototype)?.let { return@methodTarget it }
+    application.method("attachBaseContext", prototype)?.let {
+        log.info("SignatureKiller: $applicationName declares attachBaseContext.")
+        return@methodTarget it
+    }
 
     val inherited = application.superclassChain.firstNotNullOfOrNull {
         it.method(
             "attachBaseContext", prototype
         )
     }
-    if (inherited != null && AccessFlags.FINAL.isSet(inherited.info.accessFlags)) return@methodTarget inherited
+    if (inherited != null && AccessFlags.FINAL.isSet(inherited.info.accessFlags)) {
+        log.info("SignatureKiller: $applicationName inherits a final attachBaseContext from ${inherited.owner}.")
+        return@methodTarget inherited
+    }
 
     val superclass =
         application.superclass ?: error("SignatureKiller: Application has no superclass")
+    log.info("SignatureKiller: $applicationName adds an attachBaseContext override that calls $superclass first.")
 
     // The DSL hooks existing methods; an inherited platform method needs a forwarding override first.
     application.addMethod(

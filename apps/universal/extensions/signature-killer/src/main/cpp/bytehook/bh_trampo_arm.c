@@ -1,4 +1,4 @@
-// Copyright (c) 2018-present, iQIYI, Inc. All rights reserved.
+// Copyright (c) 2020-2022 ByteDance, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -19,48 +19,40 @@
 // SOFTWARE.
 //
 
-// Created by caikelun on 2018-04-11.
-
-#include "xh_version.h"
-
-#define XH_VERSION_MAJOR 1
-#define XH_VERSION_MINOR 2
-#define XH_VERSION_EXTRA 0
-
-#define XH_VERSION ((XH_VERSION_MAJOR << 16) | (XH_VERSION_MINOR <<  8) | (XH_VERSION_EXTRA))
-
-#define XH_VERSION_TO_STR_HELPER(x) #x
-#define XH_VERSION_TO_STR(x) XH_VERSION_TO_STR_HELPER(x)
-
-#define XH_VERSION_STR XH_VERSION_TO_STR(XH_VERSION_MAJOR) "." \
-                       XH_VERSION_TO_STR(XH_VERSION_MINOR) "." \
-                       XH_VERSION_TO_STR(XH_VERSION_EXTRA)
+// Created by Li Zhang (zhangli.foxleezh@bytedance.com) on 2020-06-21.
 
 #if defined(__arm__)
-#define XH_VERSION_ARCH "arm"
-#elif defined(__aarch64__)
-#define XH_VERSION_ARCH "aarch64"
-#elif defined(__i386__)
-#define XH_VERSION_ARCH "x86"
-#elif defined(__x86_64__)
-#define XH_VERSION_ARCH "x86_64"
+
+#include "bh_trampo.h"
+
+__attribute__((naked)) void bh_trampo_template(void) {
+    __asm__(
+        // Save caller-saved registers
+        "push  { r0 - r3, lr }     \n"
+
+        // Call bh_trampo_push_stack()
+        "ldr   r0, .L_hook_ptr     \n"
+        "mov   r1, lr              \n"
+        "ldr   ip, .L_push_stack   \n"
+        "blx   ip                  \n"
+
+        // Save the hook function's address to IP register
+        "mov   ip, r0              \n"
+
+        // Restore caller-saved registers
+        "pop   { r0 - r3, lr }     \n"
+
+        // Call hook function
+        "bx    ip                  \n"
+
+        "bh_trampo_data:"
+        ".global bh_trampo_data;"
+        ".L_push_stack:"
+        ".word 0;"
+        ".L_hook_ptr:"
+        ".word 0;");
+}
+
 #else
-#define XH_VERSION_ARCH "unknown"
+typedef int make_iso_happy;
 #endif
-
-#define XH_VERSION_STR_FULL "libxhook "XH_VERSION_STR" ("XH_VERSION_ARCH")"
-
-unsigned int xh_version()
-{
-    return XH_VERSION;
-}
-
-const char *xh_version_str()
-{
-    return XH_VERSION_STR;
-}
-
-const char *xh_version_str_full()
-{
-    return XH_VERSION_STR_FULL;
-}

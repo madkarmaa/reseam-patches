@@ -19,32 +19,45 @@ path = [
 SPDX-FileCopyrightText = "2015-2024 the original authors"
 SPDX-License-Identifier = "Apache-2.0"
 
-# Vendored xHook sources retain their MIT license.
+# Vendored bytehook sources retain their upstream licenses.
 [[annotations]]
-path = ["apps/universal/extensions/signature-killer/src/main/cpp/xh*"]
+path = ["apps/universal/extensions/signature-killer/src/main/cpp/bytehook/**"]
 precedence = "override"
-SPDX-FileCopyrightText = "2018-present iQIYI, Inc."
+SPDX-FileCopyrightText = "2020-2024 ByteDance, Inc."
 SPDX-License-Identifier = "MIT"
 
 [[annotations]]
-path = ["apps/universal/extensions/signature-killer/src/main/cpp/queue.h"]
+path = ["apps/universal/extensions/signature-killer/src/main/cpp/bytehook/third_party/lss/**"]
+precedence = "override"
+SPDX-FileCopyrightText = "2005-2011 Google Inc."
+SPDX-License-Identifier = "BSD-3-Clause"
+
+[[annotations]]
+path = ["apps/universal/extensions/signature-killer/src/main/cpp/bytehook/third_party/bsd/queue.h"]
 precedence = "override"
 SPDX-FileCopyrightText = "1991, 1993 The Regents of the University of California"
 SPDX-License-Identifier = "BSD-3-Clause"
 
 [[annotations]]
-path = ["apps/universal/extensions/signature-killer/src/main/cpp/tree.h"]
+path = ["apps/universal/extensions/signature-killer/src/main/cpp/bytehook/third_party/bsd/tree.h"]
 precedence = "override"
 SPDX-FileCopyrightText = "2002 Niels Provos <provos@citi.umich.edu>"
 SPDX-License-Identifier = "BSD-2-Clause"
 
-# The native binaries combine project-owned JNI code, xHook, and the BSD headers.
+[[annotations]]
+path = ["apps/universal/extensions/signature-killer/src/main/cpp/shadowhook.h"]
+precedence = "override"
+SPDX-FileCopyrightText = "2021-2026 ByteDance Inc."
+SPDX-License-Identifier = "MIT"
+
+# The native binaries combine project-owned JNI code, bytehook, ShadowHook declarations, and their third-party headers.
 [[annotations]]
 path = ["apps/universal/patch/src/main/resources/lib/**/libSignatureKiller.so"]
 precedence = "override"
 SPDX-FileCopyrightText = [
     "2026 MadKarma <me@madkarma.top>",
-    "2018-present iQIYI, Inc.",
+    "2020-2026 ByteDance Inc.",
+    "2005-2011 Google Inc.",
     "1991, 1993 The Regents of the University of California",
     "2002 Niels Provos <provos@citi.umich.edu>",
 ]

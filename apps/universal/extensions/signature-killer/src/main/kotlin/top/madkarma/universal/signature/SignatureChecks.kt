@@ -12,13 +12,13 @@ import android.content.pm.Signature
 import android.os.Build
 import android.os.Process
 import android.util.Base64
-import android.util.Log
 import app.reseam.runtime.Export
 import java.io.File
 import java.io.IOException
 import java.security.MessageDigest
 
-private const val TAG = "SignatureKiller"
+private val certificateChecks = EventLog("hasSigningCertificate")
+private val archiveReads = EventLog("getPackageArchiveInfo")
 
 private class SigningIdentity(val packageName: String, val certificate: ByteArray) {
     val signature = Signature(certificate)
@@ -35,7 +35,17 @@ private class SigningIdentity(val packageName: String, val certificate: ByteArra
 private var signingIdentity: SigningIdentity? = null
 
 internal fun configureSignatureChecks(packageName: String, signature: String) {
+    val previous = signingIdentity
     signingIdentity = SigningIdentity(packageName, Base64.decode(signature, Base64.DEFAULT))
+    logDebug {
+        "Signature checks answer for $packageName" + if (previous != null) " (replacing an earlier configuration)" else ""
+    }
+}
+
+private fun describeCertificate(certificate: ByteArray?, type: Int): String = when (type) {
+    PackageManager.CERT_INPUT_RAW_X509 -> "raw certificate ${certificateFingerprint(certificate)}"
+    PackageManager.CERT_INPUT_SHA256 -> "SHA-256 ${certificate?.let(::hexPrefix) ?: "none"}"
+    else -> "unknown certificate type $type"
 }
 
 @Export
@@ -47,10 +57,15 @@ fun hasSigningCertificate(
 ): Boolean {
     val identity = signingIdentity
 
-    if (identity != null && packageName == identity.packageName) return identity.matches(
-        certificate, type
-    )
+    if (identity != null && packageName == identity.packageName) {
+        val matches = identity.matches(certificate, type)
+        certificateChecks.log {
+            "$packageName with ${describeCertificate(certificate, type)} -> $matches (spoofed)"
+        }
+        return matches
+    }
 
+    certificateChecks.log { "$packageName is not the patched package; asking Android" }
     return manager.hasSigningCertificate(packageName!!, certificate!!, type)
 }
 
@@ -63,12 +78,25 @@ fun hasSigningCertificateForUid(
 ): Boolean {
     val identity = signingIdentity
 
-    // Shared UIDs describe several packages; keep Android's signing-history selection there.
-    if (identity != null && uid == Process.myUid() && manager.getPackagesForUid(uid)
-            ?.singleOrNull() == identity.packageName
-    ) return identity.matches(certificate, type)
+    if (identity == null || uid != Process.myUid()) {
+        certificateChecks.log { "uid $uid is not this app; asking Android" }
+        return manager.hasSigningCertificate(uid, certificate!!, type)
+    }
 
-    return manager.hasSigningCertificate(uid, certificate!!, type)
+    // Shared UIDs describe several packages; keep Android's signing-history selection there.
+    val packages = manager.getPackagesForUid(uid)
+    if (packages?.singleOrNull() != identity.packageName) {
+        certificateChecks.log {
+            "uid $uid is shared by ${packages.contentToString()}; asking Android"
+        }
+        return manager.hasSigningCertificate(uid, certificate!!, type)
+    }
+
+    val matches = identity.matches(certificate, type)
+    certificateChecks.log {
+        "uid $uid with ${describeCertificate(certificate, type)} -> $matches (spoofed)"
+    }
+    return matches
 }
 
 @Export
@@ -89,7 +117,12 @@ internal fun spoofInstalledArchive(
 ): PackageInfo? {
     val identity = signingIdentity ?: return info
 
-    if (info == null || info.packageName != identity.packageName || archiveFilePath == null) return info
+    if (info == null || info.packageName != identity.packageName || archiveFilePath == null) {
+        archiveReads.log {
+            "$archiveFilePath parsed as ${info?.packageName ?: "nothing"}; left unchanged"
+        }
+        return info
+    }
 
     try {
         val application = manager.getApplicationInfo(identity.packageName, 0)
@@ -99,23 +132,36 @@ internal fun spoofInstalledArchive(
             application.sourceDir, application.publicSourceDir
         ) + application.splitSourceDirs.orEmpty() + application.splitPublicSourceDirs.orEmpty()
 
-        if (installedPaths.none { File(it).canonicalFile == archive }) return info
+        if (installedPaths.none { File(it).canonicalFile == archive }) {
+            archiveReads.log { "$archive is not an installed component; left unchanged" }
+            return info
+        }
     } catch (exception: PackageManager.NameNotFoundException) {
+        archiveReads.log { "${identity.packageName} is not installed; $archiveFilePath left unchanged" }
         return info
     } catch (exception: IOException) {
-        Log.w(TAG, "Cannot resolve installed APK path", exception)
+        logWarning(exception) { "Cannot resolve installed APK path $archiveFilePath" }
         return info
     } catch (exception: SecurityException) {
-        Log.w(TAG, "Cannot inspect installed APK path", exception)
+        logWarning(exception) { "Cannot inspect installed APK path $archiveFilePath" }
         return info
     }
 
-    replaceFirstSignature(getLegacySignatures(info), identity.signature)
+    val legacySignatures = getLegacySignatures(info)
+    replaceFirstSignature(legacySignatures, identity.signature)
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) replaceFirstSignature(
-        info.signingInfo?.apkContentsSigners, identity.signature
-    )
+    val signers =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) info.signingInfo?.apkContentsSigners
+        else null
+    replaceFirstSignature(signers, identity.signature)
 
+    archiveReads.log {
+        "$archiveFilePath: legacy signatures ${signatureState(legacySignatures)}, " + "signing info ${
+            signatureState(
+                signers
+            )
+        }"
+    }
     return info
 }
 
@@ -123,6 +169,7 @@ internal fun spoofInstalledArchive(
 @Suppress("DEPRECATION")
 @Export
 fun checkSignatureApis(context: Context) {
+    if (!diagnosticsEnabled) return
     val identity = signingIdentity ?: return
     val manager = context.packageManager
 
@@ -131,8 +178,8 @@ fun checkSignatureApis(context: Context) {
             val raw = PackageManager.CERT_INPUT_RAW_X509
             val sha256 = PackageManager.CERT_INPUT_SHA256
 
-            Log.i(
-                TAG, "hasSigningCertificate probe: systemRaw=" + manager.hasSigningCertificate(
+            logInfo {
+                "hasSigningCertificate probe: systemRaw=" + manager.hasSigningCertificate(
                     identity.packageName, identity.certificate, raw
                 ) + " systemSha256=" + manager.hasSigningCertificate(
                     identity.packageName, identity.digest, sha256
@@ -145,7 +192,7 @@ fun checkSignatureApis(context: Context) {
                 ) + " redirectedUidSha256=" + hasSigningCertificateForUid(
                     manager, Process.myUid(), identity.digest, sha256
                 )
-            )
+            }
         }
 
         val flags =
@@ -157,8 +204,8 @@ fun checkSignatureApis(context: Context) {
         val systemCertificate = archiveCertificate(systemInfo)
         val redirected = spoofInstalledArchive(manager, path, systemInfo)
 
-        Log.i(
-            TAG, "installed APK probe: parsed=${systemInfo != null}" + " systemOriginal=${
+        logInfo {
+            "installed APK probe: parsed=${systemInfo != null}" + " systemOriginal=${
                 identity.certificate.contentEquals(systemCertificate)
             }" + " redirectedOriginal=${
                 identity.certificate.contentEquals(
@@ -169,9 +216,9 @@ fun checkSignatureApis(context: Context) {
             }" + " redirectedAcceptsInstalled=" + hasSigningCertificate(
                 manager, identity.packageName, systemCertificate, PackageManager.CERT_INPUT_RAW_X509
             )
-        )
+        }
     } catch (exception: RuntimeException) {
-        Log.w(TAG, "Signature API diagnostics failed", exception)
+        logWarning(exception) { "Signature API diagnostics failed" }
     }
 }
 

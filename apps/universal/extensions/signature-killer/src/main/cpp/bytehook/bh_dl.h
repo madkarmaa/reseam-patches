@@ -1,4 +1,4 @@
-// Copyright (c) 2018-present, iQIYI, Inc. All rights reserved.
+// Copyright (c) 2020-2022 ByteDance, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -19,33 +19,10 @@
 // SOFTWARE.
 //
 
-// Created by caikelun on 2018-04-11.
+// Created by Kelun Cai (caikelun@bytedance.com) on 2020-06-02.
 
-#ifndef XH_UTILS_H
-#define XH_UTILS_H 1
+#pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#if defined(__LP64__)
-#define XH_UTIL_FMT_LEN     "16"
-#define XH_UTIL_FMT_X       "llx"
-#else
-#define XH_UTIL_FMT_LEN     "8"
-#define XH_UTIL_FMT_X       "x"
-#endif
-
-#define XH_UTIL_FMT_FIXED_X XH_UTIL_FMT_LEN XH_UTIL_FMT_X
-#define XH_UTIL_FMT_FIXED_S XH_UTIL_FMT_LEN "s"
-
-int xh_util_get_mem_protect(uintptr_t addr, size_t len, const char *pathname, unsigned int *prot);
-int xh_util_get_addr_protect(uintptr_t addr, const char *pathname, unsigned int *prot);
-int xh_util_set_addr_protect(uintptr_t addr, unsigned int prot);
-void xh_util_flush_instruction_cache(uintptr_t addr);
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif
+void *bh_dl_open_linker(void);
+void bh_dl_close(void *handle);
+void *bh_dl_dsym(void *handle, const char *symbol);

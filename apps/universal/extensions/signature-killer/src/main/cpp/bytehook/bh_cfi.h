@@ -1,4 +1,4 @@
-// Copyright (c) 2018-present, iQIYI, Inc. All rights reserved.
+// Copyright (c) 2020-2022 ByteDance, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -19,30 +19,8 @@
 // SOFTWARE.
 //
 
-// Created by caikelun on 2018-04-11.
+// Created by Li Han (hanli.lee@bytedance.com) on 2020-11-04.
 
-#ifndef XH_CORE_H
-#define XH_CORE_H 1
+#pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-int xh_core_register(const char *pathname_regex_str, const char *symbol,
-                     void *new_func, void **old_func);
-
-int xh_core_ignore(const char *pathname_regex_str, const char *symbol);
-
-int xh_core_refresh(int async);
-
-void xh_core_clear();
-
-void xh_core_enable_debug(int flag);
-
-void xh_core_enable_sigsegv_protection(int flag);
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif
+int bh_cfi_disable_slowpath(void);

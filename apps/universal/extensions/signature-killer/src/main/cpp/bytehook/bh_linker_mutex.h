@@ -1,4 +1,4 @@
-// Copyright (c) 2018-present, iQIYI, Inc. All rights reserved.
+// Copyright (c) 2020-2022 ByteDance, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -19,9 +19,10 @@
 // SOFTWARE.
 //
 
-// Created by caikelun on 2018-04-11.
+// Created by Yingmin Piao (piaoyingmin@bytedance.com) on 2022-09-26.
 
-#include <android/log.h>
-#include "xh_log.h"
+#pragma once
 
-android_LogPriority xh_log_priority = ANDROID_LOG_WARN;
+#include <pthread.h>
+
+pthread_mutex_t *bh_linker_mutex_get_by_stack(void);

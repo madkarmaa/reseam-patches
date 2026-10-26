@@ -1,4 +1,4 @@
-// Copyright (c) 2018-present, iQIYI, Inc. All rights reserved.
+// Copyright (c) 2020-2022 ByteDance, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -19,23 +19,28 @@
 // SOFTWARE.
 //
 
-// Created by caikelun on 2018-04-11.
+// Created by Tianzhou Shen (shentianzhou@bytedance.com) on 2020-06-02.
 
-#ifndef XH_VERSION_H
-#define XH_VERSION_H 1
+#pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <stdbool.h>
 
-unsigned int xh_version();
+#include "bytehook.h"
 
-const char *xh_version_str();
+typedef void (*bh_dl_monitor_post_dlopen_t)(void *arg);
+void bh_dl_monitor_set_post_dlopen(bh_dl_monitor_post_dlopen_t cb, void *cb_arg);
 
-const char *xh_version_str_full();
+typedef void (*bh_dl_monitor_post_dlclose_t)(bool sync_refresh, void *arg);
+void bh_dl_monitor_set_post_dlclose(bh_dl_monitor_post_dlclose_t cb, void *cb_arg);
 
-#ifdef __cplusplus
-}
-#endif
+void bh_dl_monitor_add_dlopen_callback(bytehook_pre_dlopen_t pre, bytehook_post_dlopen_t post,
+                                       void *data);
+void bh_dl_monitor_del_dlopen_callback(bytehook_pre_dlopen_t pre, bytehook_post_dlopen_t post,
+                                       void *data);
 
-#endif
+bool bh_dl_monitor_is_initing(void);
+int bh_dl_monitor_init(void);
+void bh_dl_monitor_uninit(void);
+
+void bh_dl_monitor_dlclose_rdlock(void);
+void bh_dl_monitor_dlclose_unlock(void);

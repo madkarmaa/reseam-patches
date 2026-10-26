@@ -1,4 +1,4 @@
-// Copyright (c) 2018-present, iQIYI, Inc. All rights reserved.
+// Copyright (c) 2020-2022 ByteDance, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -19,32 +19,10 @@
 // SOFTWARE.
 //
 
-// Created by caikelun on 2018-04-11.
+// Created by Kelun Cai (caikelun@bytedance.com) on 2020-06-02.
 
-#ifndef XHOOK_H
-#define XHOOK_H 1
+#pragma once
+#include <link.h>
+#include <stddef.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#define XHOOK_EXPORT __attribute__((visibility("default")))
-
-int xhook_register(const char *pathname_regex_str, const char *symbol,
-                   void *new_func, void **old_func) XHOOK_EXPORT;
-
-int xhook_ignore(const char *pathname_regex_str, const char *symbol) XHOOK_EXPORT;
-
-int xhook_refresh(int async) XHOOK_EXPORT;
-
-void xhook_clear() XHOOK_EXPORT;
-
-void xhook_enable_debug(int flag) XHOOK_EXPORT;
-
-void xhook_enable_sigsegv_protection(int flag) XHOOK_EXPORT;
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif
+int bh_dl_iterate(int (*callback)(struct dl_phdr_info *, size_t, void *), void *data);

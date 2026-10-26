@@ -1,4 +1,4 @@
-// Copyright (c) 2018-present, iQIYI, Inc. All rights reserved.
+// Copyright (c) 2020-2022 ByteDance, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -19,27 +19,16 @@
 // SOFTWARE.
 //
 
-// Created by caikelun on 2018-04-11.
+// Created by Kelun Cai (caikelun@bytedance.com) on 2020-06-02.
 
-#ifndef XH_LOG_H
-#define XH_LOG_H 1
+#pragma once
+#include <stddef.h>
+#include <stdint.h>
 
-#include <android/log.h>
+typedef struct {
+    uint8_t *cur;
+    uint8_t *end;
+} bh_sleb128_decoder_t;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-extern android_LogPriority xh_log_priority;
-
-#define XH_LOG_TAG "xhook"
-#define XH_LOG_DEBUG(fmt, ...) do{if(xh_log_priority <= ANDROID_LOG_DEBUG) __android_log_print(ANDROID_LOG_DEBUG, XH_LOG_TAG, fmt, ##__VA_ARGS__);}while(0)
-#define XH_LOG_INFO(fmt, ...)  do{if(xh_log_priority <= ANDROID_LOG_INFO)  __android_log_print(ANDROID_LOG_INFO,  XH_LOG_TAG, fmt, ##__VA_ARGS__);}while(0)
-#define XH_LOG_WARN(fmt, ...)  do{if(xh_log_priority <= ANDROID_LOG_WARN)  __android_log_print(ANDROID_LOG_WARN,  XH_LOG_TAG, fmt, ##__VA_ARGS__);}while(0)
-#define XH_LOG_ERROR(fmt, ...) do{if(xh_log_priority <= ANDROID_LOG_ERROR) __android_log_print(ANDROID_LOG_ERROR, XH_LOG_TAG, fmt, ##__VA_ARGS__);}while(0)
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif
+void bh_sleb128_decoder_init(bh_sleb128_decoder_t *self, uint8_t *data, size_t data_sz);
+int bh_sleb128_decoder_next(bh_sleb128_decoder_t *self, size_t *ret);
