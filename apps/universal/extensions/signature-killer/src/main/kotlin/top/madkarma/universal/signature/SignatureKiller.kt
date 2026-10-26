@@ -105,23 +105,15 @@ fun killApkPath(context: Context, packageName: String) {
     killOpen(context, packageName)
 }
 
-/** Redirects a path register at a native call instruction located by the calling patch. */
+/** Traps raw openat syscalls from a loaded library and redirects installed APK paths. */
 @Export
 @Synchronized
-fun redirectPrivateApkOpens(
-    libraryName: String, offset: Long, instruction: Int, pathRegister: Int
-) {
-    logInfo {
-        "redirectPrivateApkOpens: $libraryName+0x${offset.toString(16)}, instruction " + "0x${
-            Integer.toHexString(
-                instruction
-            )
-        }, path register $pathRegister"
-    }
+fun redirectRawApkOpens(libraryName: String) {
     check(fileRedirectionInstalled) { "Original APK file redirection is not installed" }
-    check(hookPrivateOpen(libraryName, offset, instruction, pathRegister)) {
-        "Redirecting private APK opens failed in $libraryName at 0x${offset.toString(16)}"
+    check(trapRawApkOpens(libraryName)) {
+        "Installing raw APK open redirection failed in $libraryName"
     }
+    logInfo { "redirectRawApkOpens: seccomp redirect installed for $libraryName" }
 }
 
 /** Compares what Android reports with the spoofed certificate. Runs only with diagnostics on. */
@@ -403,6 +395,4 @@ private external fun hookApkPaths(
     installedPaths: Array<String>, replacementPaths: Array<String>
 ): Boolean
 
-private external fun hookPrivateOpen(
-    libraryName: String, offset: Long, instruction: Int, pathRegister: Int
-): Boolean
+private external fun trapRawApkOpens(libraryName: String): Boolean

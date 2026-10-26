@@ -44,13 +44,7 @@ precedence = "override"
 SPDX-FileCopyrightText = "2002 Niels Provos <provos@citi.umich.edu>"
 SPDX-License-Identifier = "BSD-2-Clause"
 
-[[annotations]]
-path = ["apps/universal/extensions/signature-killer/src/main/cpp/shadowhook.h"]
-precedence = "override"
-SPDX-FileCopyrightText = "2021-2026 ByteDance Inc."
-SPDX-License-Identifier = "MIT"
-
-# The native binaries combine project-owned JNI code, bytehook, ShadowHook declarations, and their third-party headers.
+# The native binaries combine project-owned JNI code, bytehook, and their third-party headers.
 [[annotations]]
 path = ["apps/universal/patch/src/main/resources/lib/**/libSignatureKiller.so"]
 precedence = "override"
