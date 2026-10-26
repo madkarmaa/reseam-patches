@@ -188,7 +188,6 @@ universal patches that work on any app. Want an app supported?
 
 | Name | Description | Version pins |
 | --- | --- | --- |
-| Disable Play Store updates | Hides the app from Google Play's pending updates. | None |
 | Force extract native libs | Sets android:extractNativeLibs to true when it is false. | None |
 | Hide packages | Hides the chosen packages from the app's PackageManager queries, as if they were not installed. | None |
 | Remove unused native libraries | Removes native libraries for every CPU architecture except the selected one to shrink the APK. | None |
