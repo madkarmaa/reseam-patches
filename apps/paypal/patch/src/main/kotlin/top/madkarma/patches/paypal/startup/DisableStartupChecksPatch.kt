@@ -16,8 +16,7 @@ val disableStartupChecks = patch("Disable startup checks") {
     dependsOn(signatureKiller)
 
     execute {
-        // Uncomment to require native APK spoofing from the signature-check dependency.
-        // if ("assets/SignatureKiller/origin.apk" !in files.list()) error("PayPal requires Signature killer spoofApkPath=true")
+        // Depend on spoofApkFileAccess instead if native checks start reading the installed APK files.
 
         startupVerifier.alwaysReturn()
         log.info("Disabled startup verifier ${startupVerifier.descriptor}")
