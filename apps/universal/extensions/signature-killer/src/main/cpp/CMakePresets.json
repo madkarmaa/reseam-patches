@@ -1,0 +1,69 @@
+{
+    "version": 3,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 22,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": "android",
+            "hidden": true,
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "installDir": "${sourceDir}/../../../../../patch/src/main/resources/lib",
+            "toolchainFile": "$env{ANDROID_NDK_HOME}/build/cmake/android.toolchain.cmake",
+            "cacheVariables": {
+                "ANDROID_PLATFORM": "android-21",
+                "ANDROID_STL": "c++_static",
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "arm64-v8a",
+            "inherits": "android",
+            "cacheVariables": {
+                "ANDROID_ABI": "arm64-v8a"
+            }
+        },
+        {
+            "name": "armeabi-v7a",
+            "inherits": "android",
+            "cacheVariables": {
+                "ANDROID_ABI": "armeabi-v7a"
+            }
+        },
+        {
+            "name": "x86",
+            "inherits": "android",
+            "cacheVariables": {
+                "ANDROID_ABI": "x86"
+            }
+        },
+        {
+            "name": "x86_64",
+            "inherits": "android",
+            "cacheVariables": {
+                "ANDROID_ABI": "x86_64"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "arm64-v8a",
+            "configurePreset": "arm64-v8a"
+        },
+        {
+            "name": "armeabi-v7a",
+            "configurePreset": "armeabi-v7a"
+        },
+        {
+            "name": "x86",
+            "configurePreset": "x86"
+        },
+        {
+            "name": "x86_64",
+            "configurePreset": "x86_64"
+        }
+    ]
+}
