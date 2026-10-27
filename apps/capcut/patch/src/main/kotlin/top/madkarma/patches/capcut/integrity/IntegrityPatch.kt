@@ -158,7 +158,7 @@ val bypassIntegrityChecks = patch("Bypass integrity checks") {
         log.info("Integrity: ${openLynxView.descriptor} blocks the unsafe-package notice from downloaded JavaScript.")
 
         val replacedUrls =
-            unsafePackageFallback.replaceAllStrings(unsafePackageModal, TEMPLATE_PORTAL)
+            unsafePackageFallback.method.replaceAllStrings(unsafePackageModal, TEMPLATE_PORTAL)
         check(replacedUrls > 0) { "Unsafe-package fallback URL was not found" }
         log.info("Integrity: ${unsafePackageFallback.descriptor} uses the template portal fallback.")
     }

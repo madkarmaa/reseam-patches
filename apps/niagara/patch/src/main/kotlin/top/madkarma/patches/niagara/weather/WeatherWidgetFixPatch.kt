@@ -8,7 +8,6 @@ package top.madkarma.patches.niagara.weather
 import app.reseam.patch.after
 import app.reseam.patch.patch
 import app.reseam.patch.replace
-import app.reseam.patch.replaceAllStrings
 import top.madkarma.extensions.bindings.WeatherApi
 import top.madkarma.extensions.bindings.WeatherApiKeyField
 import top.madkarma.patches.niagara.pro.unlockPro
@@ -33,7 +32,7 @@ val weatherWidgetFix = patch("Weather widget fix") {
         val provider = resources.setStringEverywhere("open_weather", "WeatherAPI.com")
         if (!provider) error("Weather widget fix: open_weather string not writable")
 
-        val links = weatherSheet.replaceAllStrings(
+        val links = weatherSheet.method.replaceAllStrings(
             WEATHER_WIDGET_ARTICLE_URL,
             "https://www.weatherapi.com/terms.aspx",
         )

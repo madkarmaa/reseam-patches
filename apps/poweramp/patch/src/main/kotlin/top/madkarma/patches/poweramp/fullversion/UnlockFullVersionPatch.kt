@@ -35,11 +35,11 @@ val unlockFullVersion = patch("Unlock full version") {
 
         for (label in listOf("one_time_purchase", "lifetime_license")) {
             val id = resources.id("string", label) ?: error("Purchase label $label is missing")
-            val count = updatePurchaseCard.replaceAllLiterals(id.toLong(), blankLabel.toLong())
+            val count = updatePurchaseCard.method.replaceAllLiterals(id.toLong(), blankLabel.toLong())
             check(count == 1) { "Expected one $label label on the purchase card" }
         }
 
-        val separators = updatePurchaseCard.replaceAllStrings(" | ", PATCH_ATTRIBUTION)
+        val separators = updatePurchaseCard.method.replaceAllStrings(" | ", PATCH_ATTRIBUTION)
         check(separators == 1) { "Expected one purchase terms separator" }
         log.info("Full version: ${updatePurchaseCard.descriptor} shows the shared patch attribution in place of the purchase terms.")
 

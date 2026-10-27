@@ -9,7 +9,6 @@ import app.reseam.patch.Type
 import app.reseam.patch.after
 import app.reseam.patch.dex.stringValue
 import app.reseam.patch.patch
-import app.reseam.patch.replaceAllStrings
 import top.madkarma.googlephotos.spoof.bindings.PixelXlIdentity
 import top.madkarma.patches.googlephotos.GOOGLE_PHOTOS
 
@@ -56,8 +55,8 @@ val unlimitedBackupStorage = patch("Unlimited backup storage") {
 
         check(enabled.isNotEmpty() && disabled.isNotEmpty()) { "Unsupported Pixel feature catalogue" }
 
-        enabled.forEach { initializePixelFeatures.replaceAllStrings(it, "android.hardware.wifi") }
-        disabled.forEach { initializePixelFeatures.replaceAllStrings(it, "dummy") }
+        enabled.forEach { initializePixelFeatures.method.replaceAllStrings(it, "android.hardware.wifi") }
+        disabled.forEach { initializePixelFeatures.method.replaceAllStrings(it, "dummy") }
         log.info("Unlimited backup storage: ${initializePixelFeatures.descriptor} selects the original Pixel offer.")
 
         // Override values at their read sites; Android 17 refuses reflective writes to final Build fields.

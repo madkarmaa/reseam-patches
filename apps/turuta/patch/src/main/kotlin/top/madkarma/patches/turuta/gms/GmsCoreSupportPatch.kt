@@ -30,10 +30,10 @@ val gmsCoreSupport = patch("GmsCore support") {
         }
         val gmsPackage = "$vendor.android.gms"
 
-        check(signInActivityCreate.replaceAllStrings("com.google.android.gms", gmsPackage) > 0)
+        check(signInActivityCreate.method.replaceAllStrings("com.google.android.gms", gmsPackage) > 0)
         log.info("GmsCore: ${signInActivityCreate.descriptor} opens the GmsCore sign-in activity.")
 
-        check(tokenServiceInitializer.replaceAllStrings("com.google.android.gms", gmsPackage) > 0)
+        check(tokenServiceInitializer.method.replaceAllStrings("com.google.android.gms", gmsPackage) > 0)
         log.info("GmsCore: ${tokenServiceInitializer.descriptor} binds to the GmsCore GetToken service.")
 
         modernTokenApiAvailable.alwaysReturn(false)
@@ -65,7 +65,7 @@ val gmsCoreSupport = patch("GmsCore support") {
         check(accountTypes.isNotEmpty()) { "Google account types not found" }
 
         for (target in accountTypes) {
-            check(target.replaceAllStrings("com.google", vendor) > 0)
+            check(target.method.replaceAllStrings("com.google", vendor) > 0)
             log.info("GmsCore: ${target.descriptor} uses the GmsCore account type.")
         }
 

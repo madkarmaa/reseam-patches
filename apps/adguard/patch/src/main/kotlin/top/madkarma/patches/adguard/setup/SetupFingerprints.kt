@@ -14,8 +14,15 @@ internal val privacyGroup = filterGroups.enumConstant("Privacy")
 internal val securityGroup = filterGroups.enumConstant("Security")
 internal val privacyLevels = klass(PRIVACY_LEVEL)
 
-internal val basePreferences = method("basePreferences") {
-    strings("storageFactory", "base")
+// PreferencesInfo.Android names a SharedPreferences file; the setup extension writes to "base".
+private val sharedPreferencesInfo = klass("sharedPreferencesInfo") {
+    sourceFile("PreferencesInfo.android.kt")
+    hasInstanceField(Type.Context)
+}
+
+internal val basePreferences = methods("basePreferences") {
+    strings("base")
+    calls(sharedPreferencesInfo.method("<init>"))
 }
 
 internal val setupPreferences = method("setupPreferences") {

@@ -8,7 +8,6 @@ package top.madkarma.patches.smartlauncher.lifetime
 import app.reseam.patch.Type
 import app.reseam.patch.before
 import app.reseam.patch.patch
-import app.reseam.patch.replaceAllStrings
 import top.madkarma.patches.shared.PATCH_ATTRIBUTION
 import top.madkarma.patches.shared.setStringEverywhere
 import top.madkarma.patches.universal.signature.signatureKiller
@@ -46,7 +45,7 @@ val unlockLifetime = patch("Unlock Lifetime premium") {
         }
         log.info("Lifetime: ${writePreference.descriptor} preserves lifetime access when preferences change.")
 
-        if (fullLicenseRow.replaceAllStrings(
+        if (fullLicenseRow.method.replaceAllStrings(
                 "SL6", "❤"
             ) != 1
         ) error("Expected exactly one full-license badge label")

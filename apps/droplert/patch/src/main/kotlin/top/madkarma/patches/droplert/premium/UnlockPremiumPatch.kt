@@ -32,7 +32,7 @@ val unlockPremium = patch("Unlock Lifetime Premium") {
         playPurchaseCallback.promoteFreeTier()
         log.info("Premium: ${playPurchaseCallback.descriptor} preserves the premium tier after purchase checks.")
 
-        if (premiumCardStatus.replaceAllStrings(
+        if (premiumCardStatus.method.replaceAllStrings(
                 "All features unlocked", PATCH_ATTRIBUTION
             ) == 0
         ) error("Premium: settings card status text not found")
