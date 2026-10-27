@@ -131,6 +131,15 @@ universal patches that work on any app. Want an app supported?
 </details>
 
 <details>
+<summary><strong>com.otp.octopilauncher</strong></summary>
+
+| Name | Description | Version pins |
+| --- | --- | --- |
+| Unlock Pro | Unlocks Pro-only features. | None |
+
+</details>
+
+<details>
 <summary><strong>com.paypal.android.p2pmobile</strong></summary>
 
 | Name | Description | Version pins |
