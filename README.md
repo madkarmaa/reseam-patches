@@ -70,6 +70,15 @@ universal patches that work on any app. Want an app supported?
 </details>
 
 <details>
+<summary><strong>com.delphicoder.flud</strong></summary>
+
+| Name | Description | Version pins |
+| --- | --- | --- |
+| Unlock Premium | Unlocks Premium-only features. | None |
+
+</details>
+
+<details>
 <summary><strong>com.frontrow.vlog</strong></summary>
 
 | Name | Description | Version pins |
@@ -94,6 +103,22 @@ universal patches that work on any app. Want an app supported?
 | Name | Description | Version pins |
 | --- | --- | --- |
 | Unlock Pro | Unlocks Pro-only features, including shop items. | None |
+
+</details>
+
+<details>
+<summary><strong>com.lemon.lvoverseas</strong></summary>
+
+| Name | Description | Version pins |
+| --- | --- | --- |
+| Bypass effects region restrictions | Keeps locally blocked effects accessible. Server restrictions may still apply. | None |
+| Bypass geographic restrictions | Keeps locally blocked tools, pages, and links accessible. | None |
+| Remove annoyances | Removes app annoyances, upsells and popups. | None |
+| top.madkarma.patches.capcut.integrity.bypassIntegrityChecks |  | None |
+| top.madkarma.patches.capcut.integrity.bypassNativeApkChecks |  | None |
+| Unlock Premium | Unlocks Premium-only features and removes subscription offers. Most, if not all, AI tools run on CapCut's servers and cannot be unlocked by this patch. | None |
+| Unlock premium effects and templates | Allows local premium effects and template export. | None |
+| Unlock Ultra HD export | Unlocks editor 2K/4K and template Ultra HD export. | None |
 
 </details>
 
@@ -192,6 +217,7 @@ universal patches that work on any app. Want an app supported?
 | Hide packages | Hides the chosen packages from the app's PackageManager queries, as if they were not installed. | None |
 | Remove unused native libraries | Removes native libraries for every CPU architecture except the selected one to shrink the APK. | None |
 | Signature Killer | Spoofs the original app signature and optionally redirects installed-file reads to the original app files. | None |
+| top.madkarma.patches.universal.signature.spoofApkFileAccess |  | None |
 
 </details>
 
