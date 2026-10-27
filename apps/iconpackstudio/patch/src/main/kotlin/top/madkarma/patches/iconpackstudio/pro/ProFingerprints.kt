@@ -21,3 +21,7 @@ private val licenseStatus = klass("licenseStatus") {
 }
 
 internal val licenseStatusConstructor = licenseStatus.method("<init>")
+
+internal val proLicenseBadge = method("proLicenseBadge") {
+    strings("PRO")
+}
