@@ -8,6 +8,8 @@ package top.madkarma.patches.capcut.integrity
 import app.reseam.patch.*
 import top.madkarma.capcut.integrity.bindings.DeviceRegistration
 import top.madkarma.capcut.integrity.bindings.UnsafePackageNotice
+import top.madkarma.patches.universal.signature.spoofApkFileAccess
+import top.madkarma.universal.signature.bindings.SignatureKiller
 import java.security.MessageDigest
 import java.util.*
 
@@ -18,11 +20,17 @@ private const val JSON_OBJECT = "org.json.JSONObject"
 private const val TEMPLATE_PORTAL =
     "capcut://lynxview?channel=image_lynx_template_portal&bundle=template.js"
 
-val bypassIntegrityChecks = patch {
+val bypassIntegrityChecks = patch("Bypass integrity checks") {
+    description("Spoofs the original signature and registers a fresh device identity to avoid device bans.")
     compatibleWith("com.lemon.lvoverseas")
-    dependsOn(bypassNativeApkChecks)
+    dependsOn(spoofApkFileAccess)
 
     execute {
+        metaSecLibraryLoad.after {
+            call(SignatureKiller.redirectRawApkOpens, string("libmetasec_ov.so"))
+        }
+        log.info("Integrity: ${metaSecLibraryLoad.descriptor} installs a process-wide seccomp redirect for MetaSec raw openat syscalls after loading the library.")
+
         deviceRegistrationInit.before {
             call(DeviceRegistration.initialize, paramOfType("android.content.Context"))
         }

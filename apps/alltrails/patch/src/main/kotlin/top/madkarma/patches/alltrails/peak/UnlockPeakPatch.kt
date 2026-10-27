@@ -8,6 +8,7 @@ package top.madkarma.patches.alltrails.peak
 import app.reseam.patch.alwaysReturn
 import app.reseam.patch.patch
 import top.madkarma.patches.shared.PATCH_ATTRIBUTION
+import top.madkarma.patches.shared.setStringEverywhere
 
 val unlockPeak = patch("Unlock Peak") {
     description("Unlocks Peak-only features.")
@@ -24,8 +25,10 @@ val unlockPeak = patch("Unlock Peak") {
             ?: error("Unlock Peak: peak_display_name string missing")
 
         val signedPeakName = "$peakName | $PATCH_ATTRIBUTION"
-        if (!resources.setString("peak_display_name", signedPeakName))
-            error("Unlock Peak: peak_display_name string not writable")
+        if (!resources.setStringEverywhere(
+                "peak_display_name", signedPeakName
+            )
+        ) error("Unlock Peak: peak_display_name string not writable")
 
         log.info("Peak: plan label tagged.")
     }

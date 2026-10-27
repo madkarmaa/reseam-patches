@@ -8,6 +8,7 @@ package top.madkarma.patches.niagara.pro
 import app.reseam.patch.before
 import app.reseam.patch.patch
 import top.madkarma.patches.shared.PATCH_ATTRIBUTION
+import top.madkarma.patches.shared.setStringEverywhere
 
 val unlockPro = patch("Unlock Pro") {
     description("Unlocks Pro-only features.")
@@ -22,12 +23,11 @@ val unlockPro = patch("Unlock Pro") {
         val thankYou = resources.getString("purchase_pro_thank_you")
             ?: error("Unlock Pro: purchase_pro_thank_you string missing")
 
-        val tagged = resources.setString(
+        val tagged = resources.setStringEverywhere(
             "purchase_pro_thank_you",
             "$thankYou\n\n$PATCH_ATTRIBUTION",
         )
-        if (!tagged)
-            error("Unlock Pro: purchase_pro_thank_you string not writable")
+        if (!tagged) error("Unlock Pro: purchase_pro_thank_you string not writable")
         log.info("Pro: thank-you label tagged.")
 
         log.info("Pro: unlocked via ${proCheckerConstructor.descriptor}.")

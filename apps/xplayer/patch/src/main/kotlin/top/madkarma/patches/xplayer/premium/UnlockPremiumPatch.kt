@@ -11,6 +11,7 @@ import app.reseam.patch.before
 import app.reseam.patch.patch
 import top.madkarma.extensions.xplayer.bindings.XPlayerPremium
 import top.madkarma.patches.shared.PATCH_ATTRIBUTION
+import top.madkarma.patches.shared.setStringEverywhere
 
 private const val ALREADY_PREMIUM_TOAST_KEY = "toast_already_vip"
 
@@ -34,7 +35,7 @@ val unlockPremium = patch("Unlock premium") {
         }
         log.info("Premium: ${purchaseStateConstructor.descriptor} initializes Premium before billing connects.")
 
-        check(resources.setString(ALREADY_PREMIUM_TOAST_KEY, PATCH_ATTRIBUTION)) {
+        check(resources.setStringEverywhere(ALREADY_PREMIUM_TOAST_KEY, PATCH_ATTRIBUTION)) {
             "Unlock premium: failed to rewrite string $ALREADY_PREMIUM_TOAST_KEY"
         }
         log.info("Premium: $ALREADY_PREMIUM_TOAST_KEY shows the shared patch attribution.")

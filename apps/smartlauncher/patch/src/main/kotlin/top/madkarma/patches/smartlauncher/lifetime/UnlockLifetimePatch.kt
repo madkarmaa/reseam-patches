@@ -10,6 +10,7 @@ import app.reseam.patch.before
 import app.reseam.patch.patch
 import app.reseam.patch.replaceAllStrings
 import top.madkarma.patches.shared.PATCH_ATTRIBUTION
+import top.madkarma.patches.shared.setStringEverywhere
 import top.madkarma.patches.universal.signature.signatureKiller
 import top.madkarma.smartlauncher.extensions.bindings.PreferenceOverrides
 
@@ -50,7 +51,7 @@ val unlockLifetime = patch("Unlock Lifetime premium") {
             ) != 1
         ) error("Expected exactly one full-license badge label")
 
-        if (!resources.setString(
+        if (!resources.setStringEverywhere(
                 "full_license_thank_you", PATCH_ATTRIBUTION
             )
         ) error("Full-license attribution string missing")
