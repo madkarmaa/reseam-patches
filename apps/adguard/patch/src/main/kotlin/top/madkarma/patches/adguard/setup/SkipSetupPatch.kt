@@ -66,7 +66,8 @@ val skipSetup = patch("Skip setup") {
     )
 
     execute {
-        if (!isPresent(basePreferences) || !isPresent(setupPreferences)) error("Skip setup: unsupported preference storage")
+        if (basePreferences.all.isEmpty() || !isPresent(setupPreferences)) error("Skip setup: unsupported preference storage")
+        log.info("Setup: ${basePreferences.all.joinToString { it.descriptor }} open the base preferences that hold the setup flags.")
 
         val selectedPrivacyLevel = options[privacyLevel]
         val privacyEnabled = selectedPrivacyLevel != "None"
