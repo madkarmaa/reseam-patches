@@ -12,6 +12,7 @@ import app.reseam.patch.replaceAllStrings
 import top.madkarma.extensions.bindings.WeatherApi
 import top.madkarma.extensions.bindings.WeatherApiKeyField
 import top.madkarma.patches.niagara.pro.unlockPro
+import top.madkarma.patches.shared.setStringEverywhere
 
 val weatherWidgetFix = patch("Weather widget fix") {
     description(
@@ -23,13 +24,13 @@ val weatherWidgetFix = patch("Weather widget fix") {
     dependsOn(unlockPro)
 
     execute {
-        val hint = resources.setString(
+        val hint = resources.setStringEverywhere(
             "weather_forecast_hint",
             "Weather forecasts are probabilistic and can be wrong. Never use them as the sole basis for safety-critical decisions.",
         )
         if (!hint) error("Weather widget fix: weather_forecast_hint string not writable")
 
-        val provider = resources.setString("open_weather", "WeatherAPI.com")
+        val provider = resources.setStringEverywhere("open_weather", "WeatherAPI.com")
         if (!provider) error("Weather widget fix: open_weather string not writable")
 
         val links = weatherSheet.replaceAllStrings(

@@ -7,6 +7,7 @@ package top.madkarma.patches.vn.pro
 
 import app.reseam.patch.*
 import top.madkarma.patches.shared.PATCH_ATTRIBUTION
+import top.madkarma.patches.shared.setStringEverywhere
 import top.madkarma.vn.extensions.bindings.Pro
 
 val unlockPro = patch("Unlock Pro") {
@@ -64,7 +65,7 @@ val unlockPro = patch("Unlock Pro") {
             className(Pro.SkippedSubscriptionActivity.descriptor)
         )
 
-        check(resources.setString("frv_help_center", PATCH_ATTRIBUTION)) {
+        check(resources.setStringEverywhere("frv_help_center", PATCH_ATTRIBUTION)) {
             "Help Center attribution string is missing"
         }
     }

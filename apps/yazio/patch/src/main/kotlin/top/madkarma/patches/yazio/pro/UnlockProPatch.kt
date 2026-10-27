@@ -10,6 +10,7 @@ import app.reseam.patch.before
 import app.reseam.patch.patch
 import app.reseam.patch.replace
 import top.madkarma.patches.shared.PATCH_ATTRIBUTION
+import top.madkarma.patches.shared.setStringEverywhere
 
 private const val SUBSCRIPTION_LABEL_KEY = "user.settings.label.subscription"
 
@@ -18,7 +19,7 @@ val unlockPro = patch("Unlock Pro") {
     compatibleWith("com.yazio.android")
 
     execute {
-        check(resources.setString(SUBSCRIPTION_LABEL_KEY, PATCH_ATTRIBUTION)) {
+        check(resources.setStringEverywhere(SUBSCRIPTION_LABEL_KEY, PATCH_ATTRIBUTION)) {
             "Unlock Pro: failed to rewrite string $SUBSCRIPTION_LABEL_KEY"
         }
 
