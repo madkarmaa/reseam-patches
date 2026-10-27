@@ -7,6 +7,7 @@
 
 #include <dlfcn.h>
 #include <fcntl.h>
+#include <sys/syscall.h>
 #include <sys/types.h>
 
 #include <algorithm>
@@ -160,6 +161,30 @@ namespace {
         return BYTEHOOK_CALL_PREV(fopen_proxy, path, mode);
     }
 
+    // Some libraries open files through libc's syscall() to bypass the open wrappers.
+    long syscall_proxy(const long number, ...) {
+        BYTEHOOK_STACK_SCOPE();
+        // Like bionic, forward six arguments, since the caller's count is unknown.
+        std::array<long, 6> arguments{};
+        va_list list{};
+        va_start(list, number);
+        for (long &argument: arguments) argument = va_arg(list, long);
+        va_end(list);
+
+        const auto redirect = [&](long &pathname, const char *const function) {
+            pathname = reinterpret_cast<long>(redirect_file(
+                    reinterpret_cast<const char *>(pathname), function, BYTEHOOK_RETURN_ADDRESS()));
+        };
+        if (number == __NR_openat) redirect(arguments[1], "syscall(openat)");
+#ifdef __NR_open
+        if (number == __NR_open) redirect(arguments[0], "syscall(open)");
+#endif
+
+        const auto [first, second, third, fourth, fifth, sixth] = arguments;
+        return BYTEHOOK_CALL_PREV(syscall_proxy, number, first, second, third, fourth, fifth,
+                                  sixth);
+    }
+
     struct file_hook {
         const char *symbol;
         void *proxy;
@@ -175,6 +200,7 @@ namespace {
         {.symbol = "__openat_2", .proxy = reinterpret_cast<void *>(openat_2_proxy)},
         {.symbol = "fopen", .proxy = reinterpret_cast<void *>(fopen_proxy)},
         {.symbol = "fopen64", .proxy = reinterpret_cast<void *>(fopen_proxy)},
+        {.symbol = "syscall", .proxy = reinterpret_cast<void *>(syscall_proxy)},
     });
 
     // Reports each library whose import bytehook replaced, now or when the library loads later.
