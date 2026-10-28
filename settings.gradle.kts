@@ -23,10 +23,6 @@ plugins {
 
 rootProject.name = "madkarma-patches"
 
-// The workspace plugin only discovers apps and extensions, so include
-// the shared patch helpers here.
-include("apps:shared")
-
 dependencyResolutionManagement {
     repositories {
         google()

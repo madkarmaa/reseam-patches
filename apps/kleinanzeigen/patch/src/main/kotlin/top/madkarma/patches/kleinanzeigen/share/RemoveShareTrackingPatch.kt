@@ -6,20 +6,16 @@
 package top.madkarma.patches.kleinanzeigen.share
 
 import app.reseam.patch.patch
-import app.reseam.patch.replace
+import top.madkarma.patches.shared.clearurls.cleanSharedLinks
+import top.madkarma.patches.shared.clearurls.clearUrls
 
 val removeShareTracking = patch("Remove share tracking") {
-    description("Removes tracking parameters from shared ad, seller, and profile links.")
+    description("Removes tracking parameters from shared ad, seller, profile, and search links.")
     compatibleWith("com.ebay.kleinanzeigen")
+    dependsOn(clearUrls)
 
     execute {
-        appendShareTracking.replace { returnValue(param(0)) }
-        log.info("Share: ${appendShareTracking.descriptor} returns the link unchanged.")
-
-        if (bytecode.replaceAllStrings(
-                PROFILE_SHARE_TRACKING, ""
-            ) == 0
-        ) error("Share: profile share tracking not found")
-        log.info("Share: profile share links no longer carry tracking parameters.")
+        val redirectedCalls = cleanSharedLinks()
+        log.info("Share: $redirectedCalls Intent.createChooser calls remove tracking with the ClearURLs rules.")
     }
 }

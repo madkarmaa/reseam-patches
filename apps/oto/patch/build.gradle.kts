@@ -6,6 +6,6 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":apps:shared"))
+    compileOnly(project(":apps:shared:patch"))
     compileOnly(project(":apps:universal:patch"))
 }
