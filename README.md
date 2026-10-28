@@ -47,6 +47,7 @@ universal patches that work on any app. Want an app supported?
 
 | Name | Description | Version pins |
 | --- | --- | --- |
+| GmsCore support | Signs in with Google through separately installed Reseam GmsCore. | None |
 | Unlock Peak | Unlocks Peak-only features. | None |
 
 </details>
@@ -94,6 +95,7 @@ universal patches that work on any app. Want an app supported?
 
 | Name | Description | Version pins |
 | --- | --- | --- |
+| GmsCore support | Signs in with Google through separately installed Reseam GmsCore. | None |
 | Unlock Pro | Unlocks Pro-only features. | None |
 
 </details>
@@ -113,6 +115,7 @@ universal patches that work on any app. Want an app supported?
 
 | Name | Description | Version pins |
 | --- | --- | --- |
+| GmsCore support | Signs in with Google through separately installed Reseam GmsCore. | None |
 | Unlock Pro | Unlocks Pro-only features, including shop items. | None |
 
 </details>
@@ -164,7 +167,9 @@ universal patches that work on any app. Want an app supported?
 
 | Name | Description | Version pins |
 | --- | --- | --- |
+| GmsCore support | Signs in with Google through separately installed Reseam GmsCore. | None |
 | Remove annoyances | Removes promotional popups from the app. | None |
+| Skip onboarding | Skips the onboarding questionnaires shown at startup. | None |
 | Unlock Ultra | Unlocks Ultra-only features. Server credit balances remain unchanged. | None |
 
 </details>
@@ -194,6 +199,7 @@ universal patches that work on any app. Want an app supported?
 
 | Name | Description | Version pins |
 | --- | --- | --- |
+| GmsCore support | Signs in with Google through separately installed Reseam GmsCore. | None |
 | Unlock Pro | Unlocks Pro-only features. | None |
 
 </details>
