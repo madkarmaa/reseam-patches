@@ -79,6 +79,17 @@ universal patches that work on any app. Want an app supported?
 </details>
 
 <details>
+<summary><strong>com.ebay.kleinanzeigen</strong></summary>
+
+| Name | Description | Version pins |
+| --- | --- | --- |
+| Remove ads | Removes banner, native, and interstitial ads. | None |
+| Remove Pur popups | Skips the consent screen that advertises Kleinanzeigen Pur, without giving tracking consent. | None |
+| Remove share tracking | Removes tracking parameters from shared ad, seller, profile, and search links. | None |
+
+</details>
+
+<details>
 <summary><strong>com.frontrow.vlog</strong></summary>
 
 | Name | Description | Version pins |
@@ -155,6 +166,15 @@ universal patches that work on any app. Want an app supported?
 | --- | --- | --- |
 | Remove annoyances | Removes promotional popups from the app. | None |
 | Unlock Ultra | Unlocks Ultra-only features. Server credit balances remain unchanged. | None |
+
+</details>
+
+<details>
+<summary><strong>com.piyush.music</strong></summary>
+
+| Name | Description | Version pins |
+| --- | --- | --- |
+| Unlock Plus | Unlocks Plus-only features. | None |
 
 </details>
 
@@ -242,6 +262,7 @@ universal patches that work on any app. Want an app supported?
 | --- | --- | --- |
 | Force extract native libs | Sets android:extractNativeLibs to true when it is false. | None |
 | Hide packages | Hides the chosen packages from the app's PackageManager queries, as if they were not installed. | None |
+| Load ClearURLs rules | Downloads the ClearURLs tracking rules when the app starts, and caches them for offline launches. Adds internet access to apps that lack it. Rules by the ClearURLs project: https://gitlab.com/ClearURLs/rules | None |
 | Remove unused native libraries | Removes native libraries for every CPU architecture except the selected one to shrink the APK. | None |
 | Signature Killer | Spoofs the original app signature. | None |
 | Signature Killer (APK file access) | Spoofs the original app signature and redirects reads of the installed APK files to embedded original copies. Only use this for apps that verify the APK files themselves; it roughly doubles the APK size. | None |
