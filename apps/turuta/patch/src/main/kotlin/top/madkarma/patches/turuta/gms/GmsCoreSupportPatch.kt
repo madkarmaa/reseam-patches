@@ -6,6 +6,7 @@
 package top.madkarma.patches.turuta.gms
 
 import app.reseam.patch.*
+import top.madkarma.patches.shared.originalSignerSha1
 import top.madkarma.turuta.gms.bindings.GmsCoreSupport
 
 val gmsCoreSupport = patch("GmsCore support") {
@@ -70,6 +71,9 @@ val gmsCoreSupport = patch("GmsCore support") {
         }
 
         // As in Photos, authenticate with the original app identity instead of the bundle signer.
+        val originalSignature = originalSignerSha1()
+        log.info("GmsCore: presents the original signing certificate $originalSignature.")
+
         manifest.addPermission("org.microg.gms.permission.FAKE_PACKAGE_SIGNATURE")
         manifest.addPermission("$vendor.org.microg.gms.EXTENDED_ACCESS")
 
@@ -86,7 +90,7 @@ val gmsCoreSupport = patch("GmsCore support") {
 
             for ((name, value) in mapOf(
                 "$gmsPackage.SPOOFED_PACKAGE_NAME" to "pe.tumicro.android",
-                "$gmsPackage.SPOOFED_PACKAGE_SIGNATURE" to "1b7332fc3a1629b363b78908b199ba6852fc6fdd",
+                "$gmsPackage.SPOOFED_PACKAGE_SIGNATURE" to originalSignature,
                 "$vendor.MICROG_PACKAGE_NAME" to gmsPackage,
             )) application.appendChild(createElement("meta-data").apply {
                 this["android:name"] = name

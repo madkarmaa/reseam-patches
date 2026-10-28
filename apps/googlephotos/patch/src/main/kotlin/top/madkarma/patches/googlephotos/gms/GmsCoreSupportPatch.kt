@@ -10,6 +10,7 @@ package top.madkarma.patches.googlephotos.gms
 import app.reseam.patch.*
 import top.madkarma.googlephotos.gms.bindings.GmsCoreSupport
 import top.madkarma.patches.googlephotos.GOOGLE_PHOTOS
+import top.madkarma.patches.shared.originalSignerSha1
 
 private const val MARS_AUTHORITY = "com.google.android.libraries.photos.api.mars"
 
@@ -193,6 +194,9 @@ val gmsCoreSupport = patch("GmsCore support") {
         manifest.addPermission("$vendor.org.microg.gms.EXTENDED_ACCESS")
 
         // GmsCore authenticates as Photos' original Google signer, never the workspace's APK signer.
+        val originalSignature = originalSignerSha1()
+        log.info("GmsCore: presents the original signing certificate $originalSignature.")
+
         manifest.edit {
             val queries = findByTag("queries").firstOrNull()
                 ?: createElement("queries").also { root.appendChild(it) }
@@ -207,7 +211,7 @@ val gmsCoreSupport = patch("GmsCore support") {
 
             for ((name, value) in mapOf(
                 "$gmsCorePackage.SPOOFED_PACKAGE_NAME" to GOOGLE_PHOTOS,
-                "$gmsCorePackage.SPOOFED_PACKAGE_SIGNATURE" to "24bb24c05e47e0aefa68a58a766179d9b613a600",
+                "$gmsCorePackage.SPOOFED_PACKAGE_SIGNATURE" to originalSignature,
                 "$vendor.MICROG_PACKAGE_NAME" to gmsCorePackage,
             )) application.appendChild(createElement("meta-data").apply {
                 this["android:name"] = name
