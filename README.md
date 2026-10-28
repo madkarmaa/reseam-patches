@@ -197,6 +197,16 @@ universal patches that work on any app. Want an app supported?
 </details>
 
 <details>
+<summary><strong>ginlemon.iconpackstudio</strong></summary>
+
+| Name | Description | Version pins |
+| --- | --- | --- |
+| GmsCore support | Uses separately installed Reseam GmsCore for Google sign-in and Drive authorization. | None |
+| Unlock Pro | Unlocks Pro-only features. | None |
+
+</details>
+
+<details>
 <summary><strong>org.kustom.widget</strong></summary>
 
 | Name | Description | Version pins |
