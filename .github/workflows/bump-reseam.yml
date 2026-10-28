@@ -55,7 +55,6 @@ jobs:
                         f.write("\n")
                     EOF
                     sed -i -E "s/(id\(\"app\.reseam\.workspace\"\) version \")[^\"]+(\")/\1$LATEST\2/" settings.gradle.kts
-                    sed -i -E "s#(app\.reseam:reseam-patch-sdk:)[^\"]+#\1$LATEST#" apps/shared/build.gradle.kts
                     git diff --stat
 
             -   name: Commit and push to main
@@ -70,7 +69,7 @@ jobs:
                     fi
                     git config user.name "github-actions[bot]"
                     git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-                    git add settings.gradle.kts .github/workflows/ apps/shared/ package.json
+                    git add settings.gradle.kts .github/workflows/ package.json
                     git diff --cached --quiet && echo "Nothing to commit." && exit 0
                     git commit -m "feat: bump to reseam $LATEST"
                     # actions/checkout injects an extraheader with GITHUB_TOKEN for all

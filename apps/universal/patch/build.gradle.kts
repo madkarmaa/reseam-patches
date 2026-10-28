@@ -6,7 +6,7 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":apps:shared"))
+    compileOnly(project(":apps:shared:patch"))
 }
 
 // To rebuild the native libs into src/main/resources/lib, set ANDROID_NDK_HOME (NDK 30.0.16248370),
