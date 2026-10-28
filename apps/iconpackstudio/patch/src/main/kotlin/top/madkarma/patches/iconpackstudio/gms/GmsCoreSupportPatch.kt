@@ -7,6 +7,7 @@ package top.madkarma.patches.iconpackstudio.gms
 
 import app.reseam.patch.*
 import top.madkarma.iconpackstudio.gms.bindings.GmsCoreSupport
+import top.madkarma.patches.shared.originalSignerSha1
 
 val gmsCoreSupport = patch("GmsCore support") {
     description("Uses separately installed Reseam GmsCore for Google sign-in and Drive authorization.")
@@ -81,6 +82,10 @@ val gmsCoreSupport = patch("GmsCore support") {
             log.info("GmsCore: ${target.descriptor} uses the GmsCore account type.")
         }
 
+        // Authenticate with the original app identity instead of the bundle signer.
+        val originalSignature = originalSignerSha1()
+        log.info("GmsCore: presents the original signing certificate $originalSignature.")
+
         manifest.addPermission("org.microg.gms.permission.FAKE_PACKAGE_SIGNATURE")
         manifest.addPermission("$vendor.org.microg.gms.EXTENDED_ACCESS")
 
@@ -96,7 +101,7 @@ val gmsCoreSupport = patch("GmsCore support") {
                 ?: error("Icon Pack Studio Application is missing")
             for ((name, value) in mapOf(
                 "$gmsPackage.SPOOFED_PACKAGE_NAME" to "ginlemon.iconpackstudio",
-                "$gmsPackage.SPOOFED_PACKAGE_SIGNATURE" to "dfaab993de750d7b5430bbd4217472311d94f9d0",
+                "$gmsPackage.SPOOFED_PACKAGE_SIGNATURE" to originalSignature,
                 "$vendor.MICROG_PACKAGE_NAME" to gmsPackage,
             )) application.appendChild(createElement("meta-data").apply {
                 this["android:name"] = name

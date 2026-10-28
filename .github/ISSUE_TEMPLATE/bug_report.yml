@@ -7,6 +7,10 @@ body:
         attributes:
             value: |
                 Thanks for reporting. Fill in what you can. App and bundle versions plus logs help most.
+
+                ## Bundle made for an older Reseam version
+
+                If Reseam Manager refuses to add or update the bundle with "It's made for older version of Reseam. Ask its author to release an update", do not open an issue. This error means the bundle targets an older Reseam version than your Reseam Manager. Check the pull requests at https://github.com/madkarmaa/reseam-patches/pulls first. Open an issue only if no commit there updates the bundle to the new Reseam version.
     -   type: input
         id: app
         attributes:
