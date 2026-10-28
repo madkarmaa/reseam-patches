@@ -7,4 +7,5 @@ plugins {
 
 dependencies {
     compileOnly(project(":apps:universal:patch"))
+    compileOnly(project(":apps:shared:patch"))
 }
