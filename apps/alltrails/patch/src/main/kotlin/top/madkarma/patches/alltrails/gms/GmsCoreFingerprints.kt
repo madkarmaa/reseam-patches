@@ -8,14 +8,6 @@ import app.reseam.patch.klass
 import app.reseam.patch.method
 import app.reseam.patch.methods
 
-internal val authActivityCreate =
-    klass("com.alltrails.alltrails.ui.authentication.AuthActivity").method("onCreate")
-
-internal val signInIntentLauncher = method("signInIntentLauncher") {
-    inClass(klass("com.google.android.gms.auth.api.signin.internal.SignInHubActivity"))
-    strings("com.google.android.gms.auth.GOOGLE_SIGN_IN", "com.google.android.gms")
-}
-
 private val serviceClient = klass("serviceClient") {
     strings("Calling connect() while still connected, missing disconnect() for ")
 }

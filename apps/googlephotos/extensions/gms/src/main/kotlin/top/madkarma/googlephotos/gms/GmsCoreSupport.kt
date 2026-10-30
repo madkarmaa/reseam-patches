@@ -34,6 +34,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 private const val TAG = "ReseamPhotos"
+private const val RESEAM_VENDOR = "app.reseam"
 private const val ACCOUNT_PERMISSION_REQUEST = 0x5250
 private const val PREFERENCES = "reseam_photos_gms"
 private const val MEDIA_PERMISSION_HANDLED = "media_permission_handled"
@@ -76,7 +77,8 @@ fun check(activity: Activity, packageName: String, vendor: String) {
                 activity,
                 "GmsCore is not installed",
                 "Google Photos needs GmsCore ($packageName) to sign in. Install it, open it once and grant its permissions.",
-                "Get GmsCore",
+                // Reseam publishes only its own GmsCore; other vendor groups come from their own publishers.
+                "Get GmsCore".takeIf { vendor == RESEAM_VENDOR },
             ) {
                 open(
                     activity,
@@ -338,7 +340,7 @@ private fun prompt(
     activity: Activity,
     title: String,
     message: String,
-    action: String,
+    action: String?,
     onAction: () -> Unit,
 ) {
     if (activity.isFinishing || activity.isDestroyed) return
@@ -346,10 +348,11 @@ private fun prompt(
     val previous = activePrompt.get()
     if (previous != null && previous.isShowing) return
 
-    val dialog =
+    val builder =
         AlertDialog.Builder(activity).setTitle(title).setMessage(message).setCancelable(false)
-            .setPositiveButton(action) { _, _ -> onAction() }
-            .setNegativeButton("Ignore") { prompt, _ -> prompt.dismiss() }.create()
+            .setNegativeButton("Ignore") { prompt, _ -> prompt.dismiss() }
+    if (action != null) builder.setPositiveButton(action) { _, _ -> onAction() }
+    val dialog = builder.create()
 
     activePrompt = WeakReference(dialog)
     dialog.show()

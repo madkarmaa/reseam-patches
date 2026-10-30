@@ -3,15 +3,10 @@
 
 package top.madkarma.patches.vn.gms
 
-import app.reseam.patch.*
-
-internal val loginActivityCreate =
-    klass("com.frontrow.account.ui.login.LoginActivity").method("onCreate")
-
-internal val signInIntentLauncher = method("signInIntentLauncher") {
-    inClass(klass("com.google.android.gms.auth.api.signin.internal.SignInHubActivity"))
-    strings("com.google.android.gms.auth.GOOGLE_SIGN_IN", "com.google.android.gms")
-}
+import app.reseam.patch.Type
+import app.reseam.patch.method
+import app.reseam.patch.methods
+import app.reseam.patch.point
 
 // VN inlines the token API selection; its GetToken fallback binds this component.
 internal val tokenServiceInitializer = method("tokenServiceInitializer") {
