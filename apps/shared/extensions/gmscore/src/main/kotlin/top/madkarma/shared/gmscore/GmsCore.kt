@@ -56,6 +56,18 @@ fun serviceAction(action: String): String {
     return registeredAction(action) { context.packageManager.queryIntentServices(it, 0) }
 }
 
+/**
+ * Whether credential requests can use the identity credential service. MicroG-RE registers it under its
+ * vendor group, where it rejects Google's credential type, so requests use the legacy flows.
+ */
+@Export
+fun identityCredentialsAvailable(): Boolean {
+    if (serviceAction(CREDENTIALS_SERVICE) == CREDENTIALS_SERVICE) return true
+
+    Log.i(TAG, "Using legacy credential flows for the vendor-prefixed identity credential service")
+    return false
+}
+
 /** Points the GmsCore sign-in screen intent at its registered action, after asking for GmsCore when it is missing. */
 @Export
 fun prepareSignIn(activity: Activity, intent: Intent) {

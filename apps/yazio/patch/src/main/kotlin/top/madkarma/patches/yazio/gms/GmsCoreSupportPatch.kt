@@ -67,6 +67,11 @@ val gmsCoreSupport = patch("GmsCore support") {
         credentialsAvailable.alwaysReturn(true)
         log.info("GmsCore: ${credentialsAvailable.descriptor} enables credentials through GmsCore.")
 
+        identityCredentialsCheck.before {
+            whenFalse(call(GmsCore.identityCredentialsAvailable)) { returnFalse() }
+        }
+        log.info("GmsCore: ${identityCredentialsCheck.descriptor} uses legacy credential flows when GmsCore lacks the standard identity credential service.")
+
         frameworkCredentialResponseReader.before {
             call(
                 GmsCoreSupport.restoreFrameworkCredentialResponse,

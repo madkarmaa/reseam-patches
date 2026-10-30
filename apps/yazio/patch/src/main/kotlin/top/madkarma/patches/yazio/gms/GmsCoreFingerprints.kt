@@ -3,10 +3,7 @@
 
 package top.madkarma.patches.yazio.gms
 
-import app.reseam.patch.field
-import app.reseam.patch.klass
-import app.reseam.patch.method
-import app.reseam.patch.methods
+import app.reseam.patch.*
 
 // The client keeps its member names, but this build strips its connect() diagnostics.
 private val serviceClient = klass("serviceClient") {
@@ -51,7 +48,11 @@ internal val frameworkCredentialResponseReader = method("frameworkCredentialResp
     }
 }
 
-internal val credentialsAvailable =
-    klass("androidx.credentials.playservices.CredentialProviderPlayServicesImpl").method("isAvailableOnDevice") {
-        params()
-    }
+private val credentialProvider =
+    klass("androidx.credentials.playservices.CredentialProviderPlayServicesImpl")
+
+internal val credentialsAvailable = credentialProvider.method("isAvailableOnDevice") { params() }
+
+// Credential requests use the identity credential service when this check passes, and legacy flows otherwise.
+internal val identityCredentialsCheck =
+    credentialProvider.method("isAvailableOnDevice") { params(Type.Int) }
