@@ -45,11 +45,21 @@ namespace {
 
     std::optional<std::string> read_element(JNIEnv *const env, const jobjectArray values,
                                             const jsize index) {
-        auto *value = static_cast<jstring>(env->GetObjectArrayElement(values, index));
+        auto *const value = static_cast<jstring>(env->GetObjectArrayElement(values, index));
         std::optional<std::string> copy = read_string(env, value);
         // Callers read whole arrays, which could otherwise exhaust the local reference table.
         env->DeleteLocalRef(value);
         return copy;
+    }
+
+    std::vector<raw_open_mapping> raw_path_mappings(const path_mappings &mappings) {
+        // The installed table is never freed, so these strings outlive either native redirect.
+        return mappings | std::views::transform([](const path_mapping &mapping) {
+            return raw_open_mapping{
+                .installed = mapping.installed.c_str(),
+                .replacement = mapping.replacement.c_str(),
+            };
+        }) | std::ranges::to<std::vector>();
     }
 } // namespace
 
@@ -69,15 +79,21 @@ Java_top_madkarma_universal_signature_SignatureKiller_trapRawApkOpens(
     const std::optional<std::string> name = read_string(env, library_name);
     if (!name || name->empty() || name->contains('/')) return JNI_FALSE;
 
-    // The installed table is never freed, so its strings outlive the seccomp redirect.
-    auto paths = *mappings | std::views::transform([](const path_mapping &mapping) {
-        return raw_open_mapping{
-            .installed = mapping.installed.c_str(),
-            .replacement = mapping.replacement.c_str(),
-        };
-    }) | std::ranges::to<std::vector>();
-
+    const auto paths = raw_path_mappings(*mappings);
     return install_raw_open_redirect(name->c_str(), paths) ? JNI_TRUE : JNI_FALSE;
+}
+
+extern "C" JNIEXPORT jboolean JNICALL
+Java_top_madkarma_universal_signature_SignatureKiller_prepareApkFilesOnLibraryLoad(
+    JNIEnv *const env, jclass /*declaring_class*/, const jstring library_name) {
+    const path_mappings *const mappings = installed_path_mappings();
+    if (mappings == nullptr) return JNI_FALSE;
+
+    const auto name = read_string(env, library_name);
+    if (!name || name->empty() || name->contains('/')) return JNI_FALSE;
+
+    const auto paths = raw_path_mappings(*mappings);
+    return prepare_library_file_redirect(name->c_str(), paths) ? JNI_TRUE : JNI_FALSE;
 }
 
 extern "C" JNIEXPORT jboolean JNICALL

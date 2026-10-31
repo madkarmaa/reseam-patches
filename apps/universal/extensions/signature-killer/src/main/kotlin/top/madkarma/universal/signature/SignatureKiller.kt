@@ -61,11 +61,15 @@ fun initializeEarly(
     diagnostics: Boolean,
 ) {
     diagnosticsEnabled = diagnostics
+
     logInfo {
-        "Initializing early from the Pairip startup launcher for $packageName in " + "${processDescription()}; APK file access ${if (spoofApkPath) "on" else "off"}"
+        "Initializing before application startup for $packageName in " + "${processDescription()}; APK file access ${if (spoofApkPath) "on" else "off"}"
     }
+
     killSignature(packageName, signature)
+
     if (!spoofApkPath) return
+
     try {
         val exempted = HiddenApiBypass.addHiddenApiExemptions("Landroid/app/ActivityThread;")
         logDebug { "Hidden API exemption for ActivityThread: $exempted" }
@@ -105,7 +109,7 @@ fun killApkPath(context: Context, packageName: String) {
     killOpen(context, packageName)
 }
 
-/** Traps raw openat syscalls from a loaded library and redirects installed APK paths. */
+/** Traps raw file-open syscalls from a loaded library and redirects installed APK paths. */
 @Export
 @Synchronized
 fun redirectRawApkOpens(libraryName: String) {
@@ -114,6 +118,17 @@ fun redirectRawApkOpens(libraryName: String) {
         "Installing raw APK open redirection failed in $libraryName"
     }
     logInfo { "redirectRawApkOpens: seccomp redirect installed for $libraryName" }
+}
+
+/** Arms APK file redirection after a library loads and before Android calls its JNI_OnLoad. */
+@Export
+@Synchronized
+fun redirectApkFilesOnLibraryLoad(libraryName: String) {
+    check(fileRedirectionInstalled) { "Original APK file redirection is not installed" }
+    check(prepareApkFilesOnLibraryLoad(libraryName)) {
+        "Preparing APK file redirection failed for $libraryName"
+    }
+    logInfo { "redirectApkFilesOnLibraryLoad: waiting for $libraryName" }
 }
 
 /** Compares what Android reports with the spoofed certificate. Runs only with diagnostics on. */
@@ -396,3 +411,5 @@ private external fun hookApkPaths(
 ): Boolean
 
 private external fun trapRawApkOpens(libraryName: String): Boolean
+
+private external fun prepareApkFilesOnLibraryLoad(libraryName: String): Boolean

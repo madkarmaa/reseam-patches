@@ -12,7 +12,7 @@
             "generator": "Ninja",
             "binaryDir": "${sourceDir}/build/${presetName}",
             "installDir": "${sourceDir}/../../../../../patch/src/main/resources/lib",
-            "toolchainFile": "$env{ANDROID_NDK_HOME}/build/cmake/android.toolchain.cmake",
+            "toolchainFile": "${sourceDir}/ndk.toolchain.cmake",
             "cacheVariables": {
                 "ANDROID_PLATFORM": "android-21",
                 "ANDROID_STL": "c++_static",

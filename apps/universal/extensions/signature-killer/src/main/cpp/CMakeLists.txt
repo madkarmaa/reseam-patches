@@ -22,10 +22,13 @@ target_include_directories(bytehook SYSTEM PUBLIC
     bytehook/include
     bytehook/third_party/bsd
     bytehook/third_party/lss)
+target_include_directories(bytehook PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_library(SignatureKiller SHARED
+    code_memory.cpp
     file_hooks.cpp
     jni.cpp
+    library_file_redirect.cpp
     seccomp_open.cpp
     raw_syscall.S)
 
@@ -44,3 +47,14 @@ target_link_libraries(SignatureKiller PRIVATE bytehook log dl)
 
 # The patch module bundles the prebuilt libraries from its resources, one directory per ABI.
 install(TARGETS SignatureKiller LIBRARY DESTINATION ${ANDROID_ABI})
+
+option(SIGNATURE_KILLER_BUILD_TESTS "Build standalone native file-redirection tests" OFF)
+if (SIGNATURE_KILLER_BUILD_TESTS)
+    add_executable(signature_file_tests tests/file_redirect.cpp seccomp_open.cpp raw_syscall.S)
+    target_include_directories(signature_file_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+    target_compile_features(signature_file_tests PRIVATE cxx_std_23)
+    target_compile_options(signature_file_tests PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
+    # Static bionic tests run directly on the matching Linux/Android CPU, without an emulator.
+    target_link_options(signature_file_tests PRIVATE -static -Wl,--wrap=dl_iterate_phdr)
+    target_link_libraries(signature_file_tests PRIVATE dl)
+endif ()

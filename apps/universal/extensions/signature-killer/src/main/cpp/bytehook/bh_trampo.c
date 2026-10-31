@@ -22,6 +22,7 @@
 // Created by Li Zhang (zhangli.foxleezh@bytedance.com) on 2020-06-21.
 
 #include "bh_trampo.h"
+#include "code_memory.h"
 
 #include <inttypes.h>
 #include <pthread.h>
@@ -48,7 +49,6 @@
 #include "linux_syscall_support.h"
 #pragma clang diagnostic pop
 
-#define BH_TRAMPO_BLOCK_NAME      "bytehook-plt-trampolines"
 #define BH_TRAMPO_BLOCK_SIZE      4096
 #define BH_TRAMPO_ALIGN           4
 #define BH_TRAMPO_STACK_NAME      "bytehook-stack"
@@ -183,13 +183,11 @@ static void *bh_trampo_allocate(size_t sz) {
     // get/create an usable block
     if (remaining < sz) {
         // create new memory map
-        block = sys_mmap(NULL, BH_TRAMPO_BLOCK_SIZE, PROT_READ | PROT_WRITE | PROT_EXEC,
-                         MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+        block = signature_allocate_code_block(BH_TRAMPO_BLOCK_SIZE);
         if (MAP_FAILED == block) {
             ret = NULL;
             goto end;
         }
-        prctl(PR_SET_VMA, PR_SET_VMA_ANON_NAME, block, BH_TRAMPO_BLOCK_SIZE, BH_TRAMPO_BLOCK_NAME);
 
         // update the remaining size info
         remaining = BH_TRAMPO_BLOCK_SIZE;

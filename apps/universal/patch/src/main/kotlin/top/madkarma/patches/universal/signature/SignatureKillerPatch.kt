@@ -121,7 +121,6 @@ val spoofApkFileAccess = patch("Signature Killer (APK file access)") {
         val packageName =
             manifest.packageName ?: error("SignatureKiller: manifest has no package name")
         val signers = files.signers()
-        var originalSize = 0L
         val assetPaths = mutableSetOf<String>()
 
         for (component in files.components()) {
@@ -136,10 +135,10 @@ val spoofApkFileAccess = patch("Signature Killer (APK file access)") {
 
             if (!assetPaths.add(assetPath)) error("SignatureKiller: duplicate original component: $component")
 
-            val original = files.component(component).sourceStream().use { it.readBytes() }
-            files.writeStored(assetPath, original)
-            originalSize += original.size
-            log.info("SignatureKiller: embeds original $component (${splitName?.let { "split $it" } ?: "base"}, ${original.size} bytes) as $assetPath.")
+            files.component(component).sourceStream().use { original ->
+                files.writeStored(assetPath, original)
+            }
+            log.info("SignatureKiller: embeds original $component (${splitName?.let { "split $it" } ?: "base"}) as $assetPath.")
         }
 
         val nativeLibraries = files.components().flatMap { files.component(it).list() }
@@ -165,13 +164,12 @@ val spoofApkFileAccess = patch("Signature Killer (APK file access)") {
 
         for (abi in nativeAbis) {
             val path = "lib/$abi/libSignatureKiller.so"
-            val bytes = SignatureResources.javaClass.classLoader.getResourceAsStream(path)
-                ?.use { it.readBytes() }
+            val library = SignatureResources.javaClass.classLoader.getResourceAsStream(path)
                 ?: error("SignatureKiller: bundled native lib missing: $path")
-            files.write(path, bytes)
+            library.use { files.write(path, it) }
         }
 
-        log.info("SignatureKiller: hooked $packageName with APK-path spoofing (${assetPaths.size} original component(s), $originalSize bytes, ${signers.size} signer(s)).")
+        log.info("SignatureKiller: hooked $packageName with APK-path spoofing (${assetPaths.size} original component(s), ${signers.size} signer(s)).")
     }
 }
 

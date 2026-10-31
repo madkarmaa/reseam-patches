@@ -3,6 +3,8 @@
 
 # CLion's default check groups, minus checks that contradict what this library must do:
 # - cert-dcl50-cpp, cppcoreguidelines-pro-type-vararg: the proxies match libc's variadic open().
+# - modernize-avoid-variadic-functions: the same required libc and Android logging ABI.
+# - portability-avoid-pragma-once: all four Android NDK targets support this header convention.
 # - cppcoreguidelines-pro-bounds-array-to-pointer-decay: va_list is an array type on x86_64.
 # - cppcoreguidelines-avoid-non-const-global-variables: hook and signal state is process-wide,
 #   since libc proxies and signal handlers receive no context.
@@ -41,10 +43,12 @@ Checks: >
   -misc-misplaced-const,
   -misc-unused-parameters,
   modernize-*,
+  -modernize-avoid-variadic-functions,
   -modernize-use-trailing-return-type,
   performance-*,
   -performance-no-int-to-ptr,
   portability-*,
+  -portability-avoid-pragma-once,
   readability-*,
   -readability-braces-around-statements,
   -readability-identifier-length,
