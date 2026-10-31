@@ -38,38 +38,6 @@ signature_raw_syscall:
     ldr r5, [sp, #24]
     svc #0
     pop {r4, r5, r7, pc}
-#elif defined(__x86_64__)
-.p2align 4
-signature_raw_syscall:
-    mov %rdi, %rax
-    mov %rsi, %rdi
-    mov %rdx, %rsi
-    mov %rcx, %rdx
-    mov %r8, %r10
-    mov %r9, %r8
-    mov 8(%rsp), %r9
-    syscall
-    ret
-#elif defined(__i386__)
-.p2align 4
-signature_raw_syscall:
-    push %ebx
-    push %esi
-    push %edi
-    push %ebp
-    mov 20(%esp), %eax
-    mov 24(%esp), %ebx
-    mov 28(%esp), %ecx
-    mov 32(%esp), %edx
-    mov 36(%esp), %esi
-    mov 40(%esp), %edi
-    mov 44(%esp), %ebp
-    int $0x80
-    pop %ebp
-    pop %edi
-    pop %esi
-    pop %ebx
-    ret
 #else
 #error Unsupported raw syscall architecture
 #endif

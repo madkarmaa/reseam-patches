@@ -2,7 +2,8 @@ MadKarma patches NOTICE
 
 Copyright (C) 2026 MadKarma <me@madkarma.top>
 
-Project-owned material is licensed under AGPL-3.0-or-later. MadKarma patches
+Except where otherwise identified, project-owned material is licensed under
+AGPL-3.0-or-later. MadKarma patches
 is an independent, modified patch bundle and is not an official Reseam
 release. Existing author attributions are preserved in the source headers.
 
@@ -37,18 +38,49 @@ This license grants no rights under trademark law to use the name
 
 Third-party material
 
-xHook (xhook.c, xhook.h, and xh_*):
-Copyright (c) 2018-present, iQIYI, Inc. All rights reserved.
-License: MIT; see LICENSES/MIT.txt. Original notices remain in the source.
+Native sources are under apps/universal/extensions/signature-killer/src/main/cpp.
+Their original notices are also included in signed bundles, under
+signature-killer/ beside this NOTICE file.
 
-queue.h:
+ByteHook 1.0.10:
+Copyright (c) 2020-2024 ByteDance, Inc.
+License: MIT; see LICENSES/MIT.txt. Original notices remain in the source.
+The ARM-only port and trampoline allocator are locally modified.
+
+ShadowHook 2.0.1:
+Copyright (c) 2021-2026 ByteDance Inc.
+Source: https://github.com/bytedance/android-inline-hook/tree/v2.0.1
+License: MIT; see LICENSES/MIT.txt and signature-killer/shadowhook/LICENSE.
+The CMake configuration and xDL architecture handling are locally modified
+for this project's ARM-only build. Local vendor changes retain MIT terms;
+Copyright (c) 2026 MadKarma <me@madkarma.top>.
+
+xDL (included in ShadowHook):
+Copyright (c) 2020-2025 HexHacking Team.
+License: MIT; see signature-killer/shadowhook/third_party/xdl/LICENSE.
+
+Linux syscall support (included in ByteHook and ShadowHook):
+Copyright (c) 2005-2011 Google Inc. All rights reserved.
+License: BSD-3-Clause; the original notice, conditions and disclaimer are
+preserved in each third_party/lss/LICENSE.
+
+queue.h (included in ByteHook and ShadowHook):
 Copyright (c) 1991, 1993 The Regents of the University of California.
 All rights reserved.
 License: BSD-3-Clause; see LICENSES/BSD-3-Clause.txt.
 
-tree.h:
+tree.h (included in ByteHook and ShadowHook):
 Copyright 2002 Niels Provos <provos@citi.umich.edu>. All rights reserved.
 License: BSD-2-Clause; see LICENSES/BSD-2-Clause.txt.
+
+LLVM runtime components from Android NDK 30.0.16248370:
+libc++, libc++abi, libunwind and compiler-rt; the LLVM Project contributors.
+License: Apache-2.0 WITH LLVM-exception; applicable legacy code also offers
+MIT terms. See LICENSES/Apache-2.0.txt, LICENSES/LLVM-exception.txt and the
+upstream runtime notices in signature-killer/llvm-runtime.NOTICE.
+libSignatureKiller.so includes the static C++ runtime; libshadowhook.so
+includes compiler runtime support. libshadowhook_nothing.so is an MIT-only
+stub built without runtime libraries.
 
 Gradle wrapper:
 Copyright 2015-2024 the original authors.

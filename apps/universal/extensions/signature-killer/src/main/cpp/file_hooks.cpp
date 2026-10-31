@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-// Each file includes what it uses, even when another header already provides it.
 // ReSharper disable CppUnusedIncludeDirective
 #include "file_hooks.h"
 
@@ -261,7 +260,7 @@ const path_mappings *installed_path_mappings() {
     return mappings.load(std::memory_order_acquire);
 }
 
-bool install_file_redirect(std::unique_ptr<path_mappings> table) {
+bool install_file_redirect(std::unique_ptr<path_mappings> table, const bool hook_libc) {
     // The extension installs one table per process.
     if (const path_mappings *expected = nullptr;
         !mappings.compare_exchange_strong(expected, table.get(), std::memory_order_release,
@@ -273,5 +272,5 @@ bool install_file_redirect(std::unique_ptr<path_mappings> table) {
     // The process now owns the table.
     const path_mappings *const installed = table.release();
     LOG_INFO("Installed %zu path mappings", installed->size());
-    return register_file_hooks();
+    return !hook_libc || register_file_hooks();
 }

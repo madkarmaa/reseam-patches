@@ -32,20 +32,6 @@
             "cacheVariables": {
                 "ANDROID_ABI": "armeabi-v7a"
             }
-        },
-        {
-            "name": "x86",
-            "inherits": "android",
-            "cacheVariables": {
-                "ANDROID_ABI": "x86"
-            }
-        },
-        {
-            "name": "x86_64",
-            "inherits": "android",
-            "cacheVariables": {
-                "ANDROID_ABI": "x86_64"
-            }
         }
     ],
     "buildPresets": [
@@ -56,14 +42,6 @@
         {
             "name": "armeabi-v7a",
             "configurePreset": "armeabi-v7a"
-        },
-        {
-            "name": "x86",
-            "configurePreset": "x86"
-        },
-        {
-            "name": "x86_64",
-            "configurePreset": "x86_64"
         }
     ]
 }

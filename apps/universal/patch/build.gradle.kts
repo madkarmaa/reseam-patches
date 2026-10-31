@@ -13,6 +13,6 @@ dependencies {
 // put CMake 3.22+ and Ninja on PATH, and run this from
 // apps/universal/extensions/signature-killer/src/main/cpp:
 //
-// for abi in armeabi-v7a arm64-v8a x86 x86_64; do
+// for abi in armeabi-v7a arm64-v8a; do
 //     cmake --preset $abi && cmake --build --preset $abi --target install || break
 // done

@@ -252,3 +252,11 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Native libraries packaged in the universal patch bundle
+apps/universal/patch/src/main/resources/lib/**
+!apps/universal/patch/src/main/resources/lib/
+!apps/universal/patch/src/main/resources/lib/**/
+!apps/universal/patch/src/main/resources/lib/**/libSignatureKiller.so
+!apps/universal/patch/src/main/resources/lib/**/libshadowhook.so
+!apps/universal/patch/src/main/resources/lib/**/libshadowhook_nothing.so

@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-// Each file includes what it uses, even when another header already provides it.
 // ReSharper disable CppUnusedIncludeDirective
 #include <jni.h>
 
@@ -17,19 +16,21 @@
 #include "file_hooks.h"
 #include "logging.h"
 #include "seccomp_open.h"
+#include "library_view.h"
 // ReSharper restore CppUnusedIncludeDirective
 
 #ifdef __aarch64__
 #define PROCESS_ABI "arm64-v8a"
 #elifdef __arm__
 #define PROCESS_ABI "armeabi-v7a"
-#elifdef __x86_64__
-#define PROCESS_ABI "x86_64"
-#elifdef __i386__
-#define PROCESS_ABI "x86"
 #else
 #error Unsupported Android ABI
 #endif
+
+// Resolve this library's initialization locally rather than a dependency's Java bridge.
+extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * /*vm*/, void * /*reserved*/) {
+    return JNI_VERSION_1_6;
+}
 
 namespace {
     std::optional<std::string> read_string(JNIEnv *const env, const jstring value) {
@@ -72,7 +73,8 @@ Java_top_madkarma_universal_signature_SignatureKiller_setNativeDiagnostics(
 
 extern "C" JNIEXPORT jboolean JNICALL
 Java_top_madkarma_universal_signature_SignatureKiller_trapRawApkOpens(
-    JNIEnv *const env, jclass /*declaring_class*/, const jstring library_name) {
+    JNIEnv *const env, jclass /*declaring_class*/, const jstring library_name,
+    const jboolean redirect_contents) {
     const path_mappings *const mappings = installed_path_mappings();
     if (mappings == nullptr) return JNI_FALSE;
 
@@ -80,12 +82,21 @@ Java_top_madkarma_universal_signature_SignatureKiller_trapRawApkOpens(
     if (!name || name->empty() || name->contains('/')) return JNI_FALSE;
 
     const auto paths = raw_path_mappings(*mappings);
-    return install_raw_open_redirect(name->c_str(), paths) ? JNI_TRUE : JNI_FALSE;
+    if (redirect_contents == JNI_TRUE && !prepare_library_view(name->c_str())) return JNI_FALSE;
+    
+    const raw_redirect_options options{
+        .preserve_descriptor_identity = redirect_contents == JNI_TRUE,
+        .redirect_file_contents = redirect_contents == JNI_TRUE,
+        .snapshot_proc_file = redirect_contents == JNI_TRUE ? snapshot_process_file : nullptr,
+    };
+    
+    return install_raw_open_redirect(name->c_str(), paths, options) ? JNI_TRUE : JNI_FALSE;
 }
 
 extern "C" JNIEXPORT jboolean JNICALL
 Java_top_madkarma_universal_signature_SignatureKiller_prepareApkFilesOnLibraryLoad(
-    JNIEnv *const env, jclass /*declaring_class*/, const jstring library_name) {
+    JNIEnv *const env, jclass /*declaring_class*/, const jstring library_name,
+    const jboolean redirect_contents) {
     const path_mappings *const mappings = installed_path_mappings();
     if (mappings == nullptr) return JNI_FALSE;
 
@@ -93,13 +104,14 @@ Java_top_madkarma_universal_signature_SignatureKiller_prepareApkFilesOnLibraryLo
     if (!name || name->empty() || name->contains('/')) return JNI_FALSE;
 
     const auto paths = raw_path_mappings(*mappings);
-    return prepare_library_file_redirect(name->c_str(), paths) ? JNI_TRUE : JNI_FALSE;
+    return prepare_library_file_redirect(name->c_str(), paths, redirect_contents == JNI_TRUE)
+            ? JNI_TRUE : JNI_FALSE;
 }
 
 extern "C" JNIEXPORT jboolean JNICALL
 Java_top_madkarma_universal_signature_SignatureKiller_hookApkPaths(
     JNIEnv *const env, jclass /*declaring_class*/, const jobjectArray installed,
-    const jobjectArray replacements) {
+    const jobjectArray replacements, const jboolean hook_libc) {
     // Both arrays come from the extension's component list.
     if (installed == nullptr || replacements == nullptr) {
         LOG_ERROR("Rejected path mappings: an array is null");
@@ -135,5 +147,5 @@ Java_top_madkarma_universal_signature_SignatureKiller_hookApkPaths(
         });
     }
 
-    return install_file_redirect(std::move(table)) ? JNI_TRUE : JNI_FALSE;
+    return install_file_redirect(std::move(table), hook_libc == JNI_TRUE) ? JNI_TRUE : JNI_FALSE;
 }

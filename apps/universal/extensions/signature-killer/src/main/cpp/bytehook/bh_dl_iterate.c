@@ -89,7 +89,7 @@ static int bh_dl_iterate_by_linker(int (*callback)(struct dl_phdr_info *, size_t
     return 0;
 }
 
-#if (defined(__arm__) || defined(__i386__)) && __ANDROID_API__ < __ANDROID_API_L__
+#if defined(__arm__) && __ANDROID_API__ < __ANDROID_API_L__
 
 static uintptr_t bh_dl_iterate_get_min_vaddr(struct dl_phdr_info *info) {
     uintptr_t min_vaddr = UINTPTR_MAX;
@@ -194,8 +194,8 @@ end:
 #endif
 
 int bh_dl_iterate(int (*callback)(struct dl_phdr_info *, size_t, void *), void *data) {
-    // iterate by /proc/self/maps in Android 4.x (Android 4.x only supports arm32 and x86)
-#if (defined(__arm__) || defined(__i386__)) && __ANDROID_API__ < __ANDROID_API_L__
+    // iterate by /proc/self/maps in Android 4.x (ARM32 on Android 4.x)
+#if defined(__arm__) && __ANDROID_API__ < __ANDROID_API_L__
     if (bh_util_get_api_level() < __ANDROID_API_L__) return bh_dl_iterate_by_maps(callback, data);
 #endif
 

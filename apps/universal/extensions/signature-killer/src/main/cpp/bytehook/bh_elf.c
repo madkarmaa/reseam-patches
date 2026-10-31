@@ -56,14 +56,6 @@
 #define BH_ELF_R_JUMP_SLOT R_AARCH64_JUMP_SLOT
 #define BH_ELF_R_GLOB_DAT  R_AARCH64_GLOB_DAT
 #define BH_ELF_R_ABS       R_AARCH64_ABS64
-#elif defined(__i386__)
-#define BH_ELF_R_JUMP_SLOT R_386_JMP_SLOT
-#define BH_ELF_R_GLOB_DAT  R_386_GLOB_DAT
-#define BH_ELF_R_ABS       R_386_32
-#elif defined(__x86_64__)
-#define BH_ELF_R_JUMP_SLOT R_X86_64_JUMP_SLOT
-#define BH_ELF_R_GLOB_DAT  R_X86_64_GLOB_DAT
-#define BH_ELF_R_ABS       R_X86_64_64
 #endif
 
 #if defined(__LP64__)
