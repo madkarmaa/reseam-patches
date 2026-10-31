@@ -96,7 +96,7 @@ namespace {
         return pathname;
     }
 
-    bool needs_mode(const int flags) {
+    bool needs_mode(const unsigned flags) {
         // Only creation flags require the optional mode argument.
         if ((flags & O_CREAT) != 0) return true;
 #ifdef O_TMPFILE
@@ -111,6 +111,8 @@ namespace {
     //
     // Each proxy also serves the matching large-file symbol, which has the same signature. bytehook
     // keeps one hook chain per import slot, so forwarding still reaches the symbol that was called.
+    // The exported libc ABI requires C varargs.
+    // NOLINTNEXTLINE(cert-dcl50-cpp)
     int open_proxy(const char *const pathname, const int flags, ...) {
         BYTEHOOK_STACK_SCOPE();
         // Like bionic, read the mode only when the flags require it and forward zero otherwise.
@@ -127,6 +129,7 @@ namespace {
     }
 
     // Preserve the directory descriptor when forwarding relative paths.
+    // NOLINTNEXTLINE(cert-dcl50-cpp)
     int openat_proxy(const int directory, const char *const pathname, const int flags, ...) {
         BYTEHOOK_STACK_SCOPE();
         mode_t mode = 0;
@@ -162,6 +165,7 @@ namespace {
     }
 
     // Some libraries open files through libc's syscall() to bypass the open wrappers.
+    // NOLINTNEXTLINE(cert-dcl50-cpp)
     long syscall_proxy(const long number, ...) {
         BYTEHOOK_STACK_SCOPE();
         // Like bionic, forward six arguments, since the caller's count is unknown.
@@ -175,9 +179,9 @@ namespace {
             pathname = reinterpret_cast<long>(redirect_file(
                     reinterpret_cast<const char *>(pathname), function, BYTEHOOK_RETURN_ADDRESS()));
         };
-        if (number == __NR_openat) redirect(arguments[1], "syscall(openat)");
+        if (number == __NR_openat) redirect(std::get<1>(arguments), "syscall(openat)");
 #ifdef __NR_open
-        if (number == __NR_open) redirect(arguments[0], "syscall(open)");
+        if (number == __NR_open) redirect(std::get<0>(arguments), "syscall(open)");
 #endif
 
         const auto [first, second, third, fourth, fifth, sixth] = arguments;
@@ -206,9 +210,10 @@ namespace {
     // Reports each library whose import bytehook replaced, now or when the library loads later.
     // bytehook_hooked_t fixes the signature.
     // ReSharper disable once CppParameterMayBeConstPtrOrRef
+    // NOLINTNEXTLINE(misc-const-correctness)
     void log_hook_result(bytehook_stub_t /*task*/, const int status,
                          const char *const caller_path_name, const char *const symbol,
-                         void * /*proxy*/, void *const previous, void * /*argument*/) {
+                         void * /*proxy*/, void *const previous, void * /*argument*/) { // NOLINT(misc-const-correctness)
         // bytehook reports the resolved original separately after a successful hook.
         if (status == BYTEHOOK_STATUS_CODE_ORIG_ADDR) return;
 

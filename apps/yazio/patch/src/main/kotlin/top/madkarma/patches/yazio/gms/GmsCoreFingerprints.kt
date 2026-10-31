@@ -3,17 +3,7 @@
 
 package top.madkarma.patches.yazio.gms
 
-import app.reseam.patch.field
-import app.reseam.patch.klass
-import app.reseam.patch.method
-import app.reseam.patch.methods
-
-internal val mainActivityCreate = klass("yazio.feature.MainActivity").method("onCreate")
-
-internal val signInIntentLauncher = method("signInIntentLauncher") {
-    inClass(klass("com.google.android.gms.auth.api.signin.internal.SignInHubActivity"))
-    strings("com.google.android.gms.auth.GOOGLE_SIGN_IN", "com.google.android.gms")
-}
+import app.reseam.patch.*
 
 // The client keeps its member names, but this build strips its connect() diagnostics.
 private val serviceClient = klass("serviceClient") {
@@ -58,7 +48,11 @@ internal val frameworkCredentialResponseReader = method("frameworkCredentialResp
     }
 }
 
-internal val credentialsAvailable =
-    klass("androidx.credentials.playservices.CredentialProviderPlayServicesImpl").method("isAvailableOnDevice") {
-        params()
-    }
+private val credentialProvider =
+    klass("androidx.credentials.playservices.CredentialProviderPlayServicesImpl")
+
+internal val credentialsAvailable = credentialProvider.method("isAvailableOnDevice") { params() }
+
+// Credential requests use the identity credential service when this check passes, and legacy flows otherwise.
+internal val identityCredentialsCheck =
+    credentialProvider.method("isAvailableOnDevice") { params(Type.Int) }

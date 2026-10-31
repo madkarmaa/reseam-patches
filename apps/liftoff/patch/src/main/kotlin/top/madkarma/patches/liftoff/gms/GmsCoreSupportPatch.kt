@@ -5,12 +5,12 @@
 
 package top.madkarma.patches.liftoff.gms
 
-import app.reseam.patch.after
 import app.reseam.patch.alwaysReturn
 import app.reseam.patch.before
 import app.reseam.patch.patch
-import top.madkarma.liftoff.gms.bindings.GmsCoreSupport
+import top.madkarma.patches.shared.gmscore.signInThroughGmsCore
 import top.madkarma.patches.shared.originalSignerSha1
+import top.madkarma.shared.gmscore.bindings.GmsCore
 
 val gmsCoreSupport = patch("GmsCore support") {
     description("Signs in with Google through separately installed Reseam GmsCore.")
@@ -32,12 +32,7 @@ val gmsCoreSupport = patch("GmsCore support") {
         ) { "gmsCoreVendorGroupId must be a vendor group such as app.reseam" }
         val gmsPackage = "$vendor.android.gms"
 
-        check(
-            signInIntentLauncher.method.replaceAllStrings(
-                "com.google.android.gms", gmsPackage
-            ) > 0
-        )
-        log.info("GmsCore: ${signInIntentLauncher.descriptor} opens the GmsCore sign-in activity.")
+        signInThroughGmsCore(vendor)
 
         check(
             tokenServiceInitializer.method.replaceAllStrings(
@@ -50,11 +45,11 @@ val gmsCoreSupport = patch("GmsCore support") {
         log.info("GmsCore: ${modernTokenApiAvailable.descriptor} selects the supported GetToken API.")
 
         serviceConfigurationConstructor.before {
-            val packageOverride =
-                call(GmsCoreSupport.servicePackageOverride, param(1), string(vendor))
+            val packageOverride = call(GmsCore.servicePackageOverride, param(1))
 
             whenNotNull(packageOverride) {
                 param(0).assign(packageOverride)
+                param(1).assign(call(GmsCore.serviceAction, param(1)))
                 param(4).assign(bool(false))
             }
         }
@@ -95,8 +90,5 @@ val gmsCoreSupport = patch("GmsCore support") {
                 this["android:value"] = value
             })
         }
-
-        mainActivityCreate.after { call(GmsCoreSupport.check, thisObject, string(gmsPackage)) }
-        log.info("GmsCore: ${mainActivityCreate.descriptor} checks that $gmsPackage is installed.")
     }
 }

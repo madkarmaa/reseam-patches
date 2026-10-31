@@ -8,14 +8,6 @@ import app.reseam.patch.klass
 import app.reseam.patch.method
 import app.reseam.patch.methods
 
-internal val homeActivityCreate =
-    klass("ginlemon.iconpackstudio.editor.homeActivity.HomeActivity").method("onCreate")
-
-internal val signInActivityCreate =
-    klass("com.google.android.gms.auth.api.signin.internal.SignInHubActivity").method("onCreate") {
-        strings("com.google.android.gms")
-    }
-
 private val serviceClient = klass("serviceClient") {
     strings("Calling connect() while still connected, missing disconnect() for ")
 }

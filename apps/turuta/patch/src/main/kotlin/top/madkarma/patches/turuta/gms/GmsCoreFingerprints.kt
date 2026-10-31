@@ -5,15 +5,6 @@ package top.madkarma.patches.turuta.gms
 
 import app.reseam.patch.*
 
-internal val mainActivityCreate = klass("pe.tumicro.android.MainActivity").method(
-    "onCreate", inherited = true
-) { params("android.os.Bundle") }
-
-internal val signInActivityCreate =
-    klass("com.google.android.gms.auth.api.signin.internal.SignInHubActivity").method("onCreate") {
-        strings("com.google.android.gms")
-    }
-
 internal val tokenServiceInitializer = method("tokenServiceInitializer") {
     strings("GoogleAuthUtil", "com.google.android.gms.auth.GetToken")
     name("<clinit>")

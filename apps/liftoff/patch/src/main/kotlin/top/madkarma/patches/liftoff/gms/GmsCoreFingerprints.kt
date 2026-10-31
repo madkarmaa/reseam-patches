@@ -8,13 +8,6 @@ import app.reseam.patch.klass
 import app.reseam.patch.method
 import app.reseam.patch.methods
 
-internal val mainActivityCreate = klass("com.gymbros.app.MainActivity").method("onCreate")
-
-internal val signInIntentLauncher = method("signInIntentLauncher") {
-    inClass(klass("com.google.android.gms.auth.api.signin.internal.SignInHubActivity"))
-    strings("com.google.android.gms.auth.GOOGLE_SIGN_IN", "com.google.android.gms")
-}
-
 internal val tokenServiceInitializer = method("tokenServiceInitializer") {
     strings("com.google.android.gms.auth.GetToken")
     name("<clinit>")

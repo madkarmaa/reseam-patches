@@ -6,8 +6,9 @@
 package top.madkarma.patches.turuta.gms
 
 import app.reseam.patch.*
+import top.madkarma.patches.shared.gmscore.signInThroughGmsCore
 import top.madkarma.patches.shared.originalSignerSha1
-import top.madkarma.turuta.gms.bindings.GmsCoreSupport
+import top.madkarma.shared.gmscore.bindings.GmsCore
 
 val gmsCoreSupport = patch("GmsCore support") {
     description("Signs in through separately installed Reseam GmsCore.")
@@ -31,10 +32,13 @@ val gmsCoreSupport = patch("GmsCore support") {
         }
         val gmsPackage = "$vendor.android.gms"
 
-        check(signInActivityCreate.method.replaceAllStrings("com.google.android.gms", gmsPackage) > 0)
-        log.info("GmsCore: ${signInActivityCreate.descriptor} opens the GmsCore sign-in activity.")
+        signInThroughGmsCore(vendor)
 
-        check(tokenServiceInitializer.method.replaceAllStrings("com.google.android.gms", gmsPackage) > 0)
+        check(
+            tokenServiceInitializer.method.replaceAllStrings(
+                "com.google.android.gms", gmsPackage
+            ) > 0
+        )
         log.info("GmsCore: ${tokenServiceInitializer.descriptor} binds to the GmsCore GetToken service.")
 
         modernTokenApiAvailable.alwaysReturn(false)
@@ -46,11 +50,16 @@ val gmsCoreSupport = patch("GmsCore support") {
         serviceConfigurationConstructor.before {
             local(packageOverride).assign(
                 call(
-                    GmsCoreSupport.servicePackageOverride, paramOfType(Type.String), string(vendor)
+                    GmsCore.servicePackageOverride, paramOfType(Type.String)
                 )
             )
 
             whenNotNull(local(packageOverride)) {
+                paramOfType(Type.String).assign(
+                    call(
+                        GmsCore.serviceAction, paramOfType(Type.String)
+                    )
+                )
                 paramOfType(Type.Boolean).assign(bool(false))
             }
         }
@@ -97,8 +106,5 @@ val gmsCoreSupport = patch("GmsCore support") {
                 this["android:value"] = value
             })
         }
-
-        mainActivityCreate.after { call(GmsCoreSupport.check, thisObject, string(gmsPackage)) }
-        log.info("GmsCore: ${mainActivityCreate.descriptor} checks that $gmsPackage is installed.")
     }
 }
