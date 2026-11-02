@@ -1,0 +1,5 @@
+<resources>
+    <string name="section_behavior">App behavior</string>
+    <string name="disable_auto_launch">Disable auto-launch</string>
+    <string name="disable_auto_launch_summary">Stop automatic after-call screens and launches for inactive users.</string>
+</resources>
