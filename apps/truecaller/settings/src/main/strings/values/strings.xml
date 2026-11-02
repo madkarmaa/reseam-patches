@@ -8,4 +8,6 @@
     <string name="hide_premium">Hide Premium tab</string>
     <string name="hide_family">Hide Family button</string>
     <string name="hide_family_summary">Hide Family Protection in the bottom bar and call-log header.</string>
+    <string name="hide_scam_feed">Hide Scam Feed</string>
+    <string name="hide_scam_feed_summary">Hide the feed and its tab, and stop new Scam Feed notifications.</string>
 </resources>
