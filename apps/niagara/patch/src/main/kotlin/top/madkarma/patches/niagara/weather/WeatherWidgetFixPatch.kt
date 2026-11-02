@@ -6,10 +6,11 @@
 package top.madkarma.patches.niagara.weather
 
 import app.reseam.patch.after
+import app.reseam.patch.className
 import app.reseam.patch.patch
 import app.reseam.patch.replace
-import top.madkarma.extensions.bindings.WeatherApi
 import top.madkarma.extensions.bindings.WeatherApiKeyField
+import top.madkarma.extensions.bindings.WeatherRepository
 import top.madkarma.patches.niagara.pro.unlockPro
 import top.madkarma.patches.shared.setStringEverywhere
 
@@ -40,17 +41,33 @@ val weatherWidgetFix = patch("Weather widget fix") {
 
         log.info("Weather widget fix: ${weatherSheet.descriptor} links to the WeatherAPI.com terms.")
 
+        val hasResponseParser = responseParsers.all.isNotEmpty()
+
+        val parserName = if (hasResponseParser) parseResponse.name else ""
+
+        val readerClassName =
+            if (hasResponseParser) "" else className(cachedResponseConstructor.owner)
+
+        val readerMethodName = if (hasResponseParser) "" else readCachedResponse.name
+        val readerResultFieldName = if (hasResponseParser) "" else cachedResultValue.name
+
         weatherFetch.replace {
-            val context = thisObject.field(weatherContext)
-            val api = call(WeatherApi.create, context)
-            val json = api.call(WeatherApi.fetch)
-            val timestamp = api.call(WeatherApi.now)
-            val forecast = thisObject.call(parseResponse, json, timestamp)
+            val repository =
+                if (weatherFetch.method.isStatic) paramOfType(weatherContext.owner) else thisObject
 
-            thisObject.call(cacheResponse, json)
-            thisObject.call(publishState, forecast)
-
-            returnValue(forecast)
+            returnValue(
+                call(
+                    WeatherRepository.fetchForecast,
+                    repository,
+                    repository.field(weatherContext),
+                    string(parserName),
+                    string(cacheResponse.name),
+                    string(publishState.name),
+                    string(readerClassName),
+                    string(readerMethodName),
+                    string(readerResultFieldName),
+                )
+            )
         }
         log.info("Weather widget fix: ${weatherFetch.descriptor} fetches and caches WeatherAPI.com forecasts.")
 
