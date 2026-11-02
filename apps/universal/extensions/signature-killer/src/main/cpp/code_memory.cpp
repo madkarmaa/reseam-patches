@@ -1,15 +1,15 @@
 // SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+// ReSharper disable CppUnusedIncludeDirective
 #include "code_memory.h"
-
 #include <dlfcn.h>
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <unistd.h>
-
 #include <utility>
+// ReSharper restore CppUnusedIncludeDirective
 
 namespace {
     void *map_library_code(const size_t size) {

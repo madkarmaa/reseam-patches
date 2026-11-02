@@ -16,6 +16,9 @@
 # - misc-include-cleaner: it has no mappings for bionic's internal headers.
 # - misc-misplaced-const: const JNI handle parameters deliberately make the handle const.
 # - readability-braces-around-statements: single-statement guards stay without braces.
+# - cppcoreguidelines-pro-type-member-init.IgnoreArrays: the PATH_MAX scratch buffers stay
+#   uninitialized, because the kernel fills only the prefix that is later read, and zeroing them
+#   would cost a full PATH_MAX write on the signal stack.
 Checks: >
   -*,
   bugprone-*,
@@ -59,3 +62,5 @@ CheckOptions:
   # The logging macros use the standard do-while(false) statement wrapper.
   cppcoreguidelines-avoid-do-while.IgnoreMacros: true
   readability-function-cognitive-complexity.IgnoreMacros: true
+  # Signal-safe scratch buffers stay uninitialized; see the header comment.
+  cppcoreguidelines-pro-type-member-init.IgnoreArrays: true

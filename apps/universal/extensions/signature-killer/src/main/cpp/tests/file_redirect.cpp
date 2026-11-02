@@ -254,7 +254,7 @@ namespace {
         assert(munmap(reinterpret_cast<void *>(anonymous), page_size) == 0);
     }
 
-    int proc_snapshot(const proc_file file) {
+    int proc_snapshot(const proc_file file, int) {
         const char *const content = file == proc_file::maps ? "maps snapshot" : "status snapshot";
         const long descriptor = signature_raw_syscall(__NR_memfd_create,
                 reinterpret_cast<long>("proc-test"), MFD_CLOEXEC, 0, 0, 0, 0);

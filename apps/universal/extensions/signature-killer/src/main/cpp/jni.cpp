@@ -17,6 +17,7 @@
 #include "logging.h"
 #include "seccomp_open.h"
 #include "library_view.h"
+#include "native_file_hooks.h"
 // ReSharper restore CppUnusedIncludeDirective
 
 #ifdef __aarch64__
@@ -82,15 +83,22 @@ Java_top_madkarma_universal_signature_SignatureKiller_trapRawApkOpens(
     if (!name || name->empty() || name->contains('/')) return JNI_FALSE;
 
     const auto paths = raw_path_mappings(*mappings);
-    if (redirect_contents == JNI_TRUE && !prepare_library_view(name->c_str())) return JNI_FALSE;
-    
+
+    if (redirect_contents == JNI_TRUE && !prepare_library_view(name->c_str(), {
+            .contains_address = raw_redirect_contains_address,
+            .filter_count = raw_redirect_filter_count,
+        }))
+        return JNI_FALSE;
+
     const raw_redirect_options options{
         .preserve_descriptor_identity = redirect_contents == JNI_TRUE,
         .redirect_file_contents = redirect_contents == JNI_TRUE,
         .snapshot_proc_file = redirect_contents == JNI_TRUE ? snapshot_process_file : nullptr,
     };
-    
-    return install_raw_open_redirect(name->c_str(), paths, options) ? JNI_TRUE : JNI_FALSE;
+
+    if (!install_raw_open_redirect(name->c_str(), paths, options)) return JNI_FALSE;
+    refresh_native_file_hooks();
+    return JNI_TRUE;
 }
 
 extern "C" JNIEXPORT jboolean JNICALL

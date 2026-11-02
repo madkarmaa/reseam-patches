@@ -3,9 +3,11 @@
 
 #pragma once
 
+// ReSharper disable CppUnusedIncludeDirective
 #include <memory>
 #include <string>
 #include <vector>
+// ReSharper restore CppUnusedIncludeDirective
 
 struct path_mapping {
     // Android's installed base or split path.

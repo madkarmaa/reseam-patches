@@ -3,10 +3,13 @@
 
 #pragma once
 
+// ReSharper disable CppUnusedIncludeDirective
 #include <cstdint>
+#include <optional>
 #include <span>
+// ReSharper restore CppUnusedIncludeDirective
 
-enum class proc_file { maps, status };
+enum class proc_file : uint8_t { maps, status };
 
 struct raw_redirect_options {
     uintptr_t start = 0;
@@ -16,7 +19,8 @@ struct raw_redirect_options {
     // Keep installed descriptors and mappings while serving original bytes on reads.
     bool redirect_file_contents = false;
     // Optional signal-safe provider of a filtered procfs snapshot descriptor.
-    int (*snapshot_proc_file)(proc_file) = nullptr;
+    int (*snapshot_proc_file)(proc_file, int) = nullptr;
+    bool (*bypass_current_thread)() = nullptr;
 };
 
 struct raw_open_mapping {
@@ -36,3 +40,13 @@ struct raw_open_mapping {
 [[nodiscard]] bool prepare_library_file_redirect(const char *library,
                                                 std::span<const raw_open_mapping> paths,
                                                 bool redirect_contents = false);
+
+// Unpacked code retains its own disjoint range; replay code must never enter that range.
+[[nodiscard]] bool raw_redirect_contains_address(uintptr_t address);
+[[nodiscard]] bool extend_raw_open_redirect(uintptr_t start, uintptr_t end);
+[[nodiscard]] unsigned raw_redirect_filter_count();
+
+// Caller-aware libc hooks share the raw redirect logic. Unrelated callers retain installed files.
+[[nodiscard]] std::optional<long> redirect_native_file_syscall(
+        uintptr_t caller, int number, long first, long second, long third,
+        long fourth, long fifth, long sixth);

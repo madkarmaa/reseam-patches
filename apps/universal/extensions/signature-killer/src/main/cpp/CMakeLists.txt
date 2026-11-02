@@ -34,6 +34,7 @@ add_library(SignatureKiller SHARED
         jni.cpp
         library_file_redirect.cpp
         library_view.cpp
+        native_file_hooks.cpp
         seccomp_open.cpp
         raw_syscall.S)
 
@@ -83,4 +84,23 @@ if (SIGNATURE_KILLER_BUILD_TESTS)
     target_compile_options(signature_view_tests PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
     target_link_options(signature_view_tests PRIVATE "LINKER:-rpath,$ORIGIN")
     target_link_libraries(signature_view_tests PRIVATE signature_view_probe shadowhook log dl)
+
+    add_library(signature_unpacked_probe SHARED
+            tests/unpacked_probe.cpp tests/unpacked_bridge.S raw_syscall.S)
+    target_compile_features(signature_unpacked_probe PRIVATE cxx_std_23)
+    target_link_options(signature_unpacked_probe PRIVATE -static-libstdc++)
+    add_executable(signature_unpacked_tests
+            tests/unpacked_redirect.cpp
+            library_file_redirect.cpp
+            native_file_hooks.cpp
+            library_view.cpp
+            seccomp_open.cpp
+            raw_syscall.S)
+    target_include_directories(signature_unpacked_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+    target_include_directories(signature_unpacked_tests SYSTEM PRIVATE shadowhook/include)
+    target_compile_features(signature_unpacked_tests PRIVATE cxx_std_23)
+    target_compile_options(signature_unpacked_tests PRIVATE
+            -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
+    target_link_options(signature_unpacked_tests PRIVATE "LINKER:-rpath,$ORIGIN")
+    target_link_libraries(signature_unpacked_tests PRIVATE shadowhook log dl)
 endif ()
