@@ -3,9 +3,11 @@
 
 #pragma once
 
+// ReSharper disable CppUnusedIncludeDirective
 #include <android/log.h>
 
 #include <atomic>
+// ReSharper restore CppUnusedIncludeDirective
 
 // Set from the patch's diagnostics option right after loading. When off, nothing is logged.
 inline constinit std::atomic<bool> diagnostics{false};

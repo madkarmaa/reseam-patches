@@ -3,10 +3,7 @@
 
 package top.madkarma.patches.niagara.weather
 
-import app.reseam.patch.Type
-import app.reseam.patch.fieldOfType
-import app.reseam.patch.klass
-import app.reseam.patch.method
+import app.reseam.patch.*
 
 private val weatherRepository = klass("weatherRepository") {
     strings("Weather not fetched yet")
@@ -18,12 +15,36 @@ internal val weatherFetch = method("weatherFetch") {
     strings("location missing")
 }
 
-// The parser has no strings; it is the only caller of the retained WeatherResponse serializer.
-internal val parseResponse = method("parseResponse") {
+// Newer repositories extract parsing into a method; older releases parse inside cache-reader coroutines.
+internal val responseParsers = methods("responseParsers") {
+    inClass(weatherRepository)
     calls {
-        owner("bitpit.launcher.backend.weather.model.WeatherResponse\$Companion")
+        owner($$"bitpit.launcher.backend.weather.model.WeatherResponse$Companion")
         name("serializer")
     }
+}
+
+internal val parseResponse = responseParsers.single()
+
+internal val readCachedResponse = method("readCachedResponse") {
+    strings("Cache expired")
+    params(Type.Object)
+}
+
+internal val cachedResponseConstructor = method("cachedResponseConstructor") {
+    inClass(klass(readCachedResponse.owner))
+    name("<init>")
+    hasParam(weatherRepository.descriptor)
+}
+
+private val cachedResultConstructor = method("cachedResultConstructor") {
+    calledBy(readCachedResponse)
+    name("<init>")
+    params(Type.Object)
+}
+
+internal val cachedResultValue = fieldTarget("cachedResultValue") {
+    klass(cachedResultConstructor.owner).fieldOfType(Type.Object).ref
 }
 
 internal val cacheResponse = method("cacheResponse") {
@@ -31,9 +52,9 @@ internal val cacheResponse = method("cacheResponse") {
     strings("weather2")
 }
 
-// The publisher's refresh-interval string is shared; its single model argument distinguishes it.
+// Only the publisher takes a single model object; refresh scheduling may live in a separate method.
 internal val publishState = method("publishState") {
-    strings("weather_refresh_interval_high")
+    inClass(weatherRepository)
     params(Type.Object)
 }
 

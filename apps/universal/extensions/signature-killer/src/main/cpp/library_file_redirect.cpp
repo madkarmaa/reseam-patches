@@ -4,24 +4,21 @@
 // ReSharper disable CppUnusedIncludeDirective
 #include "seccomp_open.h"
 #include "logging.h"
+#include "library_view.h"
+#include "native_file_hooks.h"
 
-#include "bytehook.h"
+#include "shadowhook.h"
 
-#include <dlfcn.h>
 #include <elf.h>
 #include <link.h>
 
 #include <algorithm>
 #include <atomic>
-#include <charconv>
-#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <memory>
 #include <mutex>
-#include <optional>
 #include <string>
-#include <string_view>
 #include <vector>
 // ReSharper restore CppUnusedIncludeDirective
 
@@ -30,128 +27,76 @@ namespace {
         std::string library;
         std::vector<raw_open_mapping> paths;
         std::atomic<bool> installed{false};
+        bool redirect_contents = false;
     };
 
     constinit std::mutex pending_mutex;
     // Registered callbacks retain this request until process exit.
     pending_redirect *pending = nullptr;
-    thread_local bool resolving_library = false;
 
-    std::optional<raw_redirect_options> library_executable_range(const void *const entry_point) {
-        const auto close_maps = [](FILE *const file) { static_cast<void>(fclose(file)); };
-        std::unique_ptr<FILE, decltype(close_maps)> maps(fopen("/proc/self/maps", "re"), close_maps);
-        if (!maps) return std::nullopt;
+    // Reads only the module's load segments, which is what the redirect range needs.
+    void locate_executable_segments(const dl_phdr_info &info, raw_redirect_options &options) {
+        for (ElfW(Half) index = 0; index < info.dlpi_phnum; index++) {
+            const auto &segment = info.dlpi_phdr[index];
+            if (segment.p_type != PT_LOAD || (segment.p_flags & PF_X) == 0) continue;
 
-        char *line = nullptr;
-        size_t capacity = 0;
-        uintptr_t mapping_start = 0;
-        uintptr_t mapping_end = 0;
-#ifdef __arm__
-        // Function pointers carry the Thumb-state bit, which is not part of the code address.
-        const auto address = reinterpret_cast<uintptr_t>(entry_point) & ~uintptr_t{1};
-#else
-        const auto address = reinterpret_cast<uintptr_t>(entry_point);
-#endif
-        
-        while (getline(&line, &capacity, maps.get()) >= 0) {
-            unsigned long start = 0;
-            unsigned long end = 0;
-
-            const char *const line_end = line + strlen(line);
-            const auto [start_end, start_error] = std::from_chars(line, line_end, start, 16);
-            if (start_error != std::errc{} || start_end == line_end || *start_end != '-') continue;
-            const auto [end_end, end_error] = std::from_chars(start_end + 1, line_end, end, 16);
-            if (end_error != std::errc{} || address < start || address >= end) continue;
-
-            // procfs separates the hexadecimal range from its four permission characters.
-            if (const std::string_view permissions(end_end, line_end);
-                permissions.size() < 5 || !permissions.starts_with(" r") || permissions.substr(3, 1) != "x")
-                continue;
-            
-            mapping_start = start;
-            mapping_end = end;
-            
-            break;
+            options.start = std::min<uintptr_t>(options.start, info.dlpi_addr + segment.p_vaddr);
+            options.end = std::max<uintptr_t>(options.end, info.dlpi_addr + segment.p_vaddr + segment.p_memsz);
         }
-        
-        // getline owns a reallocatable buffer; adopt it once it can no longer change.
-        std::unique_ptr<char, decltype(&free)> line_memory(line, free);
-        line_memory.reset();
-        maps.reset();
-        
-        if (mapping_start == 0) return std::nullopt;
+    }
 
-        // Resolve the complete ELF image from the mapping containing the actual entry point.
-        // This also covers anonymous images absent from the named library's program headers.
-        const auto *const elf_header = reinterpret_cast<const ElfW(Ehdr) *>(mapping_start);
-        if (memcmp(elf_header->e_ident, ELFMAG, SELFMAG) != 0 ||
-            elf_header->e_phentsize != sizeof(ElfW(Phdr)) || elf_header->e_phnum > 1024 ||
-            elf_header->e_phoff > mapping_end - mapping_start ||
-            elf_header->e_phnum > (mapping_end - mapping_start - elf_header->e_phoff) / sizeof(ElfW(Phdr)))
-            return std::nullopt;
+    void install_for_module(const dl_phdr_info &info, pending_redirect &request) {
+        auto &[library, paths, installed, redirect_contents] = request;
+        if (installed.load(std::memory_order_acquire) || info.dlpi_name == nullptr) return;
 
-        const auto *const segments = reinterpret_cast<const ElfW(Phdr) *>(mapping_start + elf_header->e_phoff);
-        uintptr_t load_bias = mapping_start;
-        
-        for (unsigned index = 0; index < elf_header->e_phnum; index++) {
-            const auto &segment = segments[index];
-            if (segment.p_type != PT_LOAD || segment.p_offset != 0) continue;
-            
-            load_bias = mapping_start - segment.p_vaddr;
-            break;
-        }
+        if (const char *const slash = strrchr(info.dlpi_name, '/');
+            library != (slash == nullptr ? info.dlpi_name : slash + 1))
+            return;
 
         raw_redirect_options options{.start = UINTPTR_MAX, .preserve_descriptor_identity = true};
-        for (unsigned index = 0; index < elf_header->e_phnum; index++) {
-            const auto &segment = segments[index];
-            if (segment.p_type != PT_LOAD || (segment.p_flags & PF_X) == 0) continue;
-            
-            options.start = std::min<uintptr_t>(options.start, load_bias + segment.p_vaddr);
-            options.end = std::max<uintptr_t>(options.end, load_bias + segment.p_vaddr + segment.p_memsz);
+        options.redirect_file_contents = redirect_contents;
+        options.bypass_current_thread = native_file_hooks_bypassed;
+        locate_executable_segments(info, options);
+
+        if (redirect_contents) {
+            constexpr library_view_options view{
+                .contains_address = raw_redirect_contains_address,
+                .filter_count = raw_redirect_filter_count,
+                .enter_worker = bypass_native_file_hooks_for_thread,
+            };
+            if (!prepare_library_view(library.c_str(), view)) {
+                LOG_ERROR("Cannot prepare process views for %s before constructors", library.c_str());
+                abort();
+            }
+            options.snapshot_proc_file = snapshot_process_file;
         }
-        
-        if (address < options.start || address >= options.end) return std::nullopt;
-        return options;
-    }
 
-    void library_loaded(const char *const filename, const int result, void *const data) {
-        auto &[library, paths, installed] = *static_cast<pending_redirect *>(data);
-        if (result != 0 || filename == nullptr || resolving_library) return;
-        if (installed.load(std::memory_order_acquire)) return;
-
-        if (const char *const slash = strrchr(filename, '/');
-            library != (slash == nullptr ? filename : slash + 1)) return;
-
-        // RTLD_NOLOAD also passes through the load monitor. Suppress this callback's recursion.
-        resolving_library = true;
-        
-        void *const handle = dlopen(filename, RTLD_NOW | RTLD_NOLOAD);
-        
-        const void *const entry_point = handle == nullptr ? nullptr : dlsym(handle, "JNI_OnLoad");
-        
-        const auto executable_range = entry_point == nullptr
-                ? std::nullopt : library_executable_range(entry_point);
-        
-        const bool redirected = executable_range && install_raw_open_redirect(
-                library.c_str(), paths, *executable_range);
-        
-        if (handle != nullptr) dlclose(handle);
-        
-        resolving_library = false;
-
-        if (!redirected) {
-            LOG_ERROR("Cannot install APK file redirection for %s before JNI_OnLoad",
-                      library.c_str());
+        if (!install_raw_open_redirect(library.c_str(), paths, options)) {
+            LOG_ERROR("Cannot install APK file redirection for %s before constructors", library.c_str());
             abort();
         }
+
+        if (!prepare_native_file_hooks()) {
+            LOG_ERROR("Cannot cover unpacked native file access for %s", library.c_str());
+            abort();
+        }
+
         installed.store(true, std::memory_order_release);
-        LOG_INFO("APK file redirection installed for %s before JNI_OnLoad at %p",
-                 library.c_str(), entry_point);
+        LOG_INFO("APK file redirection installed for %s before constructors", library.c_str());
     }
+
+    // Registering for both constructor and destructor callbacks fixes this signature, and the
+    // request arrives as the data argument.
+    // ReSharper disable once CppParameterMayBeConstPtrOrRef
+    const shadowhook_dl_info_t library_initializing = [](dl_phdr_info *const info, size_t /*size*/,
+                                                         void *const data) {
+        install_for_module(*info, *static_cast<pending_redirect *>(data));
+    };
 } // namespace
 
 bool prepare_library_file_redirect(const char *const library,
-                                  const std::span<const raw_open_mapping> paths) {
+                                  const std::span<const raw_open_mapping> paths,
+                                  const bool redirect_contents) {
     const std::scoped_lock lock(pending_mutex);
     
     if (pending != nullptr) return pending->library == library;
@@ -160,9 +105,19 @@ bool prepare_library_file_redirect(const char *const library,
     auto request = std::make_unique<pending_redirect>();
     request->library = library;
     request->paths.assign_range(paths);
+    request->redirect_contents = redirect_contents;
+    
+    if (const int initialized = shadowhook_init(SHADOWHOOK_MODE_SHARED, false); initialized != 0) {
+        LOG_ERROR("ShadowHook initialization failed: %d", initialized);
+        return false;
+    }
+    
+    if (shadowhook_register_dl_init_callback(library_initializing, nullptr, request.get()) != 0) {
+        LOG_ERROR("Registering native constructor callback failed: %d", shadowhook_get_errno());
+        return false;
+    }
     
     pending = request.release();
-    bytehook_add_dlopen_callback(nullptr, library_loaded, pending);
     
     LOG_INFO("Waiting for %s to install APK file redirection", library);
     return true;

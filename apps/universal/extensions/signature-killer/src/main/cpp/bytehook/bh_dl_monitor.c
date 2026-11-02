@@ -241,10 +241,6 @@ static void bh_dl_monitor_set_dlerror_msg(void) {
         __asm__("mrs %0, tpidr_el0" : "=r"(libc_tls));
 #elif defined(__arm__)
         __asm__("mrc p15, 0, %0, c13, c0, 3" : "=r"(libc_tls));
-#elif defined(__i386__)
-        __asm__("movl %%gs:0, %0" : "=r"(libc_tls));
-#elif defined(__x86_64__)
-        __asm__("mov %%fs:0, %0" : "=r"(libc_tls));
 #endif
 
         // build error message from linker's error buffer, save it in TLS

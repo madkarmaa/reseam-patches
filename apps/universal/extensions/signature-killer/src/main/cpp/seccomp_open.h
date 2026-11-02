@@ -3,14 +3,24 @@
 
 #pragma once
 
+// ReSharper disable CppUnusedIncludeDirective
 #include <cstdint>
+#include <optional>
 #include <span>
+// ReSharper restore CppUnusedIncludeDirective
+
+enum class proc_file : uint8_t { maps, status };
 
 struct raw_redirect_options {
     uintptr_t start = 0;
     uintptr_t end = 0;
     // Masks replacement paths and ownership without changing real inodes or content metadata.
     bool preserve_descriptor_identity = false;
+    // Keep installed descriptors and mappings while serving original bytes on reads.
+    bool redirect_file_contents = false;
+    // Optional signal-safe provider of a filtered procfs snapshot descriptor.
+    int (*snapshot_proc_file)(proc_file, int) = nullptr;
+    bool (*bypass_current_thread)() = nullptr;
 };
 
 struct raw_open_mapping {
@@ -19,7 +29,7 @@ struct raw_open_mapping {
 };
 
 // Traps raw open/openat syscalls issued from the library's code and opens the replacement of any
-// installed path instead. Descriptor mode also handles readlink/readlinkat and fstat/fstat64
+// installed path instead. Descriptor mode also handles readlink/readlinkat, fstat/fstat64 and fstatat
 // where the ABI provides them. Strings must remain valid until process exit. Only one library can be
 // configured per process. Logs according to the diagnostics flag in logging.h.
 [[nodiscard]] bool install_raw_open_redirect(const char *library,
@@ -28,4 +38,15 @@ struct raw_open_mapping {
 
 // Installs after dlopen completes and before Android calls the library's JNI_OnLoad.
 [[nodiscard]] bool prepare_library_file_redirect(const char *library,
-                                                std::span<const raw_open_mapping> paths);
+                                                std::span<const raw_open_mapping> paths,
+                                                bool redirect_contents = false);
+
+// Unpacked code retains its own disjoint range; replay code must never enter that range.
+[[nodiscard]] bool raw_redirect_contains_address(uintptr_t address);
+[[nodiscard]] bool extend_raw_open_redirect(uintptr_t start, uintptr_t end);
+[[nodiscard]] unsigned raw_redirect_filter_count();
+
+// Caller-aware libc hooks share the raw redirect logic. Unrelated callers retain installed files.
+[[nodiscard]] std::optional<long> redirect_native_file_syscall(
+        uintptr_t caller, int number, long first, long second, long third,
+        long fourth, long fifth, long sixth);

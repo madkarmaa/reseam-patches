@@ -21,14 +21,36 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.lang.reflect.Field
 import java.util.zip.ZipFile
+import java.util.zip.ZipEntry
 
 private const val LIBRARY_NAME = "SignatureKiller"
 private const val ORIGIN_ASSET_PATH = "assets/SignatureKiller/origin.apk"
 private const val SPLIT_ASSET_DIRECTORY = "assets/SignatureKiller/splits"
 private var fileRedirectionInstalled = false
+private var libcFileHooksEnabled = true
 private const val COPY_BUFFER_SIZE = 102400
 
 private val packageInfoSpoofs = EventLog("PackageInfo spoof")
+
+/** Prepares original APK files without redirecting the Android runtime's own file opens. */
+@Export
+fun initializeBeforeNativeLibrary(
+    packageName: String,
+    signature: String,
+    libraryName: String,
+    diagnostics: Boolean,
+) {
+    initializeNativeFileAccess(packageName, signature, diagnostics)
+    redirectApkFilesOnLibraryLoad(libraryName)
+}
+
+/** Prepares original files for a native hook installed explicitly after the target library loads. */
+@Export
+fun initializeNativeFileAccess(packageName: String, signature: String, diagnostics: Boolean) {
+    check(!fileRedirectionInstalled) { "Native file access must be configured before file hooks" }
+    libcFileHooksEnabled = false
+    initializeEarly(packageName, signature, true, diagnostics)
+}
 
 /**
  * Spoofs package signatures and optionally redirects installed-file reads to the embedded original.
@@ -114,7 +136,7 @@ fun killApkPath(context: Context, packageName: String) {
 @Synchronized
 fun redirectRawApkOpens(libraryName: String) {
     check(fileRedirectionInstalled) { "Original APK file redirection is not installed" }
-    check(trapRawApkOpens(libraryName)) {
+    check(trapRawApkOpens(libraryName, !libcFileHooksEnabled)) {
         "Installing raw APK open redirection failed in $libraryName"
     }
     logInfo { "redirectRawApkOpens: seccomp redirect installed for $libraryName" }
@@ -125,7 +147,7 @@ fun redirectRawApkOpens(libraryName: String) {
 @Synchronized
 fun redirectApkFilesOnLibraryLoad(libraryName: String) {
     check(fileRedirectionInstalled) { "Original APK file redirection is not installed" }
-    check(prepareApkFilesOnLibraryLoad(libraryName)) {
+    check(prepareApkFilesOnLibraryLoad(libraryName, !libcFileHooksEnabled)) {
         "Preparing APK file redirection failed for $libraryName"
     }
     logInfo { "redirectApkFilesOnLibraryLoad: waiting for $libraryName" }
@@ -325,7 +347,8 @@ private fun killOpen(context: Context, packageName: String) {
     }
 
     try {
-        System.loadLibrary(LIBRARY_NAME)
+        if (libcFileHooksEnabled) System.loadLibrary(LIBRARY_NAME)
+        else loadNativeFileAccess(context)
     } catch (exception: UnsatisfiedLinkError) {
         logError(exception) { "Load SignatureKiller library failed" }
         return
@@ -355,10 +378,10 @@ private fun killOpen(context: Context, packageName: String) {
 
     // Extract everything before installing the hooks, which redirect later reads of the base too.
     val replacements = ZipFile(application.sourceDir).use { zip ->
-        assetPaths.map { extractOriginApk(zip, it, context).absolutePath }
+        assetPaths.map { extractApkEntry(zip, it, context).absolutePath }
     }
 
-    check(hookApkPaths(installedPaths.toTypedArray(), replacements.toTypedArray())) {
+    check(hookApkPaths(installedPaths.toTypedArray(), replacements.toTypedArray(), libcFileHooksEnabled)) {
         "Installing original APK file redirection failed"
     }
 
@@ -369,20 +392,50 @@ private fun killOpen(context: Context, packageName: String) {
     }
 }
 
-private fun extractOriginApk(zip: ZipFile, assetPath: String, context: Context): File {
+/** Keep extension libraries outside the installed APK's native library inventory. */
+private fun loadNativeFileAccess(context: Context) {
+    val abi = when (val directory = File(context.applicationInfo.nativeLibraryDir).name) {
+        "arm64" -> "arm64-v8a"
+        "arm" -> "armeabi-v7a"
+        else -> error("Unsupported native library directory: $directory")
+    }
+    val libraries = listOf("libshadowhook.so", "libSignatureKiller.so")
+
+    ZipFile(context.applicationInfo.sourceDir).use { zip ->
+        val entries = libraries.map { library ->
+            zip.getEntry("lib/$abi/$library") ?: error("Native library is missing: $library")
+        }
+        val directory = File(
+            context.getDir(LIBRARY_NAME, Context.MODE_PRIVATE),
+            "native-${entries.joinToString("-") { it.crc.toString() }}",
+        )
+        check(directory.isDirectory || directory.mkdirs()) { "Cannot create $directory" }
+        for (entry in entries)
+            extractZipEntry(zip, entry, File(directory, File(entry.name).name))
+
+        // The library's $ORIGIN runpath loads dependencies here without their Java JNI glue.
+        System.load(File(directory, "libSignatureKiller.so").absolutePath)
+    }
+}
+
+private fun extractApkEntry(zip: ZipFile, assetPath: String, context: Context): File {
     val entry = zip.getEntry(assetPath) ?: throw IOException("Entry not found: $assetPath")
 
     // The CRC also changes the cache name when an update replaces an equally sized component.
     val directory = context.getDir(LIBRARY_NAME, Context.MODE_PRIVATE)
 
     val replacement = File(directory, "${entry.crc}-${File(assetPath).name}")
+    return extractZipEntry(zip, entry, replacement)
+}
+
+private fun extractZipEntry(zip: ZipFile, entry: ZipEntry, replacement: File): File {
     if (replacement.isFile && replacement.length() == entry.size) {
-        logDebug { "Reusing extracted $assetPath at $replacement (${entry.size} bytes)" }
+        logDebug { "Reusing extracted ${entry.name} at $replacement (${entry.size} bytes)" }
         return replacement
     }
 
     val started = SystemClock.elapsedRealtime()
-    val temporary = File.createTempFile("origin-", ".apk", directory)
+    val temporary = File.createTempFile("extract-", ".tmp", replacement.parentFile)
 
     try {
         zip.getInputStream(entry).use { input ->
@@ -395,7 +448,7 @@ private fun extractOriginApk(zip: ZipFile, assetPath: String, context: Context):
     }
 
     logInfo {
-        "Extracted $assetPath to $replacement (${entry.size} bytes, crc " + "${
+        "Extracted ${entry.name} to $replacement (${entry.size} bytes, crc " + "${
             java.lang.Long.toHexString(
                 entry.crc
             )
@@ -407,9 +460,9 @@ private fun extractOriginApk(zip: ZipFile, assetPath: String, context: Context):
 private external fun setNativeDiagnostics(enabled: Boolean)
 
 private external fun hookApkPaths(
-    installedPaths: Array<String>, replacementPaths: Array<String>
+    installedPaths: Array<String>, replacementPaths: Array<String>, hookLibc: Boolean,
 ): Boolean
 
-private external fun trapRawApkOpens(libraryName: String): Boolean
+private external fun trapRawApkOpens(libraryName: String, redirectContents: Boolean): Boolean
 
-private external fun prepareApkFilesOnLibraryLoad(libraryName: String): Boolean
+private external fun prepareApkFilesOnLibraryLoad(libraryName: String, redirectContents: Boolean): Boolean

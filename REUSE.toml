@@ -26,25 +26,81 @@ precedence = "override"
 SPDX-FileCopyrightText = "2020-2024 ByteDance, Inc."
 SPDX-License-Identifier = "MIT"
 
+# Vendored ShadowHook 2.0.1 and its xDL dependency retain their upstream licenses.
 [[annotations]]
-path = ["apps/universal/extensions/signature-killer/src/main/cpp/bytehook/third_party/lss/**"]
+path = ["apps/universal/extensions/signature-killer/src/main/cpp/shadowhook/**"]
+precedence = "override"
+SPDX-FileCopyrightText = "2021-2026 ByteDance Inc."
+SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+path = ["apps/universal/extensions/signature-killer/src/main/cpp/shadowhook/third_party/xdl/**"]
+precedence = "override"
+SPDX-FileCopyrightText = "2020-2025 HexHacking Team"
+SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+path = [
+    "apps/universal/extensions/signature-killer/src/main/cpp/bytehook/third_party/lss/**",
+    "apps/universal/extensions/signature-killer/src/main/cpp/shadowhook/third_party/lss/**",
+]
 precedence = "override"
 SPDX-FileCopyrightText = "2005-2011 Google Inc."
 SPDX-License-Identifier = "BSD-3-Clause"
 
 [[annotations]]
-path = ["apps/universal/extensions/signature-killer/src/main/cpp/bytehook/third_party/bsd/queue.h"]
+path = [
+    "apps/universal/extensions/signature-killer/src/main/cpp/bytehook/third_party/bsd/queue.h",
+    "apps/universal/extensions/signature-killer/src/main/cpp/shadowhook/third_party/bsd/queue.h",
+]
 precedence = "override"
 SPDX-FileCopyrightText = "1991, 1993 The Regents of the University of California"
 SPDX-License-Identifier = "BSD-3-Clause"
 
 [[annotations]]
-path = ["apps/universal/extensions/signature-killer/src/main/cpp/bytehook/third_party/bsd/tree.h"]
+path = [
+    "apps/universal/extensions/signature-killer/src/main/cpp/bytehook/third_party/bsd/tree.h",
+    "apps/universal/extensions/signature-killer/src/main/cpp/shadowhook/third_party/bsd/tree.h",
+]
 precedence = "override"
 SPDX-FileCopyrightText = "2002 Niels Provos <provos@citi.umich.edu>"
 SPDX-License-Identifier = "BSD-2-Clause"
 
-# The native binaries combine project-owned JNI code, bytehook, and their third-party headers.
+# Local changes to vendored code keep the vendor's license and original notices.
+[[annotations]]
+path = [
+    "apps/universal/extensions/signature-killer/src/main/cpp/bytehook/bh_dl_iterate.c",
+    "apps/universal/extensions/signature-killer/src/main/cpp/bytehook/bh_dl_monitor.c",
+    "apps/universal/extensions/signature-killer/src/main/cpp/bytehook/bh_elf.c",
+    "apps/universal/extensions/signature-killer/src/main/cpp/bytehook/bh_trampo.c",
+]
+precedence = "override"
+SPDX-FileCopyrightText = ["2020-2024 ByteDance, Inc.", "2026 MadKarma <me@madkarma.top>"]
+SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+path = ["apps/universal/extensions/signature-killer/src/main/cpp/shadowhook/CMakeLists.txt"]
+precedence = "override"
+SPDX-FileCopyrightText = ["2021-2026 ByteDance Inc.", "2026 MadKarma <me@madkarma.top>"]
+SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+path = [
+    "apps/universal/extensions/signature-killer/src/main/cpp/shadowhook/third_party/xdl/xdl.c",
+    "apps/universal/extensions/signature-killer/src/main/cpp/shadowhook/third_party/xdl/xdl_iterate.c",
+    "apps/universal/extensions/signature-killer/src/main/cpp/shadowhook/third_party/xdl/xdl_util.h",
+]
+precedence = "override"
+SPDX-FileCopyrightText = ["2020-2025 HexHacking Team", "2026 MadKarma <me@madkarma.top>"]
+SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+path = ["apps/universal/extensions/signature-killer/src/main/cpp/shadowhook/VERSION"]
+precedence = "override"
+SPDX-FileCopyrightText = "2026 MadKarma <me@madkarma.top>"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
+
+# The native binaries also include statically linked LLVM runtime code from the NDK.
 [[annotations]]
 path = ["apps/universal/patch/src/main/resources/lib/**/libSignatureKiller.so"]
 precedence = "override"
@@ -54,5 +110,32 @@ SPDX-FileCopyrightText = [
     "2005-2011 Google Inc.",
     "1991, 1993 The Regents of the University of California",
     "2002 Niels Provos <provos@citi.umich.edu>",
+    "the LLVM Project contributors",
 ]
-SPDX-License-Identifier = "AGPL-3.0-or-later AND MIT AND BSD-2-Clause AND BSD-3-Clause"
+SPDX-License-Identifier = "AGPL-3.0-or-later AND MIT AND BSD-2-Clause AND BSD-3-Clause AND (Apache-2.0 WITH LLVM-exception)"
+
+[[annotations]]
+path = ["apps/universal/patch/src/main/resources/lib/**/libshadowhook.so"]
+precedence = "override"
+SPDX-FileCopyrightText = [
+    "2021-2026 ByteDance Inc.",
+    "2020-2025 HexHacking Team",
+    "2026 MadKarma <me@madkarma.top>",
+    "2005-2011 Google Inc.",
+    "1991, 1993 The Regents of the University of California",
+    "2002 Niels Provos <provos@citi.umich.edu>",
+    "the LLVM Project contributors",
+]
+SPDX-License-Identifier = "MIT AND BSD-2-Clause AND BSD-3-Clause AND (Apache-2.0 WITH LLVM-exception)"
+
+[[annotations]]
+path = ["apps/universal/patch/src/main/resources/lib/**/libshadowhook_nothing.so"]
+precedence = "override"
+SPDX-FileCopyrightText = "2021-2026 ByteDance Inc."
+SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+path = ["apps/universal/extensions/signature-killer/src/main/cpp/llvm-runtime.NOTICE"]
+precedence = "override"
+SPDX-FileCopyrightText = "the LLVM Project contributors"
+SPDX-License-Identifier = "(Apache-2.0 WITH LLVM-exception) AND MIT"

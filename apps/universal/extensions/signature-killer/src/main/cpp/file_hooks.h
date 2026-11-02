@@ -3,9 +3,11 @@
 
 #pragma once
 
+// ReSharper disable CppUnusedIncludeDirective
 #include <memory>
 #include <string>
 #include <vector>
+// ReSharper restore CppUnusedIncludeDirective
 
 struct path_mapping {
     // Android's installed base or split path.
@@ -21,4 +23,4 @@ const path_mappings *installed_path_mappings();
 
 // Installs the process's only mapping table, which is never freed, then hooks the libc file opens
 // of every loaded and later library. The hooks stay registered for the process lifetime.
-[[nodiscard]] bool install_file_redirect(std::unique_ptr<path_mappings> table);
+[[nodiscard]] bool install_file_redirect(std::unique_ptr<path_mappings> table, bool hook_libc);

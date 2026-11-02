@@ -59,6 +59,7 @@ val signatureKiller = patch("Signature Killer") {
 
         log.info("SignatureKiller: redirected hasSigningCertificate calls by package ($packageChecks) and by uid ($uidChecks), getPackageArchiveInfo calls with int flags ($archiveReads) and PackageInfoFlags ($flaggedArchiveReads); reflection and JNI calls are not redirected.")
         log.info("SignatureKiller: hooked $packageName (${signers.size} signer(s)).")
+
     }
 
     // Resolve the Application after dependent patches have finished editing the manifest.
@@ -163,10 +164,13 @@ val spoofApkFileAccess = patch("Signature Killer (APK file access)") {
         )
 
         for (abi in nativeAbis) {
-            val path = "lib/$abi/libSignatureKiller.so"
-            val library = SignatureResources.javaClass.classLoader.getResourceAsStream(path)
-                ?: error("SignatureKiller: bundled native lib missing: $path")
-            library.use { files.write(path, it) }
+            val libraries = listOf("libSignatureKiller.so", "libshadowhook.so", "libshadowhook_nothing.so")
+            for (name in libraries) {
+                val path = "lib/$abi/$name"
+                val library = SignatureResources.javaClass.classLoader.getResourceAsStream(path)
+                    ?: error("SignatureKiller: bundled native lib missing: $path")
+                library.use { files.write(path, it) }
+            }
         }
 
         log.info("SignatureKiller: hooked $packageName with APK-path spoofing (${assetPaths.size} original component(s), ${signers.size} signer(s)).")
@@ -180,6 +184,6 @@ internal fun certificateFingerprint(certificate: ByteArray): String =
 
 private const val ORIGIN_ASSET_PATH = "assets/SignatureKiller/origin.apk"
 
-private val NATIVE_ABIS = listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
+private val NATIVE_ABIS = listOf("armeabi-v7a", "arm64-v8a")
 
 private object SignatureResources
