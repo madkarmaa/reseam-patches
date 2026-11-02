@@ -8,4 +8,8 @@ import app.reseam.patch.settings.toggle
 
 object TruecallerSettings : SettingsGroup(TruecallerStrings) {
     val disableAutoLaunch by toggle(default = true, key = "truecaller.disable_auto_launch")
+    val hideMessages by toggle(default = true, key = "truecaller.hide_messages")
+    val hideBlocking by toggle(default = true, key = "truecaller.hide_blocking")
+    val hidePremium by toggle(default = true, key = "truecaller.hide_premium")
+    val hideFamily by toggle(default = true, key = "truecaller.hide_family")
 }

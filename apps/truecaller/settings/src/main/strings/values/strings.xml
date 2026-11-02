@@ -1,5 +1,11 @@
 <resources>
     <string name="section_behavior">App behavior</string>
+    <string name="section_navigation">Navigation</string>
     <string name="disable_auto_launch">Disable auto-launch</string>
     <string name="disable_auto_launch_summary">Stop automatic after-call screens and launches for inactive users.</string>
+    <string name="hide_messages">Hide Messages tab</string>
+    <string name="hide_blocking">Hide Blocking tab</string>
+    <string name="hide_premium">Hide Premium tab</string>
+    <string name="hide_family">Hide Family button</string>
+    <string name="hide_family_summary">Hide Family Protection in the bottom bar and call-log header.</string>
 </resources>
