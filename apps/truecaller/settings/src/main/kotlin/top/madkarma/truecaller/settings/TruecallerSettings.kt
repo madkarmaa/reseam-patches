@@ -13,4 +13,5 @@ object TruecallerSettings : SettingsGroup(TruecallerStrings) {
     val hidePremium by toggle(default = true, key = "truecaller.hide_premium")
     val hideFamily by toggle(default = true, key = "truecaller.hide_family")
     val hideScamFeed by toggle(default = true, key = "truecaller.hide_scam_feed")
+    val hideWearSettings by toggle(default = true, key = "truecaller.hide_wear_settings")
 }

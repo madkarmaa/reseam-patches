@@ -21,6 +21,7 @@ fun enabled(key: String?, original: Boolean): Boolean {
     if (key == null || key !in disabledKeys) return original
     return when (key) {
         "featureAutoAppLaunchPassive" -> original && !TruecallerSettings.disableAutoLaunch.value
+        "featurePromptWearApp" -> original && !TruecallerSettings.hideWearSettings.value
         else -> false
     }
 }

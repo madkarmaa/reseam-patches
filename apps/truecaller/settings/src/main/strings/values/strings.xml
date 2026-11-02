@@ -1,6 +1,7 @@
 <resources>
     <string name="section_behavior">App behavior</string>
     <string name="section_navigation">Navigation</string>
+    <string name="section_settings">Settings</string>
     <string name="disable_auto_launch">Disable auto-launch</string>
     <string name="disable_auto_launch_summary">Stop automatic after-call screens and launches for inactive users.</string>
     <string name="hide_messages">Hide Messages tab</string>
@@ -10,4 +11,6 @@
     <string name="hide_family_summary">Hide Family Protection in the bottom bar and call-log header.</string>
     <string name="hide_scam_feed">Hide Scam Feed</string>
     <string name="hide_scam_feed_summary">Hide the feed and its tab, and stop new Scam Feed notifications.</string>
+    <string name="hide_wear_settings">Hide Wear OS settings</string>
+    <string name="hide_wear_settings_summary">Hide watch entries in Settings, the profile menu, and settings search.</string>
 </resources>
