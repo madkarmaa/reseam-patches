@@ -195,6 +195,25 @@ universal patches that work on any app. Want an app supported?
 </details>
 
 <details>
+<summary><strong>com.truecaller</strong></summary>
+
+| Name | Description | Version pins |
+| --- | --- | --- |
+| Disable ads | Disables in-app ads. | None |
+| Disable annoyances | Hides permission banners, surveys, update prompts, and automatic Premium offers. | None |
+| Disable auto-launch | Disables automatic after-call screens. | None |
+| Disable telemetry | Disables analytics and Firebase crash reports. | None |
+| GmsCore support | Signs in with Google through separately installed Reseam GmsCore. | None |
+| Hide scam feed | Hides Scam Feed and stops its notifications. | None |
+| Hide tabs | Hides selected tabs. | None |
+| Hide Wear OS settings | Hides Wear OS settings and shortcuts. | None |
+| top.madkarma.patches.truecaller.settings.truecallerSettings | Settings for truecaller | None |
+| Unlock premium | Unlocks Premium-only features. Paid server-side services still need a subscription. | None |
+| Use SMS for verification codes | Reads verification codes from SMS. Uses Google SMS retrieval without SMS permission. | None |
+
+</details>
+
+<details>
 <summary><strong>com.yazio.android</strong></summary>
 
 | Name | Description | Version pins |
@@ -272,6 +291,7 @@ universal patches that work on any app. Want an app supported?
 | Remove unused native libraries | Removes native libraries for every CPU architecture except the selected one to shrink the APK. | None |
 | Signature Killer | Spoofs the original app signature. | None |
 | Signature Killer (APK file access) | Spoofs the original app signature and redirects reads of the installed APK files to embedded original copies. Only use this for apps that verify the APK files themselves; it roughly doubles the APK size. | None |
+| top.madkarma.patches.truecaller.shared.featureFlagOverrides |  | None |
 
 </details>
 
