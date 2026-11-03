@@ -266,3 +266,8 @@ apps/protonmail/patch/src/main/resources/lib/**
 !apps/protonmail/patch/src/main/resources/lib/
 !apps/protonmail/patch/src/main/resources/lib/**/
 !apps/protonmail/patch/src/main/resources/lib/**/libProtonAccounts.so
+
+# Prebuilt MotionCam recording extension
+!apps/motioncam/patch/src/main/resources/lib/
+!apps/motioncam/patch/src/main/resources/lib/**/
+!apps/motioncam/patch/src/main/resources/lib/**/libMotionCamRecording.so
