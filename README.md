@@ -24,6 +24,15 @@ universal patches that work on any app. Want an app supported?
 </details>
 
 <details>
+<summary><strong>ch.protonmail.android</strong></summary>
+
+| Name | Description | Version pins |
+| --- | --- | --- |
+| Unlimited accounts | Allows multiple free Proton Mail accounts. | None |
+
+</details>
+
+<details>
 <summary><strong>com.accuweather.android</strong></summary>
 
 | Name | Description | Version pins |
