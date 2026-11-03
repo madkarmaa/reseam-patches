@@ -7,6 +7,8 @@ plugins {
 
 dependencies {
     compileOnly(project(":apps:shared:patch"))
+    implementation("org.smali:dexlib2:2.5.2")
+    testImplementation("junit:junit:4.13.2")
 }
 
 // To rebuild the native libs into src/main/resources/lib, set ANDROID_NDK_HOME (NDK 30.0.16248370),
