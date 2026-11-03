@@ -260,3 +260,9 @@ apps/universal/patch/src/main/resources/lib/**
 !apps/universal/patch/src/main/resources/lib/**/libSignatureKiller.so
 !apps/universal/patch/src/main/resources/lib/**/libshadowhook.so
 !apps/universal/patch/src/main/resources/lib/**/libshadowhook_nothing.so
+
+# Prebuilt Proton Mail account-limit extension
+apps/protonmail/patch/src/main/resources/lib/**
+!apps/protonmail/patch/src/main/resources/lib/
+!apps/protonmail/patch/src/main/resources/lib/**/
+!apps/protonmail/patch/src/main/resources/lib/arm64-v8a/libProtonAccounts.so

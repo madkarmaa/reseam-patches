@@ -102,6 +102,12 @@ SPDX-License-Identifier = "AGPL-3.0-or-later"
 
 # The native binaries also include statically linked LLVM runtime code from the NDK.
 [[annotations]]
+path = ["apps/protonmail/patch/src/main/resources/lib/**/libProtonAccounts.so"]
+precedence = "override"
+SPDX-FileCopyrightText = ["2026 MadKarma <me@madkarma.top>", "the LLVM Project contributors"]
+SPDX-License-Identifier = "AGPL-3.0-or-later AND (Apache-2.0 WITH LLVM-exception)"
+
+[[annotations]]
 path = ["apps/universal/patch/src/main/resources/lib/**/libSignatureKiller.so"]
 precedence = "override"
 SPDX-FileCopyrightText = [
