@@ -265,4 +265,4 @@ apps/universal/patch/src/main/resources/lib/**
 apps/protonmail/patch/src/main/resources/lib/**
 !apps/protonmail/patch/src/main/resources/lib/
 !apps/protonmail/patch/src/main/resources/lib/**/
-!apps/protonmail/patch/src/main/resources/lib/arm64-v8a/libProtonAccounts.so
+!apps/protonmail/patch/src/main/resources/lib/**/libProtonAccounts.so

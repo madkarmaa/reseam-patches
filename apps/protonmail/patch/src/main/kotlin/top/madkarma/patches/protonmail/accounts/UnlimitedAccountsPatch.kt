@@ -15,18 +15,31 @@ val unlimitedAccounts = patch("Unlimited accounts") {
     compatibleWith("ch.protonmail.android")
     dependsOn(removeUnusedNativeLibs)
 
-    execute {
-        if ("lib/arm64-v8a/libmail_uniffi.so" !in files.list()) error("Proton Mail: requires the ARM64 Rust library; select arm64-v8a native libraries")
+    val diagnostics = boolOption(
+        "diagnostics",
+        title = "Log diagnostics",
+        description = "Log native account-limit discovery and installation under the ProtonAccounts logcat tag.",
+        default = false,
+    )
 
-        val path = "lib/arm64-v8a/libProtonAccounts.so"
-        val library = NativeResources.javaClass.classLoader.getResourceAsStream(path)
-            ?: error("Proton Mail: bundled native extension missing: $path")
-        library.use { files.writeStored(path, it) }
+    execute {
+        val paths = files.list().toSet()
+        val architectures = listOf(
+            "arm64-v8a", "armeabi-v7a", "x86_64"
+        ).filter { "lib/$it/libmail_uniffi.so" in paths }
+        if (architectures.isEmpty()) error("Proton Mail: requires an ARM64, ARMv7, or x86_64 Rust library")
+
+        for (architecture in architectures) {
+            val path = "lib/$architecture/libProtonAccounts.so"
+            val library = NativeResources.javaClass.classLoader.getResourceAsStream(path)
+                ?: error("Proton Mail: bundled native extension missing: $path")
+            library.use { files.writeStored(path, it) }
+        }
 
         rustLibraryLoad.after {
-            call(Accounts.install)
+            call(Accounts.install, bool(options[diagnostics]))
         }
-        log.info("Proton Mail: ${rustLibraryLoad.descriptor} installs the account-limit extension after loading Rust.")
+        log.info("Proton Mail: ${rustLibraryLoad.descriptor} installs the account-limit extension for ${architectures.joinToString()} after loading Rust.")
     }
 }
 

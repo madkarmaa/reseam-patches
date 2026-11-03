@@ -9,11 +9,11 @@ import app.reseam.runtime.Export
 
 @Export
 @Synchronized
-fun install() {
+fun install(diagnostics: Boolean) {
     System.loadLibrary("ProtonAccounts")
-    check(installNative()) {
-        "Proton Mail: installing the native account-limit hook failed; see ProtonAccounts logcat"
+    check(installNative(diagnostics)) {
+        "Proton Mail: installing the native account-limit hook failed; enable diagnostics for details"
     }
 }
 
-private external fun installNative(): Boolean
+private external fun installNative(diagnostics: Boolean): Boolean

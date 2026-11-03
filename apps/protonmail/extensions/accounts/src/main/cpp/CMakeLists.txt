@@ -4,8 +4,8 @@
 cmake_minimum_required(VERSION 3.22)
 project(ProtonAccounts CXX ASM)
 
-if (NOT ANDROID_ABI STREQUAL "arm64-v8a")
-    message(FATAL_ERROR "ProtonAccounts currently supports arm64-v8a")
+if (NOT ANDROID_ABI MATCHES "^(arm64-v8a|armeabi-v7a|x86_64)$")
+    message(FATAL_ERROR "Unsupported ProtonAccounts ABI: ${ANDROID_ABI}")
 endif ()
 
 add_library(ProtonAccounts SHARED account_limit.S account_limit.cpp accounts.cpp)
