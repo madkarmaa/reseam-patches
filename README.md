@@ -130,6 +130,15 @@ universal patches that work on any app. Want an app supported?
 </details>
 
 <details>
+<summary><strong>com.larvelplayer.app</strong></summary>
+
+| Name | Description | Version pins |
+| --- | --- | --- |
+| Unlock supporter | Unlocks lifetime ad removal and supporter access to rewarded features. | None |
+
+</details>
+
+<details>
 <summary><strong>com.lemon.lvoverseas</strong></summary>
 
 | Name | Description | Version pins |
@@ -150,6 +159,15 @@ universal patches that work on any app. Want an app supported?
 | Name | Description | Version pins |
 | --- | --- | --- |
 | Unlock full version | Unlocks the full version features. | None |
+
+</details>
+
+<details>
+<summary><strong>com.motioncam</strong></summary>
+
+| Name | Description | Version pins |
+| --- | --- | --- |
+| Unlimited recording | Removes the trial's five-second video recording limit. | None |
 
 </details>
 
@@ -294,6 +312,7 @@ universal patches that work on any app. Want an app supported?
 
 | Name | Description | Version pins |
 | --- | --- | --- |
+| Expose Pairip DEX | Makes lifted methods from an embedded Pairip DEX available to Reseam patches and uses the patched methods at runtime. Keeps Pairip running. Does not support encrypted or VM-only method bodies. | None |
 | Force extract native libs | Sets android:extractNativeLibs to true when it is false. | None |
 | Hide packages | Hides the chosen packages from the app's PackageManager queries, as if they were not installed. | None |
 | Load ClearURLs rules | Downloads the ClearURLs tracking rules when the app starts, and caches them for offline launches. Adds internet access to apps that lack it. Rules by the ClearURLs project: https://gitlab.com/ClearURLs/rules | None |
