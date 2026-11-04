@@ -10,6 +10,8 @@ import app.reseam.patch.after
 import app.reseam.patch.alwaysReturn
 import app.reseam.patch.patch
 import top.madkarma.patches.respiro.preferences.readPreference
+import top.madkarma.patches.shared.PATCH_ATTRIBUTION
+import top.madkarma.patches.shared.setStringEverywhere
 import top.madkarma.respiro.preferences.bindings.Preferences
 
 val unlockPremium = patch("Unlock premium") {
@@ -25,5 +27,11 @@ val unlockPremium = patch("Unlock premium") {
 
         validSigningCertificate.alwaysReturn(true)
         log.info("Premium: ${validSigningCertificate.descriptor} accepts the patched app's signature.")
+
+        if (!resources.setStringEverywhere(
+                "premium_room_sub_active", PATCH_ATTRIBUTION
+            )
+        ) error("Premium: active premium subtitle is missing")
+        log.info("Premium: string/premium_room_sub_active displays the shared patch attribution.")
     }
 }
