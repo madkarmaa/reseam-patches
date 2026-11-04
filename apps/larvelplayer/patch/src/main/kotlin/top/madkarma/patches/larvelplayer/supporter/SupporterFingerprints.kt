@@ -9,3 +9,10 @@ internal val loadAdRemoval = method("loadAdRemoval") {
     name("onCreate")
     strings("billing_prefs", "ads_removed")
 }
+
+internal const val SUPPORT_DESCRIPTION =
+    "100% free, all features unlocked. Your support keeps the project alive."
+
+internal val supportIntroduction = method("supportIntroduction") {
+    strings(SUPPORT_DESCRIPTION)
+}

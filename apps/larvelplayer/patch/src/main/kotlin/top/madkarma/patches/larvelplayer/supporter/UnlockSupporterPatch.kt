@@ -9,6 +9,7 @@ import app.reseam.patch.ExternalPatch
 import app.reseam.patch.before
 import app.reseam.patch.patch
 import top.madkarma.larvelplayer.supporter.bindings.Supporter
+import top.madkarma.patches.shared.PATCH_ATTRIBUTION
 
 val unlockSupporter = patch("Unlock supporter") {
     description("Unlocks lifetime ad removal and supporter access to rewarded features.")
@@ -18,5 +19,11 @@ val unlockSupporter = patch("Unlock supporter") {
     execute {
         loadAdRemoval.before { Supporter.unlock(thisObject) }
         log.info("Supporter: ${loadAdRemoval.descriptor} initializes supporter access before loading ad state.")
+
+        if (supportIntroduction.method.replaceAllStrings(
+                SUPPORT_DESCRIPTION, PATCH_ATTRIBUTION
+            ) != 1
+        ) error("Supporter: expected exactly one support introduction")
+        log.info("Supporter: ${supportIntroduction.descriptor} displays the shared patch attribution.")
     }
 }
