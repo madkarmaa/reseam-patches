@@ -11,6 +11,15 @@ universal patches that work on any app. Want an app supported?
 <!-- PATCHES:START -->
 
 <details>
+<summary><strong>app.pinya.mango</strong></summary>
+
+| Name | Description | Version pins |
+| --- | --- | --- |
+| Unlock Pro | Unlocks Pro-only features. | None |
+
+</details>
+
+<details>
 <summary><strong>bitpit.launcher</strong></summary>
 
 | Name | Description | Version pins |
@@ -67,6 +76,16 @@ universal patches that work on any app. Want an app supported?
 | Name | Description | Version pins |
 | --- | --- | --- |
 | Unlock Plus | Unlocks Plus-only features. | None |
+
+</details>
+
+<details>
+<summary><strong>com.awedea.nyx</strong></summary>
+
+| Name | Description | Version pins |
+| --- | --- | --- |
+| Remove annoyances | Removes the rating popup and the Rate button in the navigation drawer. | None |
+| Unlock Pro | Unlocks Pro-only features. | None |
 
 </details>
 
@@ -207,6 +226,16 @@ universal patches that work on any app. Want an app supported?
 | Name | Description | Version pins |
 | --- | --- | --- |
 | Unlock Plus | Unlocks Plus-only features. | None |
+
+</details>
+
+<details>
+<summary><strong>com.sgnoogle.respiro</strong></summary>
+
+| Name | Description | Version pins |
+| --- | --- | --- |
+| Skip intro | Skips the first-launch tutorial, release tour, and long welcome animation. | None |
+| Unlock premium | Unlocks Premium-only features. | None |
 
 </details>
 
