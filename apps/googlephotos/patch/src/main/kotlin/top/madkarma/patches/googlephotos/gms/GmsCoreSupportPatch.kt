@@ -10,6 +10,7 @@ package top.madkarma.patches.googlephotos.gms
 import app.reseam.patch.*
 import top.madkarma.googlephotos.gms.bindings.GmsCoreSupport
 import top.madkarma.patches.googlephotos.GOOGLE_PHOTOS
+import top.madkarma.patches.shared.isPresent
 import top.madkarma.patches.shared.originalSignerSha1
 
 private const val MARS_AUTHORITY = "com.google.android.libraries.photos.api.mars"
@@ -251,6 +252,11 @@ val gmsCoreSupport = patch("GmsCore support") {
             returnFalse()
         }
         log.info("GmsCore: ${frictionlessEligibility.descriptor} restores the saved account when frictionless login is unavailable.")
+
+        val notificationRegistrationConstructor =
+            if (isPresent(inlineIdentifierRegistration)) inlineIdentifierRegistrationConstructor
+            else if (isPresent(helperIdentifierRegistration)) helperIdentifierRegistrationConstructor
+            else error("Unsupported Google Photos notification registration")
 
         notificationRegistrationConstructor.before {
             val context = paramOfType(Type.Context)

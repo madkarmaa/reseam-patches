@@ -11,6 +11,7 @@ import app.reseam.patch.dex.stringValue
 import app.reseam.patch.patch
 import top.madkarma.googlephotos.spoof.bindings.PixelXlIdentity
 import top.madkarma.patches.googlephotos.GOOGLE_PHOTOS
+import top.madkarma.patches.shared.isPresent
 
 private val ORIGINAL_PIXEL_FEATURES = setOf(
     "$GOOGLE_PHOTOS.NEXUS_PRELOAD",
@@ -60,7 +61,11 @@ val unlimitedBackupStorage = patch("Unlimited backup storage") {
         log.info("Unlimited backup storage: ${initializePixelFeatures.descriptor} selects the original Pixel offer.")
 
         // Override values at their read sites; Android 17 refuses reflective writes to final Build fields.
-        val identityReads = deviceIdentityReads.flatMap { target ->
+        val readTargets =
+            if (isPresent(pixelBackupSettings)) deviceIdentityReads + pixelBackupIdentityReads
+            else deviceIdentityReads
+
+        val identityReads = readTargets.flatMap { target ->
             target.all.filter { it.field().name in PIXEL_XL_FIELDS }.also {
                 check(it.isNotEmpty()) { "No Google Photos device identity reads matched ${target.debugName}" }
             }
