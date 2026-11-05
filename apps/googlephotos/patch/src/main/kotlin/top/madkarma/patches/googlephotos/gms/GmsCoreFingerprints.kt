@@ -113,12 +113,40 @@ internal val restoreSelectedAccount = method("restoreSelectedAccount") {
     returns(Type.Void)
 }
 
-private val notificationRegistration = method("notificationRegistration") {
+// Through 7.x the GNP registration builder reads the Android ID itself.
+internal val inlineIdentifierRegistration = method("inlineIdentifierRegistration") {
     strings("Exception reading GServices key.")
 }
 
-internal val notificationRegistrationConstructor = method("notificationRegistrationConstructor") {
-    inClass(klass(notificationRegistration.owner))
-    name("<init>")
-    hasParam(Type.Context)
+internal val inlineIdentifierRegistrationConstructor =
+    method("inlineIdentifierRegistrationConstructor") {
+        inClass(klass(inlineIdentifierRegistration.owner))
+        name("<init>")
+        hasParam(Type.Context)
+    }
+
+// From 8.0 a device-identifier helper reads the Android ID and user serial for the builder.
+private val registrationDeviceIdentifiers = klass("registrationDeviceIdentifiers") {
+    strings(
+        "Exception reading GServices key - ANDROID_ID.", "Exception reading getSerialNumberForUser."
+    )
 }
+
+// The Chime registration also reads the helper, but only the GNP builder takes (Z, Z, String).
+internal val helperIdentifierRegistration = method("helperIdentifierRegistration") {
+    params(Type.Boolean, Type.Boolean, Type.String)
+    calls {
+        owner(registrationDeviceIdentifiers.descriptor)
+        params(Type.Boolean)
+        returns(Type.Long)
+    }
+}
+
+// Merged classes declare several constructors; only the builder's own one takes the helper.
+internal val helperIdentifierRegistrationConstructor =
+    method("helperIdentifierRegistrationConstructor") {
+        inClass(klass(helperIdentifierRegistration.owner))
+        name("<init>")
+        hasParam(Type.Context)
+        hasParam(registrationDeviceIdentifiers.descriptor)
+    }

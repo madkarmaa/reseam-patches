@@ -50,13 +50,16 @@ private val requestDeviceInfo = methods("requestDeviceInfo") {
     params()
 }
 
-internal val deviceIdentityReads = listOf(
-    method("pixelBackupSettings") {
-        strings("backup.settings_fixer")
-    }.points("pixelBackupIdentityReads") {
-        buildIdentityRead()
-    },
+// Photos 8.0 removed this Pixel backup settings fixer along with its Build reads.
+internal val pixelBackupSettings = method("pixelBackupSettings") {
+    strings("backup.settings_fixer")
+}
 
+internal val pixelBackupIdentityReads = pixelBackupSettings.points("pixelBackupIdentityReads") {
+    buildIdentityRead()
+}
+
+internal val deviceIdentityReads = listOf(
     method("pixelUploadRequest") {
         strings("Upload Media Crc32C Mismatch")
     }.points("pixelUploadIdentityReads") {
@@ -91,8 +94,10 @@ internal val deviceIdentityReads = listOf(
         buildIdentityRead()
     },
 
+    // The channel-list reader shares the diagnostic; only the device-info builder reads the model.
     method("notificationDeviceInfo") {
-        strings("device_country", "Failed to get notification channels from Android.")
+        strings("Failed to get notification channels from Android.")
+        accesses { owner("android.os.Build"); name("MODEL") }
     }.points("notificationIdentityReads") {
         buildIdentityRead()
     },
