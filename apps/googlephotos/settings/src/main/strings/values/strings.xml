@@ -1,0 +1,5 @@
+<resources>
+    <string name="section_maps">Maps</string>
+    <string name="mapbox_access_token">Mapbox access token</string>
+    <string name="mapbox_access_token_summary">Shows map tiles in Places and photo details. Without a token, maps show your photos on a blank background.</string>
+</resources>
