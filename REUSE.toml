@@ -145,3 +145,10 @@ path = ["apps/universal/extensions/signature-killer/src/main/cpp/llvm-runtime.NO
 precedence = "override"
 SPDX-FileCopyrightText = "the LLVM Project contributors"
 SPDX-License-Identifier = "(Apache-2.0 WITH LLVM-exception) AND MIT"
+
+# The Reseam settings icon, copied from the official Reseam patches.
+[[annotations]]
+path = ["apps/googlephotos/patch/src/main/resources/reseam-settings/reseam_settings_icon.xml"]
+precedence = "override"
+SPDX-FileCopyrightText = "2026 Reseam contributors <https://reseam.app>"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
