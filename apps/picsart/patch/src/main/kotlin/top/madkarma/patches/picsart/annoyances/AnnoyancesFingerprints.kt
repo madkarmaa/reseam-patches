@@ -6,6 +6,7 @@ package top.madkarma.patches.picsart.annoyances
 import app.reseam.patch.method
 
 // CleverTap routes every campaign format through this method before displaying it.
-internal val showCampaign = method("showCampaign") {
-    strings("InAppController:displayNotification")
-}
+internal val showCampaign =
+    method("showCampaign") {
+        strings("InAppController:displayNotification")
+    }

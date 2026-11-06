@@ -3,6 +3,9 @@
 
 package top.madkarma.patches.universal.pairip
 
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
+import java.util.zip.Adler32
 import org.jf.dexlib2.AccessFlags
 import org.jf.dexlib2.Opcode
 import org.jf.dexlib2.Opcodes
@@ -13,9 +16,6 @@ import org.jf.dexlib2.writer.io.MemoryDataStore
 import org.jf.dexlib2.writer.pool.DexPool
 import org.junit.Assert.*
 import org.junit.Test
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
-import java.util.zip.Adler32
 
 class EmbeddedDexTest {
     @Test
@@ -30,12 +30,16 @@ class EmbeddedDexTest {
 
     @Test
     fun rejectsAmbiguousPayloads() {
-        assertThrows(IllegalStateException::class.java) { extractEmbeddedDex(program(dex() + dex())) }
+        assertThrows(IllegalStateException::class.java) {
+            extractEmbeddedDex(program(dex() + dex()))
+        }
     }
 
     @Test
     fun rejectsVmOnlyPayloads() {
-        assertThrows(IllegalStateException::class.java) { extractEmbeddedDex(program(ByteArray(128))) }
+        assertThrows(IllegalStateException::class.java) {
+            extractEmbeddedDex(program(ByteArray(128)))
+        }
     }
 
     @Test
@@ -64,13 +68,16 @@ class EmbeddedDexTest {
         val input = dex()
         input[HeaderItem.SIGNATURE_OFFSET] =
             (input[HeaderItem.SIGNATURE_OFFSET].toInt() xor 1).toByte()
-        val checksum = Adler32().apply {
-            update(
-                input,
-                HeaderItem.CHECKSUM_DATA_START_OFFSET,
-                input.size - HeaderItem.CHECKSUM_DATA_START_OFFSET
-            )
-        }.value
+        val checksum =
+            Adler32()
+                .apply {
+                    update(
+                        input,
+                        HeaderItem.CHECKSUM_DATA_START_OFFSET,
+                        input.size - HeaderItem.CHECKSUM_DATA_START_OFFSET,
+                    )
+                }
+                .value
         littleEndian(input).putInt(HeaderItem.CHECKSUM_OFFSET, checksum.toInt())
         assertThrows(IllegalArgumentException::class.java) { extractEmbeddedDex(program(input)) }
     }
@@ -82,29 +89,35 @@ class EmbeddedDexTest {
         ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN)
 
     private fun dex(): ByteArray {
-        val implementation = ImmutableMethodImplementation(
-            1, listOf(ImmutableInstruction10x(Opcode.RETURN_VOID)), emptyList(), emptyList()
-        )
-        val method = ImmutableMethod(
-            "Lexample/Recovered;",
-            "run",
-            listOf(ImmutableMethodParameter("Lexample/Original;", emptySet(), null)),
-            "V",
-            AccessFlags.PUBLIC.value or AccessFlags.STATIC.value,
-            emptySet(),
-            emptySet(),
-            implementation
-        )
-        val definition = ImmutableClassDef(
-            "Lexample/Recovered;",
-            AccessFlags.PUBLIC.value,
-            "Ljava/lang/Object;",
-            emptyList(),
-            null,
-            emptySet(),
-            emptyList(),
-            listOf(method)
-        )
+        val implementation =
+            ImmutableMethodImplementation(
+                1,
+                listOf(ImmutableInstruction10x(Opcode.RETURN_VOID)),
+                emptyList(),
+                emptyList(),
+            )
+        val method =
+            ImmutableMethod(
+                "Lexample/Recovered;",
+                "run",
+                listOf(ImmutableMethodParameter("Lexample/Original;", emptySet(), null)),
+                "V",
+                AccessFlags.PUBLIC.value or AccessFlags.STATIC.value,
+                emptySet(),
+                emptySet(),
+                implementation,
+            )
+        val definition =
+            ImmutableClassDef(
+                "Lexample/Recovered;",
+                AccessFlags.PUBLIC.value,
+                "Ljava/lang/Object;",
+                emptyList(),
+                null,
+                emptySet(),
+                emptyList(),
+                listOf(method),
+            )
         val store = MemoryDataStore()
         try {
             DexPool.writeTo(store, ImmutableDexFile(Opcodes.forApi(26), listOf(definition)))

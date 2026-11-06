@@ -15,9 +15,10 @@ import java.util.concurrent.atomic.AtomicInteger
 
 internal const val TAG = "SignatureKiller"
 
-/** Set from the patch's diagnostics option. When off, the extension and native library log nothing. */
-@Volatile
-internal var diagnosticsEnabled = false
+/**
+ * Set from the patch's diagnostics option. When off, the extension and native library log nothing.
+ */
+@Volatile internal var diagnosticsEnabled = false
 
 internal inline fun logDebug(message: () -> String) {
     if (diagnosticsEnabled) Log.d(TAG, message())
@@ -62,11 +63,12 @@ internal fun hexPrefix(bytes: ByteArray): String =
 
 /** Describes the running process, since multi-process apps initialize once per process. */
 internal fun processDescription(): String {
-    val name = try {
-        File("/proc/self/cmdline").readText().substringBefore('\u0000')
-    } catch (exception: IOException) {
-        "unknown"
-    }
+    val name =
+        try {
+            File("/proc/self/cmdline").readText().substringBefore('\u0000')
+        } catch (exception: IOException) {
+            "unknown"
+        }
 
     return "process $name (pid ${Process.myPid()}, uid ${Process.myUid()}), API ${Build.VERSION.SDK_INT}"
 }

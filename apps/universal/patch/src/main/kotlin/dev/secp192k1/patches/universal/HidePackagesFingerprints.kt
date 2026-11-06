@@ -16,13 +16,15 @@ private val extensionDescriptorPrefix = HiddenPackages.descriptor.substringBefor
 
 internal fun packageManagerCallSites(wrapper: ExtMethod) =
     methods("callers of PackageManager.${wrapper.name}") {
-        calls { wrappedBy(wrapper) }
-        includeExtensions()
-        // Keep the extension's calls to Android intact to avoid recursion.
-        custom { !owner.startsWith(extensionDescriptorPrefix) }
-    }.points("PackageManager.${wrapper.name}") {
-        invokeVirtual { wrappedBy(wrapper) }
-    }.all
+            calls { wrappedBy(wrapper) }
+            includeExtensions()
+            // Keep the extension's calls to Android intact to avoid recursion.
+            custom { !owner.startsWith(extensionDescriptorPrefix) }
+        }
+        .points("PackageManager.${wrapper.name}") {
+            invokeVirtual { wrappedBy(wrapper) }
+        }
+        .all
 
 private fun MethodRefMatch.wrappedBy(wrapper: ExtMethod) {
     owner(PACKAGE_MANAGER)

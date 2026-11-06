@@ -11,20 +11,34 @@ private const val MISSING_ACTIVITY = "top.madkarma.shared.gmscore.GmsCoreMissing
 private const val ENTRY_APPLICATION = "top.madkarma.shared.gmscore.GmsCoreApplication"
 
 // Google Sign-In's hub activity opens the Play Services sign-in screen here.
-private val signInLauncher = method("signInLauncher") {
-    inClass(klass("com.google.android.gms.auth.api.signin.internal.SignInHubActivity"))
-    strings("com.google.android.gms.auth.GOOGLE_SIGN_IN", PLAY_SERVICES)
-}
+private val signInLauncher =
+    method("signInLauncher") {
+        inClass(klass("com.google.android.gms.auth.api.signin.internal.SignInHubActivity"))
+        strings("com.google.android.gms.auth.GOOGLE_SIGN_IN", PLAY_SERVICES)
+    }
 
-private val signInLaunch = signInLauncher.point {
-    invokeVirtual { name("startActivityForResult"); params("android.content.Intent", Type.Int) }
-}.captureArgumentAs("intent", 1, "android.content.Intent")
+private val signInLaunch =
+    signInLauncher
+        .point {
+            invokeVirtual {
+                name("startActivityForResult")
+                params("android.content.Intent", Type.Int)
+            }
+        }
+        .captureArgumentAs("intent", 1, "android.content.Intent")
 
 // Credential Manager's Google ID options store their request in a Bundle, built by these methods.
-private val googleIdRequests = listOf(
-    "com.google.android.libraries.identity.googleid.BUNDLE_KEY_FILTER_BY_AUTHORIZED_ACCOUNTS",
-    "com.google.android.libraries.identity.googleid.siwg.BUNDLE_KEY_SERVER_CLIENT_ID",
-).map { key -> methods("googleIdRequest") { strings(key); returns("android.os.Bundle") } }
+private val googleIdRequests =
+    listOf(
+            "com.google.android.libraries.identity.googleid.BUNDLE_KEY_FILTER_BY_AUTHORIZED_ACCOUNTS",
+            "com.google.android.libraries.identity.googleid.siwg.BUNDLE_KEY_SERVER_CLIENT_ID",
+        )
+        .map { key ->
+            methods("googleIdRequest") {
+                strings(key)
+                returns("android.os.Bundle")
+            }
+        }
 
 /**
  * Opens Google Sign-In through the GmsCore of [vendor], and asks for GmsCore when a sign-in starts
@@ -33,7 +47,8 @@ private val googleIdRequests = listOf(
 fun PatchRuntime.signInThroughGmsCore(vendor: String) {
     GmsCore.vendorGroupId.implement { returnValue(string(vendor)) }
 
-    // The app entry point needs an Application class inside the app, which the framework's own is not.
+    // The app entry point needs an Application class inside the app, which the framework's own is
+    // not.
     manifest.edit {
         val application = findByTag("application").single()
 
@@ -51,10 +66,14 @@ fun PatchRuntime.signInThroughGmsCore(vendor: String) {
 
     signInLaunch.before { GmsCore.prepareSignIn(thisObject, capture("intent")) }
     check(signInLauncher.method.replaceAllStrings(PLAY_SERVICES, "$vendor.android.gms") > 0)
-    log.info("GmsCore: ${signInLauncher.descriptor} opens the GmsCore sign-in screen after checking that GmsCore is installed.")
+    log.info(
+        "GmsCore: ${signInLauncher.descriptor} opens the GmsCore sign-in screen after checking that GmsCore is installed.",
+    )
 
     for (request in googleIdRequests.flatMap { it.all }) {
         request.after { GmsCore.checkGoogleIdRequest(result) }
-        log.info("GmsCore: ${request.descriptor} checks that GmsCore is installed for an interactive sign-in.")
+        log.info(
+            "GmsCore: ${request.descriptor} checks that GmsCore is installed for an interactive sign-in.",
+        )
     }
 }

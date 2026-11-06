@@ -6,7 +6,8 @@ package top.madkarma.patches.truecaller.launch
 import app.reseam.patch.Type
 import app.reseam.patch.method
 
-internal val afterCallScreenEnabled = method("afterCallScreenEnabled") {
-    strings("afterCallForPbContacts")
-    returns(Type.Boolean)
-}
+internal val afterCallScreenEnabled =
+    method("afterCallScreenEnabled") {
+        strings("afterCallForPbContacts")
+        returns(Type.Boolean)
+    }

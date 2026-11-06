@@ -8,21 +8,25 @@ import app.reseam.patch.enumConstant
 import app.reseam.patch.klass
 import app.reseam.patch.method
 
-internal val checkProKey = method("checkProKey") {
-    strings("Unable to check if pro package is installed")
-}
+internal val checkProKey =
+    method("checkProKey") {
+        strings("Unable to check if pro package is installed")
+    }
 
-internal val updateLicenseState = method("updateLicenseState") {
-    strings("provider state changed to: ")
-}
+internal val updateLicenseState =
+    method("updateLicenseState") {
+        strings("provider state changed to: ")
+    }
 
-private val licenseState = klass("licenseState") {
-    enumConstants("LICENSED")
-}
+private val licenseState =
+    klass("licenseState") {
+        enumConstants("LICENSED")
+    }
 
 internal val licensedState = licenseState.enumConstant("LICENSED")
 
-internal val proFeaturesAvailable = method("proFeaturesAvailable") {
-    strings("skudebug")
-    returns(Type.Boolean)
-}
+internal val proFeaturesAvailable =
+    method("proFeaturesAvailable") {
+        strings("skudebug")
+        returns(Type.Boolean)
+    }

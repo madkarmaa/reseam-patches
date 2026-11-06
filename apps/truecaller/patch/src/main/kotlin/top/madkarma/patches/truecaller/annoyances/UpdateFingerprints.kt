@@ -9,12 +9,14 @@ import app.reseam.patch.method
 
 private val updateType = klass("com.truecaller.forcedupdate.UpdateType")
 
-internal val currentUpdateType = method("currentUpdateType") {
-    strings("forcedUpdate_updateType")
-    returns(updateType.descriptor)
-}
+internal val currentUpdateType =
+    method("currentUpdateType") {
+        strings("forcedUpdate_updateType")
+        returns(updateType.descriptor)
+    }
 
-internal val inAppUpdateConfiguration = method("inAppUpdateConfiguration") {
-    strings("InAppUpgradeConfig_49679")
-    returns(Type.Object)
-}
+internal val inAppUpdateConfiguration =
+    method("inAppUpdateConfiguration") {
+        strings("InAppUpgradeConfig_49679")
+        returns(Type.Object)
+    }

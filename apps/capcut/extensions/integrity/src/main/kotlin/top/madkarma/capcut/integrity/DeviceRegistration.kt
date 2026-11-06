@@ -1,7 +1,8 @@
 // SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-@file:JvmName("DeviceRegistration") @file:Suppress("unused")
+@file:JvmName("DeviceRegistration")
+@file:Suppress("unused")
 
 package top.madkarma.capcut.integrity
 
@@ -14,17 +15,16 @@ import com.bytedance.frameworks.baselib.network.http.BaseRequestContext
 import com.bytedance.retrofit2.client.Request
 import com.ss.android.deviceregister.DeviceRegisterManager
 import com.ss.android.deviceregister.OnResetListener
-import org.json.JSONObject
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.RandomAccessFile
 import java.util.*
+import org.json.JSONObject
 
 private const val TAG = "CapCutRegistration"
 private lateinit var profileDirectory: File
 
-@Volatile
-private var installation: JSONObject? = null
+@Volatile private var installation: JSONObject? = null
 private var resetRequested = false
 
 @Export
@@ -40,24 +40,27 @@ fun initialize(context: Context?) {
     installation = updateProfile { it }
 }
 
-// All app processes share one profile, and Android backups must not restore another installation's IDs.
+// All app processes share one profile, and Android backups must not restore another installation's
+// IDs.
 @Synchronized
 private fun updateProfile(update: (JSONObject) -> JSONObject): JSONObject {
     RandomAccessFile(File(profileDirectory, "installation.lock"), "rw").channel.use { channel ->
         channel.lock().use {
             val file = AtomicFile(File(profileDirectory, "installation.json"))
 
-            val stored = try {
-                JSONObject(String(file.readFully(), Charsets.UTF_8))
-            } catch (missing: FileNotFoundException) {
-                JSONObject().apply {
-                    put("openudid", UUID.randomUUID().toString().replace("-", "").take(16))
-                    for (key in listOf("clientudid", "google_aid", "cdid")) put(
-                        key, UUID.randomUUID().toString()
-                    )
-                    put("registered", false)
+            val stored =
+                try {
+                    JSONObject(String(file.readFully(), Charsets.UTF_8))
+                } catch (missing: FileNotFoundException) {
+                    JSONObject().apply {
+                        put("openudid", UUID.randomUUID().toString().replace("-", "").take(16))
+                        for (key in listOf("clientudid", "google_aid", "cdid")) put(
+                            key,
+                            UUID.randomUUID().toString(),
+                        )
+                        put("registered", false)
+                    }
                 }
-            }
 
             val updated = update(stored)
 
@@ -86,21 +89,30 @@ fun resetIfNeeded() {
         "Clearing the previous device registration failed"
     }
 
-    DeviceRegisterManager.resetDidWhenSwitchChildMode(childMode, 10_000, object : OnResetListener {
-        override fun onDidUpdate(deviceId: String?, installId: String?) {
-            if (deviceId.isNullOrEmpty() || deviceId == "0" || installId.isNullOrEmpty() || installId == "0") {
-                Log.e(TAG, "The registration server did not return valid identifiers")
-                return
+    DeviceRegisterManager.resetDidWhenSwitchChildMode(
+        childMode,
+        10_000,
+        object : OnResetListener {
+            override fun onDidUpdate(deviceId: String?, installId: String?) {
+                if (
+                    deviceId.isNullOrEmpty() ||
+                        deviceId == "0" ||
+                        installId.isNullOrEmpty() ||
+                        installId == "0"
+                ) {
+                    Log.e(TAG, "The registration server did not return valid identifiers")
+                    return
+                }
+
+                installation = updateProfile { it.put("registered", true) }
+                Log.i(TAG, "The SDK accepted a registration for this installation")
             }
 
-            installation = updateProfile { it.put("registered", true) }
-            Log.i(TAG, "The SDK accepted a registration for this installation")
-        }
-
-        override fun onTimeout() {
-            Log.e(TAG, "Device registration timed out; the SDK will retry")
-        }
-    })
+            override fun onTimeout() {
+                Log.e(TAG, "Device registration timed out; the SDK will retry")
+            }
+        },
+    )
 }
 
 @Export
@@ -135,8 +147,9 @@ fun isRegistration(url: String?): Boolean =
 fun excludeAppHeaders(request: Request?): Boolean {
     if (request == null || !isRegistration(request.url)) return false
 
-    val context = request.extraInfo as? BaseRequestContext
-        ?: error("Device registration has no network request context")
+    val context =
+        request.extraInfo as? BaseRequestContext
+            ?: error("Device registration has no network request context")
 
     context.bypassCookie = true
     return true

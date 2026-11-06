@@ -9,8 +9,10 @@ import java.io.File
 import java.io.FileOutputStream
 
 internal fun loadPatchedDex(context: Context, parent: ClassLoader?): ClassLoader {
-    val classes = context.assets.open("reseam/pairip/classes.txt").bufferedReader()
-        .use { it.readLines().toSet() }
+    val classes =
+        context.assets.open("reseam/pairip/classes.txt").bufferedReader().use {
+            it.readLines().toSet()
+        }
     check(classes.isNotEmpty()) { "Patched Pairip DEX has no class inventory" }
 
     val file = File.createTempFile("reseam-pairip-", ".dex", context.codeCacheDir)
@@ -32,11 +34,12 @@ private class PatchedDexLoader(
     parent: ClassLoader?,
     private val patchedNames: Set<String>,
 ) : DexClassLoader(path, cache, null, parent) {
-    override fun loadClass(name: String, resolve: Boolean): Class<*> = synchronized(this) {
-        if (name !in patchedNames) return@synchronized super.loadClass(name, resolve)
+    override fun loadClass(name: String, resolve: Boolean): Class<*> =
+        synchronized(this) {
+            if (name !in patchedNames) return@synchronized super.loadClass(name, resolve)
 
-        val definition = findLoadedClass(name) ?: findClass(name)
-        if (resolve) resolveClass(definition)
-        definition
-    }
+            val definition = findLoadedClass(name) ?: findClass(name)
+            if (resolve) resolveClass(definition)
+            definition
+        }
 }

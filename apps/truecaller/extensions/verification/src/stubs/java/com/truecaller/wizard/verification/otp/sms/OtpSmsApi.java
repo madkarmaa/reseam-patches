@@ -4,7 +4,8 @@
 package com.truecaller.wizard.verification.otp.sms;
 
 public enum OtpSmsApi {
-    SMS, GOOGLE;
+    SMS,
+    GOOGLE;
 
     public int getValue() {
         throw new UnsupportedOperationException("Stub");

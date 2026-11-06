@@ -10,19 +10,18 @@ import android.location.Location
 import android.location.LocationManager
 import android.os.Build
 import app.reseam.runtime.Export
-import org.json.JSONArray
-import org.json.JSONObject
 import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.net.ssl.HttpsURLConnection
+import org.json.JSONArray
+import org.json.JSONObject
 
 /** Supplies Niagara's weather response through its existing parser, cache and UI. */
 class WeatherApi private constructor(context: Context) {
     private val appContext = context.applicationContext
 
-    @Export
-    fun now(): Long = System.currentTimeMillis()
+    @Export fun now(): Long = System.currentTimeMillis()
 
     // The worker continues after the caller's grace period and caches successful responses.
     @Export
@@ -44,15 +43,16 @@ class WeatherApi private constructor(context: Context) {
         return worker.json
     }
 
-    private fun startWorker(): FetchWorker = synchronized(fetchLock) {
-        val current = inFlight
-        if (current != null && current.isAlive) return@synchronized current
+    private fun startWorker(): FetchWorker =
+        synchronized(fetchLock) {
+            val current = inFlight
+            if (current != null && current.isAlive) return@synchronized current
 
-        FetchWorker().also {
-            inFlight = it
-            it.start()
+            FetchWorker().also {
+                inFlight = it
+                it.start()
+            }
         }
-    }
 
     private fun prefs() = appContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
@@ -81,11 +81,12 @@ class WeatherApi private constructor(context: Context) {
     private fun buildNoWeather(message: String, cause: Exception?): Throwable {
         try {
             val type = Class.forName("bitpit.launcher.weather.NoWeatherDataException")
-            val constructor = type.getConstructor(
-                Int::class.javaPrimitiveType,
-                Exception::class.java,
-                String::class.java,
-            )
+            val constructor =
+                type.getConstructor(
+                    Int::class.javaPrimitiveType,
+                    Exception::class.java,
+                    String::class.java,
+                )
             return constructor.newInstance(6, cause, message) as Throwable
         } catch (exception: Exception) {
             return RuntimeException(message, cause ?: exception)
@@ -95,46 +96,55 @@ class WeatherApi private constructor(context: Context) {
     private fun resolveCoords(): DoubleArray {
         val preferences = prefs()
 
-        if (!preferences.getBoolean(
+        if (
+            !preferences.getBoolean(
                 KEY_DYNAMIC,
                 false,
             ) && preferences.contains(KEY_LAT) && preferences.contains(KEY_LONG)
-        ) return doubleArrayOf(
-            preferences.getFloat(KEY_LAT, 0f).toDouble(),
-            preferences.getFloat(KEY_LONG, 0f).toDouble(),
         )
+            return doubleArrayOf(
+                preferences.getFloat(KEY_LAT, 0f).toDouble(),
+                preferences.getFloat(KEY_LONG, 0f).toDouble(),
+            )
 
-        val location = lastKnown() ?: throw RuntimeException(
-            "Location unavailable - allow location access or set a fixed location"
-        )
+        val location =
+            lastKnown()
+                ?: throw RuntimeException(
+                    "Location unavailable - allow location access or set a fixed location",
+                )
 
         return doubleArrayOf(location.latitude, location.longitude)
     }
 
     @Suppress("MissingPermission")
     private fun lastKnown(): Location? {
-        if (Build.VERSION.SDK_INT >= 23 && appContext.checkSelfPermission(
-                android.Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != android.content.pm.PackageManager.PERMISSION_GRANTED
-        ) return null
+        if (
+            Build.VERSION.SDK_INT >= 23 &&
+                appContext.checkSelfPermission(
+                    android.Manifest.permission.ACCESS_COARSE_LOCATION,
+                ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+        )
+            return null
 
         val manager =
             appContext.getSystemService(Context.LOCATION_SERVICE) as? LocationManager ?: return null
 
         var best: Location? = null
 
-        for (provider in arrayOf(
-            LocationManager.GPS_PROVIDER,
-            LocationManager.NETWORK_PROVIDER,
-            LocationManager.PASSIVE_PROVIDER,
-        )) {
-            val candidate = try {
-                manager.getLastKnownLocation(provider)
-            } catch (exception: IllegalArgumentException) {
-                continue
-            } catch (exception: SecurityException) {
-                continue
-            } ?: continue
+        for (provider in
+            arrayOf(
+                LocationManager.GPS_PROVIDER,
+                LocationManager.NETWORK_PROVIDER,
+                LocationManager.PASSIVE_PROVIDER,
+            )) {
+            val candidate =
+                try {
+                    manager.getLastKnownLocation(provider)
+                } catch (exception: IllegalArgumentException) {
+                    continue
+                } catch (exception: SecurityException) {
+                    continue
+                } ?: continue
 
             if (best == null || candidate.time > best.time) best = candidate
         }
@@ -142,8 +152,9 @@ class WeatherApi private constructor(context: Context) {
         return best
     }
 
-    private fun readLang(): String = prefs().getString(KEY_LANG, null)?.takeIf { it.isNotEmpty() }
-        ?: Locale.getDefault().language
+    private fun readLang(): String =
+        prefs().getString(KEY_LANG, null)?.takeIf { it.isNotEmpty() }
+            ?: Locale.getDefault().language
 
     private fun mapLang(lang: String?): String {
         for (row in LANG_MAP) if (row.lang == lang) return row.result
@@ -153,13 +164,15 @@ class WeatherApi private constructor(context: Context) {
     private fun download(latitude: Double, longitude: Double, language: String): String {
         var connection: HttpsURLConnection? = null
         try {
-            connection = URL(
-                requestUrl(
-                    latitude,
-                    longitude,
-                    language,
-                )
-            ).openConnection() as HttpsURLConnection
+            connection =
+                URL(
+                        requestUrl(
+                            latitude,
+                            longitude,
+                            language,
+                        ),
+                    )
+                    .openConnection() as HttpsURLConnection
             connection.connectTimeout = CONNECT_TIMEOUT_MS
             connection.readTimeout = READ_TIMEOUT_MS
             connection.setRequestProperty("User-Agent", USER_AGENT)
@@ -189,8 +202,12 @@ class WeatherApi private constructor(context: Context) {
     @Suppress("UseKtx")
     fun saveApiKey(key: String?) {
         val value = key?.trim { it <= ' ' } ?: ""
-        prefs().edit().putString(KEY_API_RUNTIME, value).remove(KEY_CACHE_JSON)
-            .remove(KEY_CACHE_TIME).apply()
+        prefs()
+            .edit()
+            .putString(KEY_API_RUNTIME, value)
+            .remove(KEY_CACHE_JSON)
+            .remove(KEY_CACHE_TIME)
+            .apply()
     }
 
     private fun parseError(body: String): JSONObject? {
@@ -235,7 +252,7 @@ class WeatherApi private constructor(context: Context) {
         for (day in 0 until days.length()) {
             val hours = days.getJSONObject(day).getJSONArray("hour")
             for (hour in 0 until hours.length()) hourly.put(
-                translateHour(hours.getJSONObject(hour))
+                translateHour(hours.getJSONObject(hour)),
             )
         }
         return hourly
@@ -343,8 +360,9 @@ class WeatherApi private constructor(context: Context) {
             val format = SimpleDateFormat("yyyy-MM-dd hh:mm a", Locale.US)
             format.timeZone = TimeZone.getTimeZone(zoneId)
             return checkNotNull(format.parse("$date $time")) {
-                "Weather timestamp could not be parsed"
-            }.time / 1000
+                    "Weather timestamp could not be parsed"
+                }
+                .time / 1000
         } catch (exception: Exception) {
             return 0
         }
@@ -374,13 +392,15 @@ class WeatherApi private constructor(context: Context) {
         val message = error.optString("message", "Weather service returned an error")
 
         return when (error.optInt("code", -1)) {
-            1002, 2006 -> RuntimeException("WeatherAPI key invalid ($message)", cause)
+            1002,
+            2006 -> RuntimeException("WeatherAPI key invalid ($message)", cause)
 
             2007 -> RuntimeException("WeatherAPI quota exceeded ($message)", cause)
-            1006 -> RuntimeException(
-                "Location unavailable - allow location access or set a fixed location",
-                cause,
-            )
+            1006 ->
+                RuntimeException(
+                    "Location unavailable - allow location access or set a fixed location",
+                    cause,
+                )
 
             else -> RuntimeException(message, cause)
         }
@@ -395,14 +415,11 @@ class WeatherApi private constructor(context: Context) {
     )
 
     private inner class FetchWorker : Thread(WORKER_NAME) {
-        @Volatile
-        private var done = false
+        @Volatile private var done = false
 
-        @Volatile
-        var json: String? = null
+        @Volatile var json: String? = null
 
-        @Volatile
-        var failure: Throwable? = null
+        @Volatile var failure: Throwable? = null
 
         init {
             isDaemon = true
@@ -412,9 +429,10 @@ class WeatherApi private constructor(context: Context) {
 
         override fun run() {
             try {
-                if (currentApiKey().isEmpty()) throw RuntimeException(
-                    "No WeatherAPI key - enter one below the temperature-units button"
-                )
+                if (currentApiKey().isEmpty())
+                    throw RuntimeException(
+                        "No WeatherAPI key - enter one below the temperature-units button",
+                    )
                 val coordinates = resolveCoords()
                 val language = mapLang(readLang())
 
@@ -455,92 +473,94 @@ class WeatherApi private constructor(context: Context) {
         private const val CACHE_TTL_MS = 10L * 60L * 1000L
         private val fetchLock = Any()
         private val FALLBACK_CONDITION = ConditionMapping(-1, 804, 4)
-        private val CONDITION_MAP = arrayOf(
-            ConditionMapping(1000, 800, 1),
-            ConditionMapping(1003, 801, 2),
-            ConditionMapping(1006, 802, 3),
-            ConditionMapping(1009, 804, 4),
-            ConditionMapping(1030, 701, 50),
-            ConditionMapping(1135, 741, 50),
-            ConditionMapping(1147, 741, 50),
-            ConditionMapping(1063, 500, 10),
-            ConditionMapping(1150, 500, 10),
-            ConditionMapping(1153, 500, 10),
-            ConditionMapping(1180, 500, 10),
-            ConditionMapping(1183, 500, 10),
-            ConditionMapping(1198, 500, 10),
-            ConditionMapping(1240, 500, 10),
-            ConditionMapping(1186, 501, 10),
-            ConditionMapping(1189, 501, 10),
-            ConditionMapping(1192, 501, 10),
-            ConditionMapping(1195, 501, 10),
-            ConditionMapping(1201, 501, 10),
-            ConditionMapping(1243, 501, 10),
-            ConditionMapping(1246, 501, 10),
-            ConditionMapping(1087, 200, 11),
-            ConditionMapping(1273, 200, 11),
-            ConditionMapping(1276, 200, 11),
-            ConditionMapping(1279, 200, 11),
-            ConditionMapping(1282, 200, 11),
-            ConditionMapping(1066, 600, 13),
-            ConditionMapping(1069, 600, 13),
-            ConditionMapping(1072, 600, 13),
-            ConditionMapping(1114, 600, 13),
-            ConditionMapping(1117, 600, 13),
-            ConditionMapping(1204, 600, 13),
-            ConditionMapping(1207, 600, 13),
-            ConditionMapping(1210, 600, 13),
-            ConditionMapping(1213, 600, 13),
-            ConditionMapping(1216, 600, 13),
-            ConditionMapping(1219, 600, 13),
-            ConditionMapping(1222, 600, 13),
-            ConditionMapping(1225, 600, 13),
-            ConditionMapping(1237, 600, 13),
-            ConditionMapping(1249, 600, 13),
-            ConditionMapping(1252, 600, 13),
-            ConditionMapping(1255, 600, 13),
-            ConditionMapping(1258, 600, 13),
-            ConditionMapping(1261, 600, 13),
-            ConditionMapping(1264, 600, 13),
-        )
-        private val LANG_MAP = arrayOf(
-            LangMapping("ar"),
-            LangMapping("bn"),
-            LangMapping("bg"),
-            LangMapping("da"),
-            LangMapping("nl"),
-            LangMapping("fi"),
-            LangMapping("fr"),
-            LangMapping("de"),
-            LangMapping("el"),
-            LangMapping("hi"),
-            LangMapping("hu"),
-            LangMapping("it"),
-            LangMapping("ja"),
-            LangMapping("jv"),
-            LangMapping("ko"),
-            LangMapping("mr"),
-            LangMapping("pl"),
-            LangMapping("pt"),
-            LangMapping("pa"),
-            LangMapping("ro"),
-            LangMapping("ru"),
-            LangMapping("sr"),
-            LangMapping("si"),
-            LangMapping("sk"),
-            LangMapping("es"),
-            LangMapping("sv"),
-            LangMapping("ta"),
-            LangMapping("te"),
-            LangMapping("tr"),
-            LangMapping("uk"),
-            LangMapping("ur"),
-            LangMapping("vi"),
-            LangMapping("zh"),
-            LangMapping("zh_tw"),
-            LangMapping("cz", "cs"),
-            LangMapping("zh_cmn", "zh"),
-        )
+        private val CONDITION_MAP =
+            arrayOf(
+                ConditionMapping(1000, 800, 1),
+                ConditionMapping(1003, 801, 2),
+                ConditionMapping(1006, 802, 3),
+                ConditionMapping(1009, 804, 4),
+                ConditionMapping(1030, 701, 50),
+                ConditionMapping(1135, 741, 50),
+                ConditionMapping(1147, 741, 50),
+                ConditionMapping(1063, 500, 10),
+                ConditionMapping(1150, 500, 10),
+                ConditionMapping(1153, 500, 10),
+                ConditionMapping(1180, 500, 10),
+                ConditionMapping(1183, 500, 10),
+                ConditionMapping(1198, 500, 10),
+                ConditionMapping(1240, 500, 10),
+                ConditionMapping(1186, 501, 10),
+                ConditionMapping(1189, 501, 10),
+                ConditionMapping(1192, 501, 10),
+                ConditionMapping(1195, 501, 10),
+                ConditionMapping(1201, 501, 10),
+                ConditionMapping(1243, 501, 10),
+                ConditionMapping(1246, 501, 10),
+                ConditionMapping(1087, 200, 11),
+                ConditionMapping(1273, 200, 11),
+                ConditionMapping(1276, 200, 11),
+                ConditionMapping(1279, 200, 11),
+                ConditionMapping(1282, 200, 11),
+                ConditionMapping(1066, 600, 13),
+                ConditionMapping(1069, 600, 13),
+                ConditionMapping(1072, 600, 13),
+                ConditionMapping(1114, 600, 13),
+                ConditionMapping(1117, 600, 13),
+                ConditionMapping(1204, 600, 13),
+                ConditionMapping(1207, 600, 13),
+                ConditionMapping(1210, 600, 13),
+                ConditionMapping(1213, 600, 13),
+                ConditionMapping(1216, 600, 13),
+                ConditionMapping(1219, 600, 13),
+                ConditionMapping(1222, 600, 13),
+                ConditionMapping(1225, 600, 13),
+                ConditionMapping(1237, 600, 13),
+                ConditionMapping(1249, 600, 13),
+                ConditionMapping(1252, 600, 13),
+                ConditionMapping(1255, 600, 13),
+                ConditionMapping(1258, 600, 13),
+                ConditionMapping(1261, 600, 13),
+                ConditionMapping(1264, 600, 13),
+            )
+        private val LANG_MAP =
+            arrayOf(
+                LangMapping("ar"),
+                LangMapping("bn"),
+                LangMapping("bg"),
+                LangMapping("da"),
+                LangMapping("nl"),
+                LangMapping("fi"),
+                LangMapping("fr"),
+                LangMapping("de"),
+                LangMapping("el"),
+                LangMapping("hi"),
+                LangMapping("hu"),
+                LangMapping("it"),
+                LangMapping("ja"),
+                LangMapping("jv"),
+                LangMapping("ko"),
+                LangMapping("mr"),
+                LangMapping("pl"),
+                LangMapping("pt"),
+                LangMapping("pa"),
+                LangMapping("ro"),
+                LangMapping("ru"),
+                LangMapping("sr"),
+                LangMapping("si"),
+                LangMapping("sk"),
+                LangMapping("es"),
+                LangMapping("sv"),
+                LangMapping("ta"),
+                LangMapping("te"),
+                LangMapping("tr"),
+                LangMapping("uk"),
+                LangMapping("ur"),
+                LangMapping("vi"),
+                LangMapping("zh"),
+                LangMapping("zh_tw"),
+                LangMapping("cz", "cs"),
+                LangMapping("zh_cmn", "zh"),
+            )
         private var inFlight: FetchWorker? = null
 
         private fun localHour(epochSeconds: Long, zone: TimeZone): Int {
@@ -550,8 +570,6 @@ class WeatherApi private constructor(context: Context) {
             return hour
         }
 
-        @Export
-        @JvmStatic
-        fun create(context: Context): WeatherApi = WeatherApi(context)
+        @Export @JvmStatic fun create(context: Context): WeatherApi = WeatherApi(context)
     }
 }

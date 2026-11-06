@@ -1,7 +1,8 @@
 // SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-@file:JvmName("WeatherRepository") @file:Suppress("unused")
+@file:JvmName("WeatherRepository")
+@file:Suppress("unused")
 
 package top.madkarma.extensions
 
@@ -10,7 +11,9 @@ import android.util.Log
 import app.reseam.runtime.Export
 import java.lang.reflect.InvocationTargetException
 
-/** Uses members resolved by the patch, including older static cache writers and coroutine parsers. */
+/**
+ * Uses members resolved by the patch, including older static cache writers and coroutine parsers.
+ */
 @Export
 fun fetchForecast(
     repository: Any,
@@ -28,17 +31,19 @@ fun fetchForecast(
 
         val type = repository.javaClass
 
-        val forecast = if (parserName.isNotEmpty()) {
-            val parser = type.getDeclaredMethod(parserName, String::class.java, java.lang.Long.TYPE)
-            parser.isAccessible = true
+        val forecast =
+            if (parserName.isNotEmpty()) {
+                val parser =
+                    type.getDeclaredMethod(parserName, String::class.java, java.lang.Long.TYPE)
+                parser.isAccessible = true
 
-            val parsed = parser.invoke(repository, json, api.now())
-            writeCache(repository, cacheName, json)
-            parsed
-        } else {
-            writeCache(repository, cacheName, json)
-            readCache(repository, readerClassName, readerMethodName, readerResultFieldName)
-        }
+                val parsed = parser.invoke(repository, json, api.now())
+                writeCache(repository, cacheName, json)
+                parsed
+            } else {
+                writeCache(repository, cacheName, json)
+                readCache(repository, readerClassName, readerMethodName, readerResultFieldName)
+            }
 
         val publisher = type.getDeclaredMethod(publisherName, Any::class.java)
         publisher.isAccessible = true
@@ -57,21 +62,25 @@ fun fetchForecast(
 private fun writeCache(repository: Any, name: String, json: String?) {
     val type = repository.javaClass
 
-    val writer = try {
-        type.getDeclaredMethod(name, String::class.java)
-    } catch (_: NoSuchMethodException) {
-        val staticWriter = type.getDeclaredMethod(name, type, String::class.java)
-        staticWriter.isAccessible = true
-        staticWriter.invoke(null, repository, json)
-        return
-    }
+    val writer =
+        try {
+            type.getDeclaredMethod(name, String::class.java)
+        } catch (_: NoSuchMethodException) {
+            val staticWriter = type.getDeclaredMethod(name, type, String::class.java)
+            staticWriter.isAccessible = true
+            staticWriter.invoke(null, repository, json)
+            return
+        }
 
     writer.isAccessible = true
     writer.invoke(repository, json)
 }
 
 private fun readCache(
-    repository: Any, className: String, methodName: String, resultFieldName: String
+    repository: Any,
+    className: String,
+    methodName: String,
+    resultFieldName: String,
 ): Any? {
     val type = Class.forName(className, true, repository.javaClass.classLoader)
 

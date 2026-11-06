@@ -6,12 +6,14 @@ package top.madkarma.patches.octopi.pro
 import app.reseam.patch.Type
 import app.reseam.patch.method
 
-private val settingsHeader = method("settingsHeader") {
-    strings("Octopi Launcher", " Pro")
-}
+private val settingsHeader =
+    method("settingsHeader") {
+        strings("Octopi Launcher", " Pro")
+    }
 
-internal val isPro = method("isPro") {
-    calledBy(settingsHeader)
-    params()
-    returns(Type.Boolean)
-}
+internal val isPro =
+    method("isPro") {
+        calledBy(settingsHeader)
+        params()
+        returns(Type.Boolean)
+    }

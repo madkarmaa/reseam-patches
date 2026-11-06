@@ -7,21 +7,25 @@ import app.reseam.patch.Type
 import app.reseam.patch.klass
 import app.reseam.patch.method
 
-private val purchaseRepository = klass("purchaseRepository") {
-    strings("iconstudio.fx.pack1")
-}
+private val purchaseRepository =
+    klass("purchaseRepository") {
+        strings("iconstudio.fx.pack1")
+    }
 
-internal val hasProAccess = method("hasProAccess") {
-    inClass(purchaseRepository)
-    returns(Type.Boolean)
-}
+internal val hasProAccess =
+    method("hasProAccess") {
+        inClass(purchaseRepository)
+        returns(Type.Boolean)
+    }
 
-private val licenseStatus = klass("licenseStatus") {
-    strings("LicenseStatus(hasProAccess=")
-}
+private val licenseStatus =
+    klass("licenseStatus") {
+        strings("LicenseStatus(hasProAccess=")
+    }
 
 internal val licenseStatusConstructor = licenseStatus.method("<init>")
 
-internal val proLicenseBadge = method("proLicenseBadge") {
-    strings("PRO")
-}
+internal val proLicenseBadge =
+    method("proLicenseBadge") {
+        strings("PRO")
+    }

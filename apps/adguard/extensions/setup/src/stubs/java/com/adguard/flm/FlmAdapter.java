@@ -4,7 +4,6 @@
 package com.adguard.flm;
 
 import com.adguard.flm.protobuf.StoredFilterMetadata;
-
 import java.util.List;
 
 public interface FlmAdapter {

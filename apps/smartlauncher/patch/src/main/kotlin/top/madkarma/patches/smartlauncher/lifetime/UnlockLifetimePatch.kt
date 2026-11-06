@@ -13,48 +13,65 @@ import top.madkarma.patches.shared.setStringEverywhere
 import top.madkarma.patches.universal.signature.signatureKiller
 import top.madkarma.smartlauncher.extensions.bindings.PreferenceOverrides
 
-val unlockLifetime = patch("Unlock Lifetime premium") {
-    description("Unlocks Premium-only features.")
-    compatibleWith("ginlemon.flowerfree")
-    dependsOn(signatureKiller)
+val unlockLifetime =
+    patch("Unlock Lifetime premium") {
+        description("Unlocks Premium-only features.")
+        compatibleWith("ginlemon.flowerfree")
+        dependsOn(signatureKiller)
 
-    execute {
-        log.info("Lifetime: ${lifetimePreferenceInitializer.descriptor} defines $LIFETIME_PREFERENCE.")
-
-        readPreference.before {
-            val override = call(
-                PreferenceOverrides.enabledOverride,
-                thisObject.call(preferenceName),
-                string(LIFETIME_PREFERENCE),
+        execute {
+            log.info(
+                "Lifetime: ${lifetimePreferenceInitializer.descriptor} defines $LIFETIME_PREFERENCE.",
             )
-            whenNotNull(override) {
-                returnValue(override)
+
+            readPreference.before {
+                val override =
+                    call(
+                        PreferenceOverrides.enabledOverride,
+                        thisObject.call(preferenceName),
+                        string(LIFETIME_PREFERENCE),
+                    )
+                whenNotNull(override) {
+                    returnValue(override)
+                }
             }
-        }
-        log.info("Lifetime: ${readPreference.descriptor} reports lifetime access for $LIFETIME_PREFERENCE.")
-
-        writePreference.before {
-            val override = call(
-                PreferenceOverrides.enabledOverride,
-                thisObject.call(preferenceName),
-                string(LIFETIME_PREFERENCE),
+            log.info(
+                "Lifetime: ${readPreference.descriptor} reports lifetime access for $LIFETIME_PREFERENCE.",
             )
-            whenNotNull(override) {
-                paramOfType(Type.Object).assign(override)
+
+            writePreference.before {
+                val override =
+                    call(
+                        PreferenceOverrides.enabledOverride,
+                        thisObject.call(preferenceName),
+                        string(LIFETIME_PREFERENCE),
+                    )
+                whenNotNull(override) {
+                    paramOfType(Type.Object).assign(override)
+                }
             }
-        }
-        log.info("Lifetime: ${writePreference.descriptor} preserves lifetime access when preferences change.")
-
-        if (fullLicenseRow.method.replaceAllStrings(
-                "SL6", "❤"
-            ) != 1
-        ) error("Expected exactly one full-license badge label")
-
-        if (!resources.setStringEverywhere(
-                "full_license_thank_you", PATCH_ATTRIBUTION
+            log.info(
+                "Lifetime: ${writePreference.descriptor} preserves lifetime access when preferences change.",
             )
-        ) error("Full-license attribution string missing")
 
-        log.info("Lifetime: ${fullLicenseRow.descriptor} shows a heart badge and the shared patch attribution.")
+            if (
+                fullLicenseRow.method.replaceAllStrings(
+                    "SL6",
+                    "❤",
+                ) != 1
+            )
+                error("Expected exactly one full-license badge label")
+
+            if (
+                !resources.setStringEverywhere(
+                    "full_license_thank_you",
+                    PATCH_ATTRIBUTION,
+                )
+            )
+                error("Full-license attribution string missing")
+
+            log.info(
+                "Lifetime: ${fullLicenseRow.descriptor} shows a heart badge and the shared patch attribution.",
+            )
+        }
     }
-}

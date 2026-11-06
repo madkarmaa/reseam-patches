@@ -16,107 +16,130 @@ internal val accountPermissionResult =
         params(Type.Int, "[Ljava/lang/String;", "[I")
     }
 
-internal val playServicesCheck = method("playServicesCheck") {
-    strings("Google Play Services not available")
-    params(Type.Context, Type.Int)
-    returns(Type.Void)
-}
+internal val playServicesCheck =
+    method("playServicesCheck") {
+        strings("Google Play Services not available")
+        params(Type.Context, Type.Int)
+        returns(Type.Void)
+    }
 
-internal val playServicesAvailability = method("playServicesAvailability") {
-    strings("com.google.android.gms.version")
-    params(Type.Context, Type.Int)
-    returns(Type.Int)
-}
+internal val playServicesAvailability =
+    method("playServicesAvailability") {
+        strings("com.google.android.gms.version")
+        params(Type.Context, Type.Int)
+        returns(Type.Int)
+    }
 
-internal val googleAccounts = method("googleAccounts") {
-    strings("com.google.android.gms.auth.accounts")
-    params(Type.Context)
-    returns("[Landroid/accounts/Account;")
-}
+internal val googleAccounts =
+    method("googleAccounts") {
+        strings("com.google.android.gms.auth.accounts")
+        params(Type.Context)
+        returns("[Landroid/accounts/Account;")
+    }
 
-private val accountAccessResponse = klass("accountAccessResponse") {
-    strings("requestGoogleAccountsAccess")
-}.method("<init>")
+private val accountAccessResponse =
+    klass("accountAccessResponse") {
+            strings("requestGoogleAccountsAccess")
+        }
+        .method("<init>")
 
-internal val accountAccessTask = method("accountAccessTask") {
-    calls(accountAccessResponse)
-    name("call")
-}
+internal val accountAccessTask =
+    method("accountAccessTask") {
+        calls(accountAccessResponse)
+        name("call")
+    }
 
-internal val accountAccessTaskConstructor = method("accountAccessTaskConstructor") {
-    inClass(klass(accountAccessTask.owner))
-    name("<init>")
-}
-
-internal val accountAccessClientConstructor = method("accountAccessClientConstructor") {
-    inClass(klass(accountAccessTaskConstructor.parameterTypes.single()))
-    name("<init>")
-    params(Type.Context, "java.util.concurrent.ExecutorService")
-}
-
-private val broadcastAccountsListener = klass("broadcastAccountsListener") {
-    strings("android.accounts.LOGIN_ACCOUNTS_CHANGED")
-    hasInstanceField("android.accounts.OnAccountsUpdateListener")
-}.method("<init>") { hasParam("android.accounts.OnAccountsUpdateListener") }
-
-// The factory shares the listener between the framework and broadcast account-update paths.
-internal val registerAccountsListener = method("registerAccountsListener") {
-    calls(broadcastAccountsListener)
-}
-
-// The scheduler has no diagnostic strings; the retained task constructor identifies its caller.
-internal val checkAccountValidity = method("checkAccountValidity") {
-    calls {
-        owner($$"com.google.android.apps.photos.login.AccountValidityMonitor$CheckAccountTask")
+internal val accountAccessTaskConstructor =
+    method("accountAccessTaskConstructor") {
+        inClass(klass(accountAccessTask.owner))
         name("<init>")
     }
-    returns(Type.Void)
-}
 
-private val frictionlessLogin = klass("frictionlessLogin") {
-    strings("checkPlayServices", "ProvideFrctAccountTask")
-}
+internal val accountAccessClientConstructor =
+    method("accountAccessClientConstructor") {
+        inClass(klass(accountAccessTaskConstructor.parameterTypes.single()))
+        name("<init>")
+        params(Type.Context, "java.util.concurrent.ExecutorService")
+    }
 
-internal val frictionlessEligibility = method("frictionlessEligibility") {
-    inClass(frictionlessLogin)
-    returns(Type.Boolean)
-    params()
-    calls { params(Type.Int); returns(Type.Void) }
-}
+private val broadcastAccountsListener =
+    klass("broadcastAccountsListener") {
+            strings("android.accounts.LOGIN_ACCOUNTS_CHANGED")
+            hasInstanceField("android.accounts.OnAccountsUpdateListener")
+        }
+        .method("<init>") { hasParam("android.accounts.OnAccountsUpdateListener") }
 
-internal val frictionlessServicesAvailable = method("frictionlessServicesAvailable") {
-    calledBy(frictionlessEligibility)
-    params()
-    returns(Type.Boolean)
-}
+// The factory shares the listener between the framework and broadcast account-update paths.
+internal val registerAccountsListener =
+    method("registerAccountsListener") {
+        calls(broadcastAccountsListener)
+    }
+
+// The scheduler has no diagnostic strings; the retained task constructor identifies its caller.
+internal val checkAccountValidity =
+    method("checkAccountValidity") {
+        calls {
+            owner($$"com.google.android.apps.photos.login.AccountValidityMonitor$CheckAccountTask")
+            name("<init>")
+        }
+        returns(Type.Void)
+    }
+
+private val frictionlessLogin =
+    klass("frictionlessLogin") {
+        strings("checkPlayServices", "ProvideFrctAccountTask")
+    }
+
+internal val frictionlessEligibility =
+    method("frictionlessEligibility") {
+        inClass(frictionlessLogin)
+        returns(Type.Boolean)
+        params()
+        calls {
+            params(Type.Int)
+            returns(Type.Void)
+        }
+    }
+
+internal val frictionlessServicesAvailable =
+    method("frictionlessServicesAvailable") {
+        calledBy(frictionlessEligibility)
+        params()
+        returns(Type.Boolean)
+    }
 
 private val accountHandler = klass("accountHandler") { strings("AccountChangeHandler") }
 
-internal val loginServices = fieldTarget("loginServices") {
-    frictionlessLogin.fieldOfType(frictionlessServicesAvailable.owner).ref
-}
+internal val loginServices =
+    fieldTarget("loginServices") {
+        frictionlessLogin.fieldOfType(frictionlessServicesAvailable.owner).ref
+    }
 
-internal val loginAccountHandler = fieldTarget("loginAccountHandler") {
-    frictionlessLogin.fieldOfType(accountHandler.descriptor).ref
-}
+internal val loginAccountHandler =
+    fieldTarget("loginAccountHandler") {
+        frictionlessLogin.fieldOfType(accountHandler.descriptor).ref
+    }
 
-private val startFrictionlessLogin = method("startFrictionlessLogin") {
-    inClass(frictionlessLogin)
-    strings("checkPlayServices", "ProvideFrctAccountTask")
-}
+private val startFrictionlessLogin =
+    method("startFrictionlessLogin") {
+        inClass(frictionlessLogin)
+        strings("checkPlayServices", "ProvideFrctAccountTask")
+    }
 
 // The same login flow already restores the saved selection through this no-argument call.
-internal val restoreSelectedAccount = method("restoreSelectedAccount") {
-    inClass(accountHandler)
-    calledBy(startFrictionlessLogin)
-    params()
-    returns(Type.Void)
-}
+internal val restoreSelectedAccount =
+    method("restoreSelectedAccount") {
+        inClass(accountHandler)
+        calledBy(startFrictionlessLogin)
+        params()
+        returns(Type.Void)
+    }
 
 // Through 7.x the GNP registration builder reads the Android ID itself.
-internal val inlineIdentifierRegistration = method("inlineIdentifierRegistration") {
-    strings("Exception reading GServices key.")
-}
+internal val inlineIdentifierRegistration =
+    method("inlineIdentifierRegistration") {
+        strings("Exception reading GServices key.")
+    }
 
 internal val inlineIdentifierRegistrationConstructor =
     method("inlineIdentifierRegistrationConstructor") {
@@ -126,21 +149,24 @@ internal val inlineIdentifierRegistrationConstructor =
     }
 
 // From 8.0 a device-identifier helper reads the Android ID and user serial for the builder.
-private val registrationDeviceIdentifiers = klass("registrationDeviceIdentifiers") {
-    strings(
-        "Exception reading GServices key - ANDROID_ID.", "Exception reading getSerialNumberForUser."
-    )
-}
+private val registrationDeviceIdentifiers =
+    klass("registrationDeviceIdentifiers") {
+        strings(
+            "Exception reading GServices key - ANDROID_ID.",
+            "Exception reading getSerialNumberForUser.",
+        )
+    }
 
 // The Chime registration also reads the helper, but only the GNP builder takes (Z, Z, String).
-internal val helperIdentifierRegistration = method("helperIdentifierRegistration") {
-    params(Type.Boolean, Type.Boolean, Type.String)
-    calls {
-        owner(registrationDeviceIdentifiers.descriptor)
-        params(Type.Boolean)
-        returns(Type.Long)
+internal val helperIdentifierRegistration =
+    method("helperIdentifierRegistration") {
+        params(Type.Boolean, Type.Boolean, Type.String)
+        calls {
+            owner(registrationDeviceIdentifiers.descriptor)
+            params(Type.Boolean)
+            returns(Type.Long)
+        }
     }
-}
 
 // Merged classes declare several constructors; only the builder's own one takes the helper.
 internal val helperIdentifierRegistrationConstructor =

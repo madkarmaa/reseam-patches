@@ -1,7 +1,8 @@
 // SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-@file:JvmName("SignatureKiller") @file:Suppress("unused")
+@file:JvmName("SignatureKiller")
+@file:Suppress("unused")
 
 package top.madkarma.universal.signature
 
@@ -15,13 +16,13 @@ import android.os.Parcelable
 import android.os.SystemClock
 import android.util.Base64
 import app.reseam.runtime.Export
-import org.lsposed.hiddenapibypass.HiddenApiBypass
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.lang.reflect.Field
-import java.util.zip.ZipFile
 import java.util.zip.ZipEntry
+import java.util.zip.ZipFile
+import org.lsposed.hiddenapibypass.HiddenApiBypass
 
 private const val LIBRARY_NAME = "SignatureKiller"
 private const val ORIGIN_ASSET_PATH = "assets/SignatureKiller/origin.apk"
@@ -44,7 +45,9 @@ fun initializeBeforeNativeLibrary(
     redirectApkFilesOnLibraryLoad(libraryName)
 }
 
-/** Prepares original files for a native hook installed explicitly after the target library loads. */
+/**
+ * Prepares original files for a native hook installed explicitly after the target library loads.
+ */
 @Export
 fun initializeNativeFileAccess(packageName: String, signature: String, diagnostics: Boolean) {
     check(!fileRedirectionInstalled) { "Native file access must be configured before file hooks" }
@@ -65,7 +68,8 @@ fun initialize(
 ) {
     diagnosticsEnabled = diagnostics
     logInfo {
-        "Initializing in attachBaseContext for $packageName in ${processDescription()}; " + "APK file access ${if (spoofApkPath) "on" else "off"}"
+        "Initializing in attachBaseContext for $packageName in ${processDescription()}; " +
+            "APK file access ${if (spoofApkPath) "on" else "off"}"
     }
     checkSignatures(context, packageName, signature)
     killSignature(packageName, signature)
@@ -85,7 +89,8 @@ fun initializeEarly(
     diagnosticsEnabled = diagnostics
 
     logInfo {
-        "Initializing before application startup for $packageName in " + "${processDescription()}; APK file access ${if (spoofApkPath) "on" else "off"}"
+        "Initializing before application startup for $packageName in " +
+            "${processDescription()}; APK file access ${if (spoofApkPath) "on" else "off"}"
     }
 
     killSignature(packageName, signature)
@@ -118,7 +123,8 @@ fun initializeEarly(
 fun killSignature(packageName: String, base64Sig: String) {
     logInfo {
         val certificate = Base64.decode(base64Sig, Base64.DEFAULT)
-        "killSignature: $packageName spoofs certificate ${certificateFingerprint(certificate)} " + "(${certificate.size} bytes)"
+        "killSignature: $packageName spoofs certificate ${certificateFingerprint(certificate)} " +
+            "(${certificate.size} bytes)"
     }
     configureSignatureChecks(packageName, base64Sig)
     killPM(packageName, base64Sig)
@@ -127,7 +133,9 @@ fun killSignature(packageName: String, base64Sig: String) {
 @Export
 fun killApkPath(context: Context, packageName: String) {
     // The library directory names the process ABI; the device may prefer another one.
-    logInfo { "killApkPath: $packageName on ${File(context.applicationInfo.nativeLibraryDir).name}" }
+    logInfo {
+        "killApkPath: $packageName on ${File(context.applicationInfo.nativeLibraryDir).name}"
+    }
     killOpen(context, packageName)
 }
 
@@ -158,19 +166,22 @@ fun redirectApkFilesOnLibraryLoad(libraryName: String) {
 fun checkSignatures(context: Context, packageName: String, base64Sig: String) {
     if (!diagnosticsEnabled) return
 
-    val real = try {
-        val current = currentSignatures(context, packageName)
-        if (!current.isNullOrEmpty()) certificateFingerprint(current[0].toByteArray()) else "none"
-    } catch (exception: PackageManager.NameNotFoundException) {
-        "unavailable ($exception)"
-    } catch (exception: RuntimeException) {
-        "unavailable ($exception)"
-    }
+    val real =
+        try {
+            val current = currentSignatures(context, packageName)
+            if (!current.isNullOrEmpty()) certificateFingerprint(current[0].toByteArray())
+            else "none"
+        } catch (exception: PackageManager.NameNotFoundException) {
+            "unavailable ($exception)"
+        } catch (exception: RuntimeException) {
+            "unavailable ($exception)"
+        }
 
     val spoofed = certificateFingerprint(Base64.decode(base64Sig, Base64.DEFAULT))
 
     logInfo {
-        "checkSignatures: $packageName real=$real spoofed=$spoofed" + if (real == spoofed) " SAME" else " DIFFERENT"
+        "checkSignatures: $packageName real=$real spoofed=$spoofed" +
+            if (real == spoofed) " SAME" else " DIFFERENT"
     }
     logInfo { "checkSignatures: $packageName history=${historySig(context, packageName)}" }
 }
@@ -178,10 +189,11 @@ fun checkSignatures(context: Context, packageName: String, base64Sig: String) {
 private fun historySig(context: Context, packageName: String): String {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) return "n/a (pre-P)"
     try {
-        val info = context.packageManager.getPackageInfo(
-            packageName,
-            PackageManager.GET_SIGNING_CERTIFICATES,
-        )
+        val info =
+            context.packageManager.getPackageInfo(
+                packageName,
+                PackageManager.GET_SIGNING_CERTIFICATES,
+            )
 
         val history = info.signingInfo?.signingCertificateHistory
         return if (!history.isNullOrEmpty()) {
@@ -198,10 +210,14 @@ private fun historySig(context: Context, packageName: String): String {
 private fun currentSignatures(context: Context, packageName: String): Array<Signature>? {
     val manager = context.packageManager
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) return manager.getPackageInfo(
-        packageName,
-        PackageManager.GET_SIGNING_CERTIFICATES,
-    ).signingInfo?.apkContentsSigners
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
+        return manager
+            .getPackageInfo(
+                packageName,
+                PackageManager.GET_SIGNING_CERTIFICATES,
+            )
+            .signingInfo
+            ?.apkContentsSigners
 
     return getLegacySignatures(manager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES))
 }
@@ -222,11 +238,12 @@ private fun killPM(packageName: String, signatureData: String) {
 
     logInfo { "killPM: PackageInfo creator spoof installed" }
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-        val exempted = HiddenApiBypass.addHiddenApiExemptions(
-            "Landroid/os/Parcel;",
-            "Landroid/content/pm",
-            "Landroid/app",
-        )
+        val exempted =
+            HiddenApiBypass.addHiddenApiExemptions(
+                "Landroid/os/Parcel;",
+                "Landroid/content/pm",
+                "Landroid/app",
+            )
         logDebug { "killPM: hidden API exemptions for Parcel and package caches: $exempted" }
     }
 
@@ -264,15 +281,17 @@ private fun getCreator(
                 replaceFirstSignature(legacySignatures, fakeSignature)
 
                 val signers =
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) info.signingInfo?.apkContentsSigners
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
+                        info.signingInfo?.apkContentsSigners
                     else null
                 replaceFirstSignature(signers, fakeSignature)
 
                 // Absent arrays usually mean the caller did not request signature flags.
                 packageInfoSpoofs.log {
-                    "$packageName legacy signatures ${signatureState(legacySignatures)}, " + "signing info ${
+                    "$packageName legacy signatures ${signatureState(legacySignatures)}, " +
+                        "signing info ${
                         signatureState(
-                            signers
+                            signers,
                         )
                     }"
                 }
@@ -285,11 +304,12 @@ private fun getCreator(
     }
 }
 
-internal fun signatureState(signatures: Array<Signature>?): String = when {
-    signatures == null -> "absent"
-    signatures.isEmpty() -> "empty"
-    else -> "replaced (first of ${signatures.size})"
-}
+internal fun signatureState(signatures: Array<Signature>?): String =
+    when {
+        signatures == null -> "absent"
+        signatures.isEmpty() -> "empty"
+        else -> "replaced (first of ${signatures.size})"
+    }
 
 @Suppress("UNCHECKED_CAST")
 internal fun getLegacySignatures(info: PackageInfo): Array<Signature>? {
@@ -367,7 +387,8 @@ private fun killOpen(context: Context, packageName: String) {
     val splitNames = info.splitNames
     val splitPaths = application.splitSourceDirs ?: emptyArray()
     logDebug {
-        "killOpen: installed base ${application.sourceDir}, splits " + "${splitNames.contentToString()} at ${splitPaths.contentToString()}"
+        "killOpen: installed base ${application.sourceDir}, splits " +
+            "${splitNames.contentToString()} at ${splitPaths.contentToString()}"
     }
     check(splitNames.size == splitPaths.size) { "Installed split names and paths differ in size" }
 
@@ -377,11 +398,18 @@ private fun killOpen(context: Context, packageName: String) {
     }
 
     // Extract everything before installing the hooks, which redirect later reads of the base too.
-    val replacements = ZipFile(application.sourceDir).use { zip ->
-        assetPaths.map { extractApkEntry(zip, it, context).absolutePath }
-    }
+    val replacements =
+        ZipFile(application.sourceDir).use { zip ->
+            assetPaths.map { extractApkEntry(zip, it, context).absolutePath }
+        }
 
-    check(hookApkPaths(installedPaths.toTypedArray(), replacements.toTypedArray(), libcFileHooksEnabled)) {
+    check(
+        hookApkPaths(
+            installedPaths.toTypedArray(),
+            replacements.toTypedArray(),
+            libcFileHooksEnabled,
+        ),
+    ) {
         "Installing original APK file redirection failed"
     }
 
@@ -394,24 +422,25 @@ private fun killOpen(context: Context, packageName: String) {
 
 /** Keep extension libraries outside the installed APK's native library inventory. */
 private fun loadNativeFileAccess(context: Context) {
-    val abi = when (val directory = File(context.applicationInfo.nativeLibraryDir).name) {
-        "arm64" -> "arm64-v8a"
-        "arm" -> "armeabi-v7a"
-        else -> error("Unsupported native library directory: $directory")
-    }
+    val abi =
+        when (val directory = File(context.applicationInfo.nativeLibraryDir).name) {
+            "arm64" -> "arm64-v8a"
+            "arm" -> "armeabi-v7a"
+            else -> error("Unsupported native library directory: $directory")
+        }
     val libraries = listOf("libshadowhook.so", "libSignatureKiller.so")
 
     ZipFile(context.applicationInfo.sourceDir).use { zip ->
         val entries = libraries.map { library ->
             zip.getEntry("lib/$abi/$library") ?: error("Native library is missing: $library")
         }
-        val directory = File(
-            context.getDir(LIBRARY_NAME, Context.MODE_PRIVATE),
-            "native-${entries.joinToString("-") { it.crc.toString() }}",
-        )
+        val directory =
+            File(
+                context.getDir(LIBRARY_NAME, Context.MODE_PRIVATE),
+                "native-${entries.joinToString("-") { it.crc.toString() }}",
+            )
         check(directory.isDirectory || directory.mkdirs()) { "Cannot create $directory" }
-        for (entry in entries)
-            extractZipEntry(zip, entry, File(directory, File(entry.name).name))
+        for (entry in entries) extractZipEntry(zip, entry, File(directory, File(entry.name).name))
 
         // The library's $ORIGIN runpath loads dependencies here without their Java JNI glue.
         System.load(File(directory, "libSignatureKiller.so").absolutePath)
@@ -448,9 +477,10 @@ private fun extractZipEntry(zip: ZipFile, entry: ZipEntry, replacement: File): F
     }
 
     logInfo {
-        "Extracted ${entry.name} to $replacement (${entry.size} bytes, crc " + "${
+        "Extracted ${entry.name} to $replacement (${entry.size} bytes, crc " +
+            "${
             java.lang.Long.toHexString(
-                entry.crc
+                entry.crc,
             )
         }) in ${SystemClock.elapsedRealtime() - started} ms"
     }
@@ -460,9 +490,14 @@ private fun extractZipEntry(zip: ZipFile, entry: ZipEntry, replacement: File): F
 private external fun setNativeDiagnostics(enabled: Boolean)
 
 private external fun hookApkPaths(
-    installedPaths: Array<String>, replacementPaths: Array<String>, hookLibc: Boolean,
+    installedPaths: Array<String>,
+    replacementPaths: Array<String>,
+    hookLibc: Boolean,
 ): Boolean
 
 private external fun trapRawApkOpens(libraryName: String, redirectContents: Boolean): Boolean
 
-private external fun prepareApkFilesOnLibraryLoad(libraryName: String, redirectContents: Boolean): Boolean
+private external fun prepareApkFilesOnLibraryLoad(
+    libraryName: String,
+    redirectContents: Boolean,
+): Boolean

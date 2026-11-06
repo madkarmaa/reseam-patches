@@ -1,7 +1,8 @@
 // SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-@file:JvmName("Ultra") @file:Suppress("unused")
+@file:JvmName("Ultra")
+@file:Suppress("unused")
 
 package top.madkarma.picsart.ultra
 
@@ -10,11 +11,9 @@ import app.reseam.runtime.Export
 
 private var logged = false
 
-@Export
-fun isUserSubscribed(): Boolean = true
+@Export fun isUserSubscribed(): Boolean = true
 
-@Export
-fun accessLevel(): Int = Int.MAX_VALUE
+@Export fun accessLevel(): Int = Int.MAX_VALUE
 
 @Export
 @Synchronized

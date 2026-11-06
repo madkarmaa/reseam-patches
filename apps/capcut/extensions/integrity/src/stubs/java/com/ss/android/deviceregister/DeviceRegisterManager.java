@@ -13,7 +13,8 @@ public final class DeviceRegisterManager {
         throw new UnsupportedOperationException();
     }
 
-    public static void resetDidWhenSwitchChildMode(boolean childMode, long timeout, OnResetListener listener) {
+    public static void resetDidWhenSwitchChildMode(
+            boolean childMode, long timeout, OnResetListener listener) {
         throw new UnsupportedOperationException();
     }
 }

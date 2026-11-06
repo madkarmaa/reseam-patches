@@ -10,30 +10,33 @@ import app.reseam.patch.patch
 import app.reseam.patch.replace
 import top.madkarma.nyx.annoyances.bindings.Rating
 
-val removeAnnoyances = patch("Remove annoyances") {
-    description("Removes the rating popup and the Rate button in the navigation drawer.")
-    compatibleWith("com.awedea.nyx")
+val removeAnnoyances =
+    patch("Remove annoyances") {
+        description("Removes the rating popup and the Rate button in the navigation drawer.")
+        compatibleWith("com.awedea.nyx")
 
-    execute {
-        showRatingDialog.replace {
-            Rating.skip(
-                paramOfType(ratingCallback.descriptor),
-                string(className(completeRating.owner)),
-                string(completeRating.name),
-                staticField(noReviewUi),
+        execute {
+            showRatingDialog.replace {
+                Rating.skip(
+                    paramOfType(ratingCallback.descriptor),
+                    string(className(completeRating.owner)),
+                    string(completeRating.name),
+                    staticField(noReviewUi),
+                )
+                returnVoid()
+            }
+            log.info(
+                "Annoyances: ${showRatingDialog.descriptor} skips the rating popup and completes its callback.",
             )
-            returnVoid()
-        }
-        log.info("Annoyances: ${showRatingDialog.descriptor} skips the rating popup and completes its callback.")
 
-        val rateId = resources.id("id", "menu_rate") ?: error("Rate drawer entry missing")
-        resources.editXml("layout", "nav_view_body") {
-            val rateButton =
-                findByAttribute("android:id", "@0x${rateId.toString(16)}").singleOrNull()
-                    ?: error("Expected exactly one Rate button in the navigation drawer")
+            val rateId = resources.id("id", "menu_rate") ?: error("Rate drawer entry missing")
+            resources.editXml("layout", "nav_view_body") {
+                val rateButton =
+                    findByAttribute("android:id", "@0x${rateId.toString(16)}").singleOrNull()
+                        ?: error("Expected exactly one Rate button in the navigation drawer")
 
-            rateButton["android:visibility"] = "gone"
+                rateButton["android:visibility"] = "gone"
+            }
+            log.info("Annoyances: layout/nav_view_body hides the Rate drawer entry.")
         }
-        log.info("Annoyances: layout/nav_view_body hides the Rate drawer entry.")
     }
-}
