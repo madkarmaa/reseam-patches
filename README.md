@@ -134,6 +134,8 @@ universal patches that work on any app. Want an app supported?
 | Name | Description | Version pins |
 | --- | --- | --- |
 | GmsCore support | Installs Google Photos alongside the original app. Uses a separate Reseam GmsCore installation for sign-in. | None |
+| Places map fix | Enter a Mapbox access token in Reseam settings to show map tiles in Places and photo-detail maps. | None |
+| top.madkarma.patches.googlephotos.settings.googlePhotosSettings | Settings for googlephotos | None |
 | Unlimited backup storage | Reports a Pixel XL device identity to request Google's unlimited backup storage offer. | None |
 
 </details>
