@@ -14,26 +14,27 @@ import top.madkarma.truecaller.settings.TruecallerSettings
 import top.madkarma.truecaller.settings.TruecallerStrings
 import top.madkarma.truecaller.ui.bindings.Interface
 
-val hideWearSettings = patch("Hide Wear OS settings") {
-    description("Hides Wear OS settings and shortcuts.")
-    compatibleWith("com.truecaller")
+val hideWearSettings =
+    patch("Hide Wear OS settings") {
+        description("Hides Wear OS settings and shortcuts.")
+        compatibleWith("com.truecaller")
 
-    settings(
-        truecallerSettings,
-        section(TruecallerStrings.sectionSettings, TruecallerSettings.hideWearSettings)
-    )
+        settings(
+            truecallerSettings,
+            section(TruecallerStrings.sectionSettings, TruecallerSettings.hideWearSettings),
+        )
 
-    execute {
-        disableFeatureFlag("featurePromptWearApp")
+        execute {
+            disableFeatureFlag("featurePromptWearApp")
 
-        gate(TruecallerSettings.hideWearSettings) {
-            watchSearchEntries.after {
-                Interface.clearCollection(
-                    result.cast(watchSearchItems.owner).field(watchSearchItems)
-                )
+            gate(TruecallerSettings.hideWearSettings) {
+                watchSearchEntries.after {
+                    Interface.clearCollection(
+                        result.cast(watchSearchItems.owner).field(watchSearchItems),
+                    )
+                }
             }
-        }
 
-        log.info("Wear OS: ${watchSearchEntries.descriptor} hides Wear OS search results.")
+            log.info("Wear OS: ${watchSearchEntries.descriptor} hides Wear OS search results.")
+        }
     }
-}

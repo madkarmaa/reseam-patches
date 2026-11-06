@@ -9,183 +9,214 @@ import app.reseam.patch.*
 import top.madkarma.extensions.adguard.bindings.AdGuardSetup
 import top.madkarma.patches.shared.isPresent
 
-val skipSetup = patch("Skip setup") {
-    description(
-        "Skips onboarding and applies the selected setup options on first startup. Configure advanced filters in the app settings."
-    )
-    compatibleWith("com.adguard.android")
+val skipSetup =
+    patch("Skip setup") {
+        description(
+            "Skips onboarding and applies the selected setup options on first startup. Configure advanced filters in the app settings.",
+        )
+        compatibleWith("com.adguard.android")
 
-    val blockSearchAds = boolOption(
-        "blockSearchAds",
-        title = "Block ads in web search",
-        description = "Remove ads from your search engine results.",
-        default = true
-    )
+        val blockSearchAds =
+            boolOption(
+                "blockSearchAds",
+                title = "Block ads in web search",
+                description = "Remove ads from your search engine results.",
+                default = true,
+            )
 
-    val blockSocialWidgets = boolOption(
-        "blockSocialWidgets",
-        title = "Block social media widgets",
-        description = "Get rid of Like, Share, and other social buttons on websites.",
-        default = true
-    )
+        val blockSocialWidgets =
+            boolOption(
+                "blockSocialWidgets",
+                title = "Block social media widgets",
+                description = "Get rid of Like, Share, and other social buttons on websites.",
+                default = true,
+            )
 
-    val blockAnnoyances = boolOption(
-        "blockAnnoyances",
-        title = "Block annoyances",
-        description = "Remove cookie notifications, live chats, and newsletter signups.",
-        default = true
-    )
+        val blockAnnoyances =
+            boolOption(
+                "blockAnnoyances",
+                title = "Block annoyances",
+                description = "Remove cookie notifications, live chats, and newsletter signups.",
+                default = true,
+            )
 
-    val privacyLevel = stringOption(
-        "privacyLevel",
-        title = "Protect your privacy",
-        description = "Protect yourself from online trackers and analytics systems.",
-        default = "Standard",
-        validValues = listOf("None", "Standard", "High")
-    )
+        val privacyLevel =
+            stringOption(
+                "privacyLevel",
+                title = "Protect your privacy",
+                description = "Protect yourself from online trackers and analytics systems.",
+                default = "Standard",
+                validValues = listOf("None", "Standard", "High"),
+            )
 
-    val blockDangerousSites = boolOption(
-        "blockDangerousSites",
-        title = "Block dangerous websites",
-        description = "Be alerted before you access phishing and malicious websites.",
-        default = true
-    )
+        val blockDangerousSites =
+            boolOption(
+                "blockDangerousSites",
+                title = "Block dangerous websites",
+                description = "Be alerted before you access phishing and malicious websites.",
+                default = true,
+            )
 
-    val hideNotificationPrompt = boolOption(
-        "hideNotificationPrompt",
-        title = "Hide \"Enable notifications\" prompt",
-        description = "Disables the \"Enable notifications\" prompt shown post-setup.",
-        default = true
-    )
+        val hideNotificationPrompt =
+            boolOption(
+                "hideNotificationPrompt",
+                title = "Hide \"Enable notifications\" prompt",
+                description = "Disables the \"Enable notifications\" prompt shown post-setup.",
+                default = true,
+            )
 
-    val skipApprovalPopups = boolOption(
-        "skipApprovalPopups",
-        title = "Skip approval popups",
-        description = "Treat all annoyance filters as approved to skip consent dialogs when enabling them.",
-        default = true
-    )
+        val skipApprovalPopups =
+            boolOption(
+                "skipApprovalPopups",
+                title = "Skip approval popups",
+                description =
+                    "Treat all annoyance filters as approved to skip consent dialogs when enabling them.",
+                default = true,
+            )
 
-    execute {
-        if (basePreferences.all.isEmpty() || !isPresent(setupPreferences)) error("Skip setup: unsupported preference storage")
-        log.info("Setup: ${basePreferences.all.joinToString { it.descriptor }} open the base preferences that hold the setup flags.")
+        execute {
+            if (basePreferences.all.isEmpty() || !isPresent(setupPreferences))
+                error("Skip setup: unsupported preference storage")
+            log.info(
+                "Setup: ${basePreferences.all.joinToString { it.descriptor }} open the base preferences that hold the setup flags.",
+            )
 
-        val selectedPrivacyLevel = options[privacyLevel]
-        val privacyEnabled = selectedPrivacyLevel != "None"
-        val securityEnabled = options[blockDangerousSites]
+            val selectedPrivacyLevel = options[privacyLevel]
+            val privacyEnabled = selectedPrivacyLevel != "None"
+            val securityEnabled = options[blockDangerousSites]
 
-        if (options[skipApprovalPopups]) {
-            approvedAnnoyanceFilters.replace {
+            if (options[skipApprovalPopups]) {
+                approvedAnnoyanceFilters.replace {
+                    val adapter =
+                        thisObject
+                            .field(filterOperations)
+                            .field(filterAdapters)
+                            .call(standardAdapter)
+
+                    val setup =
+                        call(AdGuardSetup.create, thisObject.field(filteringContext), adapter)
+
+                    returnValue(
+                        setup.call(
+                            AdGuardSetup.approvedAnnoyanceFilters,
+                            staticField(annoyancesGroup).call(filterGroupCode),
+                        ),
+                    )
+                }
+
+                log.info(
+                    "Setup: ${approvedAnnoyanceFilters.descriptor} treats annoyance filters as approved.",
+                )
+            }
+
+            filteringConstructor.after {
                 val adapter =
                     thisObject.field(filterOperations).field(filterAdapters).call(standardAdapter)
 
-                val setup = call(AdGuardSetup.create, thisObject.field(filteringContext), adapter)
+                val setup = call(AdGuardSetup.create, paramOfType(Type.Context), adapter)
 
-                returnValue(
+                whenTrue(setup.call(AdGuardSetup.needsSetup)) {
+                    setup.call(AdGuardSetup.acceptTerms)
+                    log.info("Setup: terms accepted.")
+
+                    setup.call(AdGuardSetup.disableAutomaticCrashReporting)
+                    log.info("Setup: automatic crash reporting disabled.")
+
+                    setup.call(AdGuardSetup.disableUsageTelemetry)
+                    log.info("Setup: usage telemetry disabled.")
+
+                    setup.call(AdGuardSetup.markFirstOnboardingShown)
+                    log.info("Setup: first onboarding marked as shown.")
+
+                    setup.call(AdGuardSetup.markSecondOnboardingShown)
+                    log.info("Setup: second onboarding marked as shown.")
+
                     setup.call(
-                        AdGuardSetup.approvedAnnoyanceFilters,
-                        staticField(annoyancesGroup).call(filterGroupCode)
+                        AdGuardSetup.setNotificationPromptEnabled,
+                        bool(!options[hideNotificationPrompt]),
                     )
-                )
-            }
+                    log.info(
+                        "Setup: notification prompt enabled=${!options[hideNotificationPrompt]}.",
+                    )
 
-            log.info("Setup: ${approvedAnnoyanceFilters.descriptor} treats annoyance filters as approved.")
-        }
+                    setup.call(
+                        AdGuardSetup.setAnnoyanceBlockingEnabled,
+                        bool(options[blockSocialWidgets] || options[blockAnnoyances]),
+                    )
+                    log.info(
+                        "Setup: annoyance blocking enabled=${options[blockSocialWidgets] || options[blockAnnoyances]}.",
+                    )
 
-        filteringConstructor.after {
-            val adapter =
-                thisObject.field(filterOperations).field(filterAdapters).call(standardAdapter)
+                    setup.call(AdGuardSetup.setBrowsingSecurityEnabled, bool(securityEnabled))
+                    log.info("Setup: browsing security enabled=$securityEnabled.")
 
-            val setup = call(AdGuardSetup.create, paramOfType(Type.Context), adapter)
+                    setup.call(AdGuardSetup.setPrivacyProtectionEnabled, bool(privacyEnabled))
+                    log.info("Setup: privacy protection enabled=$privacyEnabled.")
 
-            whenTrue(setup.call(AdGuardSetup.needsSetup)) {
-                setup.call(AdGuardSetup.acceptTerms)
-                log.info("Setup: terms accepted.")
-
-                setup.call(AdGuardSetup.disableAutomaticCrashReporting)
-                log.info("Setup: automatic crash reporting disabled.")
-
-                setup.call(AdGuardSetup.disableUsageTelemetry)
-                log.info("Setup: usage telemetry disabled.")
-
-                setup.call(AdGuardSetup.markFirstOnboardingShown)
-                log.info("Setup: first onboarding marked as shown.")
-
-                setup.call(AdGuardSetup.markSecondOnboardingShown)
-                log.info("Setup: second onboarding marked as shown.")
-
-                setup.call(
-                    AdGuardSetup.setNotificationPromptEnabled,
-                    bool(!options[hideNotificationPrompt])
-                )
-                log.info("Setup: notification prompt enabled=${!options[hideNotificationPrompt]}.")
-
-                setup.call(
-                    AdGuardSetup.setAnnoyanceBlockingEnabled,
-                    bool(options[blockSocialWidgets] || options[blockAnnoyances])
-                )
-                log.info("Setup: annoyance blocking enabled=${options[blockSocialWidgets] || options[blockAnnoyances]}.")
-
-                setup.call(AdGuardSetup.setBrowsingSecurityEnabled, bool(securityEnabled))
-                log.info("Setup: browsing security enabled=$securityEnabled.")
-
-                setup.call(AdGuardSetup.setPrivacyProtectionEnabled, bool(privacyEnabled))
-                log.info("Setup: privacy protection enabled=$privacyEnabled.")
-
-                thisObject.call(
-                    if (privacyEnabled) enableFilterGroup else disableFilterGroup,
-                    staticField(privacyGroup)
-                )
-                log.info("Setup: privacy filter group enabled=$privacyEnabled.")
-
-                if (privacyEnabled) {
                     thisObject.call(
-                        setPrivacyLevel,
-                        staticField(privacyLevels.enumConstant(selectedPrivacyLevel))
+                        if (privacyEnabled) enableFilterGroup else disableFilterGroup,
+                        staticField(privacyGroup),
                     )
-                    log.info("Setup: privacy level set to $selectedPrivacyLevel.")
+                    log.info("Setup: privacy filter group enabled=$privacyEnabled.")
+
+                    if (privacyEnabled) {
+                        thisObject.call(
+                            setPrivacyLevel,
+                            staticField(privacyLevels.enumConstant(selectedPrivacyLevel)),
+                        )
+                        log.info("Setup: privacy level set to $selectedPrivacyLevel.")
+                    }
+
+                    thisObject.call(
+                        if (securityEnabled) enableFilterGroup else disableFilterGroup,
+                        staticField(securityGroup),
+                    )
+                    log.info("Setup: security filter group enabled=$securityEnabled.")
+
+                    setup.call(
+                        AdGuardSetup.setSearchAdsBlockingEnabled,
+                        bool(options[blockSearchAds]),
+                    )
+                    log.info("Setup: search ads blocking enabled=${options[blockSearchAds]}.")
+
+                    setup.call(
+                        AdGuardSetup.setSocialMediaFilterEnabled,
+                        bool(options[blockSocialWidgets]),
+                    )
+                    log.info("Setup: Social Media filter enabled=${options[blockSocialWidgets]}.")
+
+                    setup.call(
+                        AdGuardSetup.setCookieNoticesFilterEnabled,
+                        bool(options[blockAnnoyances]),
+                    )
+                    log.info("Setup: Cookie Notices filter enabled=${options[blockAnnoyances]}.")
+
+                    setup.call(AdGuardSetup.setPopupsFilterEnabled, bool(options[blockAnnoyances]))
+                    log.info("Setup: Popups filter enabled=${options[blockAnnoyances]}.")
+
+                    setup.call(
+                        AdGuardSetup.setMobileAppBannersFilterEnabled,
+                        bool(options[blockAnnoyances]),
+                    )
+                    log.info(
+                        "Setup: Mobile App Banners filter enabled=${options[blockAnnoyances]}.",
+                    )
+
+                    setup.call(
+                        AdGuardSetup.setOtherAnnoyancesFilterEnabled,
+                        bool(options[blockAnnoyances]),
+                    )
+                    log.info("Setup: Other Annoyances filter enabled=${options[blockAnnoyances]}.")
+
+                    setup.call(AdGuardSetup.setWidgetsFilterEnabled, bool(options[blockAnnoyances]))
+                    log.info("Setup: Widgets filter enabled=${options[blockAnnoyances]}.")
+
+                    setup.call(AdGuardSetup.markSetupCompleted)
+                    log.info("Setup: completion marked to preserve later manual changes.")
                 }
-
-                thisObject.call(
-                    if (securityEnabled) enableFilterGroup else disableFilterGroup,
-                    staticField(securityGroup)
-                )
-                log.info("Setup: security filter group enabled=$securityEnabled.")
-
-                setup.call(
-                    AdGuardSetup.setSearchAdsBlockingEnabled, bool(options[blockSearchAds])
-                )
-                log.info("Setup: search ads blocking enabled=${options[blockSearchAds]}.")
-
-                setup.call(
-                    AdGuardSetup.setSocialMediaFilterEnabled, bool(options[blockSocialWidgets])
-                )
-                log.info("Setup: Social Media filter enabled=${options[blockSocialWidgets]}.")
-
-                setup.call(
-                    AdGuardSetup.setCookieNoticesFilterEnabled, bool(options[blockAnnoyances])
-                )
-                log.info("Setup: Cookie Notices filter enabled=${options[blockAnnoyances]}.")
-
-                setup.call(AdGuardSetup.setPopupsFilterEnabled, bool(options[blockAnnoyances]))
-                log.info("Setup: Popups filter enabled=${options[blockAnnoyances]}.")
-
-                setup.call(
-                    AdGuardSetup.setMobileAppBannersFilterEnabled, bool(options[blockAnnoyances])
-                )
-                log.info("Setup: Mobile App Banners filter enabled=${options[blockAnnoyances]}.")
-
-                setup.call(
-                    AdGuardSetup.setOtherAnnoyancesFilterEnabled, bool(options[blockAnnoyances])
-                )
-                log.info("Setup: Other Annoyances filter enabled=${options[blockAnnoyances]}.")
-
-                setup.call(AdGuardSetup.setWidgetsFilterEnabled, bool(options[blockAnnoyances]))
-                log.info("Setup: Widgets filter enabled=${options[blockAnnoyances]}.")
-
-                setup.call(AdGuardSetup.markSetupCompleted)
-                log.info("Setup: completion marked to preserve later manual changes.")
             }
+            log.info(
+                "Setup: ${filteringConstructor.descriptor} applies the selected configuration on first startup.",
+            )
         }
-        log.info("Setup: ${filteringConstructor.descriptor} applies the selected configuration on first startup.")
     }
-}

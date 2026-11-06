@@ -8,16 +8,17 @@ package top.madkarma.patches.scrobbler.plus
 import app.reseam.patch.after
 import app.reseam.patch.patch
 
-val unlockPlus = patch("Unlock Plus") {
-    description("Unlocks Plus-only features.")
-    compatibleWith("com.arn.scrobble")
+val unlockPlus =
+    patch("Unlock Plus") {
+        description("Unlocks Plus-only features.")
+        compatibleWith("com.arn.scrobble")
 
-    execute {
-        checkLicense.after {
-            whenInstanceOf(result, licenseState.descriptor) {
-                returnValue(staticField(validLicense))
+        execute {
+            checkLicense.after {
+                whenInstanceOf(result, licenseState.descriptor) {
+                    returnValue(staticField(validLicense))
+                }
             }
+            log.info("Plus: unlocked via ${checkLicense.descriptor}.")
         }
-        log.info("Plus: unlocked via ${checkLicense.descriptor}.")
     }
-}

@@ -24,8 +24,12 @@ internal fun PatchRuntime.disableFeatureFlag(key: String) {
     if (consumers.isEmpty()) error("No feature flag consumer found for $key")
 
     // Register before the first flag read, including reads before Application.onCreate.
-    FeatureFlags.target.method("<clinit>") { includeExtensions() }.after {
-        FeatureFlags.disable(string(key))
-    }
-    log.info("Feature flags: registered an override for $key, used by ${consumers.joinToString { it.descriptor }}.")
+    FeatureFlags.target
+        .method("<clinit>") { includeExtensions() }
+        .after {
+            FeatureFlags.disable(string(key))
+        }
+    log.info(
+        "Feature flags: registered an override for $key, used by ${consumers.joinToString { it.descriptor }}.",
+    )
 }

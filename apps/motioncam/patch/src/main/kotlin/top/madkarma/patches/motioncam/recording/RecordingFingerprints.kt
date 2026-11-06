@@ -5,7 +5,11 @@ package top.madkarma.patches.motioncam.recording
 
 import app.reseam.patch.method
 
-internal val cameraLibraryLoad = method("cameraLibraryLoad") {
-    strings("native-camera-host")
-    calls { owner("java.lang.System"); name("loadLibrary") }
-}
+internal val cameraLibraryLoad =
+    method("cameraLibraryLoad") {
+        strings("native-camera-host")
+        calls {
+            owner("java.lang.System")
+            name("loadLibrary")
+        }
+    }

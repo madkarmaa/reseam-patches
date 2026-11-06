@@ -6,7 +6,8 @@ package top.madkarma.patches.truecaller.scamfeed
 import app.reseam.patch.Type
 import app.reseam.patch.method
 
-internal val scamFeedEnabled = method("scamFeedEnabled") {
-    strings("featureScamFeed")
-    returns(Type.Boolean)
-}
+internal val scamFeedEnabled =
+    method("scamFeedEnabled") {
+        strings("featureScamFeed")
+        returns(Type.Boolean)
+    }

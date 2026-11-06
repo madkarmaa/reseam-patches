@@ -6,4 +6,5 @@ plugins {
 }
 
 // Rebuild the native extension with ANDROID_NDK_HOME set:
-// cd ../extensions/recording/src/main/cpp && cmake --preset arm64-v8a && cmake --build --preset arm64-v8a
+// cd ../extensions/recording/src/main/cpp && cmake --preset arm64-v8a && cmake --build --preset
+// arm64-v8a

@@ -9,12 +9,15 @@ import app.reseam.patch.after
 import app.reseam.patch.patch
 import top.madkarma.kleinanzeigen.ads.bindings.Ads
 
-val removeAds = patch("Remove ads") {
-    description("Removes banner, native, and interstitial ads.")
-    compatibleWith("com.ebay.kleinanzeigen")
+val removeAds =
+    patch("Remove ads") {
+        description("Removes banner, native, and interstitial ads.")
+        compatibleWith("com.ebay.kleinanzeigen")
 
-    execute {
-        parseAdsConfiguration.after { Ads.clearPlacements(thisObject.field(adPlacements)) }
-        log.info("Ads: ${parseAdsConfiguration.descriptor} leaves ${adPlacements.name} without ad placements.")
+        execute {
+            parseAdsConfiguration.after { Ads.clearPlacements(thisObject.field(adPlacements)) }
+            log.info(
+                "Ads: ${parseAdsConfiguration.descriptor} leaves ${adPlacements.name} without ad placements.",
+            )
+        }
     }
-}

@@ -5,7 +5,6 @@ package top.madkarma.shared.clearurls
 
 import android.content.Context
 import android.util.Log
-import org.json.JSONException
 import java.io.File
 import java.io.IOException
 import java.net.URL
@@ -15,6 +14,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.net.ssl.HttpsURLConnection
 import kotlin.concurrent.thread
+import org.json.JSONException
 
 internal const val TAG = "ClearURLs"
 
@@ -31,8 +31,7 @@ internal object RulesStore {
     private val started = AtomicBoolean()
     private val firstLoad = CountDownLatch(1)
 
-    @Volatile
-    private var rules: Rules? = null
+    @Volatile private var rules: Rules? = null
 
     fun start(context: Context) {
         if (!started.compareAndSet(false, true)) return
@@ -48,7 +47,9 @@ internal object RulesStore {
     }
 
     fun current(): Rules? {
-        rules?.let { return it }
+        rules?.let {
+            return it
+        }
         if (!started.get()) return null
 
         try {
@@ -93,12 +94,13 @@ internal object RulesStore {
     }
 
     private fun loadRules(data: ByteArray, source: String): Boolean {
-        val parsed = try {
-            Rules.parse(data.toString(Charsets.UTF_8))
-        } catch (exception: JSONException) {
-            Log.w(TAG, "Ignoring unreadable rules from $source: $exception")
-            return false
-        }
+        val parsed =
+            try {
+                Rules.parse(data.toString(Charsets.UTF_8))
+            } catch (exception: JSONException) {
+                Log.w(TAG, "Ignoring unreadable rules from $source: $exception")
+                return false
+            }
 
         rules = parsed
         Log.i(TAG, "Loaded ${parsed.size} providers from $source")

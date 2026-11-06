@@ -6,7 +6,8 @@ package top.madkarma.patches.nyx.pro
 import app.reseam.patch.Type
 import app.reseam.patch.method
 
-internal val hasActivePurchase = method("hasActivePurchase") {
-    strings("has_active_purchase")
-    returns(Type.Boolean)
-}
+internal val hasActivePurchase =
+    method("hasActivePurchase") {
+        strings("has_active_purchase")
+        returns(Type.Boolean)
+    }

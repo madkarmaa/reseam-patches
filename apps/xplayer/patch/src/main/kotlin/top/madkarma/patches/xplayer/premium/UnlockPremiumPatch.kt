@@ -15,29 +15,34 @@ import top.madkarma.patches.shared.setStringEverywhere
 
 private const val ALREADY_PREMIUM_TOAST_KEY = "toast_already_vip"
 
-val unlockPremium = patch("Unlock premium") {
-    description("Unlocks Premium-only features.")
-    compatibleWith("video.player.videoplayer")
+val unlockPremium =
+    patch("Unlock premium") {
+        description("Unlocks Premium-only features.")
+        compatibleWith("video.player.videoplayer")
 
-    execute {
-        booleanPreference.before {
-            whenTrue(call(XPlayerPremium.isPremiumPreference, paramOfType(Type.String))) {
-                returnTrue()
+        execute {
+            booleanPreference.before {
+                whenTrue(call(XPlayerPremium.isPremiumPreference, paramOfType(Type.String))) {
+                    returnTrue()
+                }
             }
-        }
-        log.info("Premium: ${booleanPreference.descriptor} enables the Premium preference.")
+            log.info("Premium: ${booleanPreference.descriptor} enables the Premium preference.")
 
-        updateCachedPremium.before { paramOfType(Type.Boolean).assign(bool(true)) }
-        log.info("Premium: ${updateCachedPremium.descriptor} keeps billing refreshes in the Premium state.")
+            updateCachedPremium.before { paramOfType(Type.Boolean).assign(bool(true)) }
+            log.info(
+                "Premium: ${updateCachedPremium.descriptor} keeps billing refreshes in the Premium state.",
+            )
 
-        purchaseStateConstructor.after {
-            call(updateCachedPremium, thisObject, bool(true))
-        }
-        log.info("Premium: ${purchaseStateConstructor.descriptor} initializes Premium before billing connects.")
+            purchaseStateConstructor.after {
+                call(updateCachedPremium, thisObject, bool(true))
+            }
+            log.info(
+                "Premium: ${purchaseStateConstructor.descriptor} initializes Premium before billing connects.",
+            )
 
-        check(resources.setStringEverywhere(ALREADY_PREMIUM_TOAST_KEY, PATCH_ATTRIBUTION)) {
-            "Unlock premium: failed to rewrite string $ALREADY_PREMIUM_TOAST_KEY"
+            check(resources.setStringEverywhere(ALREADY_PREMIUM_TOAST_KEY, PATCH_ATTRIBUTION)) {
+                "Unlock premium: failed to rewrite string $ALREADY_PREMIUM_TOAST_KEY"
+            }
+            log.info("Premium: $ALREADY_PREMIUM_TOAST_KEY shows the shared patch attribution.")
         }
-        log.info("Premium: $ALREADY_PREMIUM_TOAST_KEY shows the shared patch attribution.")
     }
-}

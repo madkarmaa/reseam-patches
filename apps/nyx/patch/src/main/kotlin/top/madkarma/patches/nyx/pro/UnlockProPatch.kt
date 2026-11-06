@@ -8,12 +8,15 @@ package top.madkarma.patches.nyx.pro
 import app.reseam.patch.alwaysReturn
 import app.reseam.patch.patch
 
-val unlockPro = patch("Unlock Pro") {
-    description("Unlocks Pro-only features.")
-    compatibleWith("com.awedea.nyx")
+val unlockPro =
+    patch("Unlock Pro") {
+        description("Unlocks Pro-only features.")
+        compatibleWith("com.awedea.nyx")
 
-    execute {
-        hasActivePurchase.alwaysReturn(true)
-        log.info("Pro: ${hasActivePurchase.descriptor} reports an active purchase to feature checks and billing observers.")
+        execute {
+            hasActivePurchase.alwaysReturn(true)
+            log.info(
+                "Pro: ${hasActivePurchase.descriptor} reports an active purchase to feature checks and billing observers.",
+            )
+        }
     }
-}

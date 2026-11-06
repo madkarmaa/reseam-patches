@@ -25,53 +25,53 @@ jobs:
             BUNDLE_SIGNING_KEY_B64: ${{ secrets.BUNDLE_SIGNING_KEY_B64 }}
             RESEAM_HOMEPAGE: ${{ github.server_url }}/${{ github.repository }}
         steps:
-            -   name: Checkout sources
-                uses: actions/checkout@v7
-                with:
-                    fetch-depth: 0
+            - name: Checkout sources
+              uses: actions/checkout@v7
+              with:
+                  fetch-depth: 0
 
-            -   name: Cache dependencies
-                uses: actions/cache@v6
-                with:
-                    path: |
-                        ~/.gradle/caches
-                        ~/.gradle/wrapper
-                        ~/.bun/install/cache
-                        ~/.npm
-                    key: deps-${{ runner.os }}-${{ hashFiles('**/*.gradle.kts', 'gradle/wrapper/gradle-wrapper.properties', 'bun.lock') }}
-                    restore-keys: deps-${{ runner.os }}-
+            - name: Cache dependencies
+              uses: actions/cache@v6
+              with:
+                  path: |
+                      ~/.gradle/caches
+                      ~/.gradle/wrapper
+                      ~/.bun/install/cache
+                      ~/.npm
+                  key: deps-${{ runner.os }}-${{ hashFiles('**/*.gradle.kts', 'gradle/wrapper/gradle-wrapper.properties', 'bun.lock') }}
+                  restore-keys: deps-${{ runner.os }}-
 
-            -   name: Install Node deps
-                run: bun ci
+            - name: Install Node deps
+              run: bun ci
 
-            -   name: Set up UV
-                uses: astral-sh/setup-uv@v10.1.0
-                with:
-                    python-version: "3.14"
-                    ignore-nothing-to-cache: true
+            - name: Set up UV
+              uses: astral-sh/setup-uv@v10.1.0
+              with:
+                  python-version: "3.14"
+                  ignore-nothing-to-cache: true
 
-            -   name: Release
-                if: (github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch') || (github.ref == 'refs/heads/dev' && github.event_name == 'push')
-                run: bun run release
+            - name: Release
+              if: (github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch') || (github.ref == 'refs/heads/dev' && github.event_name == 'push')
+              run: bun run release
 
-            -   name: Build manual bundle
-                if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
-                env:
-                    RELEASE_TAG: ${{ format('v0.0.{0}', github.run_number) }}
-                run: just index "$RELEASE_TAG"
+            - name: Build manual bundle
+              if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
+              env:
+                  RELEASE_TAG: ${{ format('v0.0.{0}', github.run_number) }}
+              run: just index "$RELEASE_TAG"
 
-            -   name: Attest release artifacts
-                if: hashFiles('build/reseam/madkarma-patches.reseam') != ''
-                uses: actions/attest@v4
-                with:
-                    subject-path: build/reseam/madkarma-patches.reseam
+            - name: Attest release artifacts
+              if: hashFiles('build/reseam/madkarma-patches.reseam') != ''
+              uses: actions/attest@v4
+              with:
+                  subject-path: build/reseam/madkarma-patches.reseam
 
-            -   name: Sync dev with main
-                if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
-                run: |
-                    git fetch origin main dev
-                    git config user.name "github-actions[bot]"
-                    git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-                    git switch -C dev origin/dev
-                    git merge --no-edit -m "chore: sync stable release to dev [skip ci]" origin/main
-                    git push origin dev
+            - name: Sync dev with main
+              if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
+              run: |
+                  git fetch origin main dev
+                  git config user.name "github-actions[bot]"
+                  git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+                  git switch -C dev origin/dev
+                  git merge --no-edit -m "chore: sync stable release to dev [skip ci]" origin/main
+                  git push origin dev

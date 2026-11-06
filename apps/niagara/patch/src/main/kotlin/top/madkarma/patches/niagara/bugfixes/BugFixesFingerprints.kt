@@ -7,12 +7,14 @@ import app.reseam.patch.Type
 import app.reseam.patch.klass
 import app.reseam.patch.method
 
-private val channelCardHolder = klass("channelCardHolder") {
-    strings("channel_multiplier")
-}
+private val channelCardHolder =
+    klass("channelCardHolder") {
+        strings("channel_multiplier")
+    }
 
 // The card's only Boolean method is its visibility gate; the method itself has no strings.
-internal val channelCardGate = method("channelCardGate") {
-    inClass(channelCardHolder)
-    returns(Type.Boolean)
-}
+internal val channelCardGate =
+    method("channelCardGate") {
+        inClass(channelCardHolder)
+        returns(Type.Boolean)
+    }

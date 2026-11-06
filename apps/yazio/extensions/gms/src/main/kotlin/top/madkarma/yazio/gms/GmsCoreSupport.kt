@@ -1,7 +1,8 @@
 // SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-@file:JvmName("GmsCoreSupport") @file:Suppress("unused")
+@file:JvmName("GmsCoreSupport")
+@file:Suppress("unused")
 
 package top.madkarma.yazio.gms
 
@@ -18,13 +19,14 @@ private const val CREDENTIAL_RESPONSE = "android.service.credentials.extra.GET_C
 private const val CREDENTIAL_TYPE = "androidx.credentials.provider.extra.EXTRA_CREDENTIAL_TYPE"
 private const val CREDENTIAL_DATA = "androidx.credentials.provider.extra.EXTRA_CREDENTIAL_DATA"
 
-// GmsCore returns the pre-Android 14 Bundle form, but AndroidX reads a framework response on Android 14+.
+// GmsCore returns the pre-Android 14 Bundle form, but AndroidX reads a framework response on
+// Android 14+.
 @Export
 fun restoreFrameworkCredentialResponse(intent: Intent) {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) return
 
-    @Suppress("DEPRECATION") val response =
-        intent.extras?.get(CREDENTIAL_RESPONSE) as? Bundle ?: return
+    @Suppress("DEPRECATION")
+    val response = intent.extras?.get(CREDENTIAL_RESPONSE) as? Bundle ?: return
     val type = response.getString(CREDENTIAL_TYPE) ?: return
     val data = response.getBundle(CREDENTIAL_DATA) ?: return
 

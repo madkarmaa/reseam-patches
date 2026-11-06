@@ -1,7 +1,8 @@
 // SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-@file:JvmName("PixelXlIdentity") @file:Suppress("unused")
+@file:JvmName("PixelXlIdentity")
+@file:Suppress("unused")
 
 package top.madkarma.googlephotos.spoof
 
@@ -11,8 +12,7 @@ import app.reseam.runtime.Export
 private const val FINGERPRINT =
     "google/marlin/marlin:10/QP1A.191005.007.A3/5972272:user/release-keys"
 
-@Export
-fun get(key: String): String = property(key) ?: SystemProperties.get(key)
+@Export fun get(key: String): String = property(key) ?: SystemProperties.get(key)
 
 @Export(name = "getWithDefault")
 fun get(key: String, fallback: String?): String? =
@@ -24,7 +24,11 @@ private fun property(key: String): String? {
         "ro.build.version.incremental" -> return "5972272"
         "ro.build.product" -> return "marlin"
         "ro.product.model.marketname" -> return "Pixel XL"
-        "ro.build.fingerprint", "ro.vendor.build.fingerprint", "ro.system.build.fingerprint", "ro.bootimage.build.fingerprint", "ro.odm.build.fingerprint" -> return FINGERPRINT
+        "ro.build.fingerprint",
+        "ro.vendor.build.fingerprint",
+        "ro.system.build.fingerprint",
+        "ro.bootimage.build.fingerprint",
+        "ro.odm.build.fingerprint" -> return FINGERPRINT
     }
 
     var product = key
@@ -36,7 +40,8 @@ private fun property(key: String): String? {
     return when (product) {
         "ro.product.brand" -> "google"
         "ro.product.manufacturer" -> "Google"
-        "ro.product.device", "ro.product.name" -> "marlin"
+        "ro.product.device",
+        "ro.product.name" -> "marlin"
         "ro.product.model" -> "Pixel XL"
         else -> null
     }

@@ -18,8 +18,7 @@ import app.reseam.runtime.Export
 private const val RESEAM_VENDOR = "app.reseam"
 private const val RESEAM_DOWNLOAD = "https://reseam.app/download/#gmscore"
 
-@Volatile
-private var promptOpen = false
+@Volatile private var promptOpen = false
 
 internal fun openMissingPrompt(context: Context) {
     if (promptOpen) return
@@ -28,8 +27,10 @@ internal fun openMissingPrompt(context: Context) {
     try {
         context.startActivity(
             Intent(
-                context, GmsCoreMissingActivity::class.java
-            ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    context,
+                    GmsCoreMissingActivity::class.java,
+                )
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
         )
     } catch (exception: RuntimeException) {
         promptOpen = false
@@ -37,25 +38,37 @@ internal fun openMissingPrompt(context: Context) {
     }
 }
 
-/** An activity rather than a dialog because a failed sign-in can finish the activity that started it. */
+/**
+ * An activity rather than a dialog because a failed sign-in can finish the activity that started
+ * it.
+ */
 @Export
 class GmsCoreMissingActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val night =
-            resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
-        val theme = if (night) android.R.style.Theme_DeviceDefault_Dialog_Alert
-        else android.R.style.Theme_DeviceDefault_Light_Dialog_Alert
+            resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
+                Configuration.UI_MODE_NIGHT_YES
+        val theme =
+            if (night) android.R.style.Theme_DeviceDefault_Dialog_Alert
+            else android.R.style.Theme_DeviceDefault_Light_Dialog_Alert
 
         val appName = applicationInfo.loadLabel(packageManager)
 
-        val dialog = AlertDialog.Builder(this, theme).setTitle("GmsCore is not installed")
-            .setMessage("$appName needs GmsCore (${gmsCorePackageName()}) for Google sign-in. Install it and add your Google account there.")
-            .setNegativeButton(android.R.string.cancel, null).setOnDismissListener { finish() }
+        val dialog =
+            AlertDialog.Builder(this, theme)
+                .setTitle("GmsCore is not installed")
+                .setMessage(
+                    "$appName needs GmsCore (${gmsCorePackageName()}) for Google sign-in. Install it and add your Google account there.",
+                )
+                .setNegativeButton(android.R.string.cancel, null)
+                .setOnDismissListener { finish() }
 
-        // Reseam publishes only its own GmsCore; other vendor groups come from their own publishers.
-        if (vendorGroupId() == RESEAM_VENDOR) dialog.setPositiveButton("Get GmsCore") { _, _ -> openDownloadPage() }
+        // Reseam publishes only its own GmsCore; other vendor groups come from their own
+        // publishers.
+        if (vendorGroupId() == RESEAM_VENDOR)
+            dialog.setPositiveButton("Get GmsCore") { _, _ -> openDownloadPage() }
 
         dialog.show()
     }

@@ -5,23 +5,26 @@ package top.madkarma.patches.turuta.gms
 
 import app.reseam.patch.*
 
-internal val tokenServiceInitializer = method("tokenServiceInitializer") {
-    strings("GoogleAuthUtil", "com.google.android.gms.auth.GetToken")
-    name("<clinit>")
-}
+internal val tokenServiceInitializer =
+    method("tokenServiceInitializer") {
+        strings("GoogleAuthUtil", "com.google.android.gms.auth.GetToken")
+        name("<clinit>")
+    }
 
 // This SDK's modern token API is a stub in GmsCore; its GetToken service is implemented.
-internal val modernTokenApiAvailable = method("modernTokenApiAvailable") {
-    inClass(klass(tokenServiceInitializer.owner))
-    returns(Type.Boolean)
-    calls { name("getApplicationInfo") }
-}
+internal val modernTokenApiAvailable =
+    method("modernTokenApiAvailable") {
+        inClass(klass(tokenServiceInitializer.owner))
+        returns(Type.Boolean)
+        calls { name("getApplicationInfo") }
+    }
 
-internal val serviceConfigurationConstructor = method("serviceConfigurationConstructor") {
-    name("<init>")
-    params(Type.String, Type.Boolean)
-    strings("com.google.android.gms")
-}
+internal val serviceConfigurationConstructor =
+    method("serviceConfigurationConstructor") {
+        name("<init>")
+        params(Type.String, Type.Boolean)
+        strings("com.google.android.gms")
+    }
 
 internal val servicePackage = serviceConfigurationConstructor.point {
     string("com.google.android.gms")

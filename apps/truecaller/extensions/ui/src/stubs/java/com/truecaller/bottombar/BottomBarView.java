@@ -11,7 +11,10 @@ public final class BottomBarView {
     }
 
     public enum BottomBarMenuItemId {
-        MESSAGES, BLOCKING, PREMIUM, FAMILY_PROTECTION_CONFIG;
+        MESSAGES,
+        BLOCKING,
+        PREMIUM,
+        FAMILY_PROTECTION_CONFIG;
 
         public int getId() {
             throw new UnsupportedOperationException("Stub");

@@ -8,18 +8,21 @@ import app.reseam.patch.klass
 import app.reseam.patch.method
 import app.reseam.patch.methods
 
-private val serviceClient = klass("serviceClient") {
-    strings("Calling connect() while still connected, missing disconnect() for ")
-}
+private val serviceClient =
+    klass("serviceClient") {
+        strings("Calling connect() while still connected, missing disconnect() for ")
+    }
 
-private val serviceConfiguration = serviceClient.method("getEndpointPackageName").field {
-    owner(serviceClient.descriptor)
-}
+private val serviceConfiguration =
+    serviceClient.method("getEndpointPackageName").field {
+        owner(serviceClient.descriptor)
+    }
 
-internal val serviceConfigurationConstructor = method("serviceConfigurationConstructor") {
-    inClass(klass(serviceConfiguration.type))
-    name("<init>")
-}
+internal val serviceConfigurationConstructor =
+    method("serviceConfigurationConstructor") {
+        inClass(klass(serviceConfiguration.type))
+        name("<init>")
+    }
 
 internal val serviceAction = serviceClient.method("getStartServiceAction")
 internal val requiresPlayServices = serviceClient.method("requiresGooglePlayServices")
@@ -27,14 +30,17 @@ internal val requiresPlayServices = serviceClient.method("requiresGooglePlayServ
 // These literals are account types, including Account parcel reconstruction and default accounts.
 internal val googleAccountTypes = methods("googleAccountTypes") { strings("com.google") }
 
-internal val credentialProviderFromManifest = method("credentialProviderFromManifest") {
-    strings("androidx.credentials.CREDENTIAL_PROVIDER_KEY")
-}
+internal val credentialProviderFromManifest =
+    method("credentialProviderFromManifest") {
+        strings("androidx.credentials.CREDENTIAL_PROVIDER_KEY")
+    }
 
-internal val selectCredentialProvider = method("selectCredentialProvider") {
-    calls(credentialProviderFromManifest)
-    inClass(klass(credentialProviderFromManifest.owner))
-}
+internal val selectCredentialProvider =
+    method("selectCredentialProvider") {
+        calls(credentialProviderFromManifest)
+        inClass(klass(credentialProviderFromManifest.owner))
+    }
 
 internal val credentialsAvailable =
-    klass("androidx.credentials.playservices.CredentialProviderPlayServicesImpl").method("isAvailableOnDevice")
+    klass("androidx.credentials.playservices.CredentialProviderPlayServicesImpl")
+        .method("isAvailableOnDevice")

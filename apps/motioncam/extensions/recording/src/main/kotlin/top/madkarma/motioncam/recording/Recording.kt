@@ -11,7 +11,10 @@ import app.reseam.runtime.Export
 @Synchronized
 fun install(diagnostics: Boolean) {
     System.loadLibrary("MotionCamRecording")
-    if (!installNative(diagnostics)) error("MotionCam: installing the native recording-limit patch failed; enable diagnostics for details")
+    if (!installNative(diagnostics))
+        error(
+            "MotionCam: installing the native recording-limit patch failed; enable diagnostics for details",
+        )
 }
 
 private external fun installNative(diagnostics: Boolean): Boolean

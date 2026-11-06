@@ -1,13 +1,14 @@
 // SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-@file:JvmName("FeatureFlags") @file:Suppress("unused")
+@file:JvmName("FeatureFlags")
+@file:Suppress("unused")
 
 package top.madkarma.truecaller.behavior
 
 import app.reseam.runtime.Export
-import top.madkarma.truecaller.settings.TruecallerSettings
 import java.util.concurrent.ConcurrentHashMap
+import top.madkarma.truecaller.settings.TruecallerSettings
 
 private val disabledKeys = ConcurrentHashMap.newKeySet<String>()
 

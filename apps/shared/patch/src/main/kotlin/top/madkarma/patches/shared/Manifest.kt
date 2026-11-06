@@ -5,7 +5,8 @@ package top.madkarma.patches.shared
 
 import app.reseam.patch.XmlDocument
 
-// Android 6 and later grant uses-permission-sdk-23 like uses-permission, and Reseam supports Android 8 onwards.
+// Android 6 and later grant uses-permission-sdk-23 like uses-permission, and Reseam supports
+// Android 8 onwards.
 private val PERMISSION_REQUESTS = setOf("uses-permission", "uses-permission-sdk-23")
 
 /** Whether the manifest already requests `permission`. */

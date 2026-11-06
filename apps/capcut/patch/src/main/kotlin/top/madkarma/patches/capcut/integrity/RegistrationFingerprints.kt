@@ -12,14 +12,16 @@ internal val deviceRegistrationInit = deviceRegisterManager.method("init")
 
 internal val deviceRegistrationStart = deviceRegisterManager.method("onCreate")
 
-internal val deviceRegistrationRequest = method("deviceRegistrationRequest") {
-    strings("RegisterServiceController app_log_config: ")
-}
+internal val deviceRegistrationRequest =
+    method("deviceRegistrationRequest") {
+        strings("RegisterServiceController app_log_config: ")
+    }
 
-internal val excludeAppRequestHeaders = method("excludeAppRequestHeaders") {
-    strings("x-tt-web-proxy")
-    inClass(klass("com.lm.components.network.extra.NetworkRuntimeConfig"))
-}
+internal val excludeAppRequestHeaders =
+    method("excludeAppRequestHeaders") {
+        strings("x-tt-web-proxy")
+        inClass(klass("com.lm.components.network.extra.NetworkRuntimeConfig"))
+    }
 
 internal val networkCommonParameters =
     klass("com.lm.components.core.network.NetworkDevice").method("addCommonParams")

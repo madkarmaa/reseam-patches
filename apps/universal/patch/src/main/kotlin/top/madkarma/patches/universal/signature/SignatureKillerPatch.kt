@@ -7,179 +7,230 @@ package top.madkarma.patches.universal.signature
 
 import app.reseam.patch.before
 import app.reseam.patch.patch
+import java.security.MessageDigest
+import java.util.*
 import top.madkarma.patches.shared.isPresent
 import top.madkarma.universal.signature.bindings.SignatureChecks
 import top.madkarma.universal.signature.bindings.SignatureChecksApi33
 import top.madkarma.universal.signature.bindings.SignatureKiller
-import java.security.MessageDigest
-import java.util.*
 
-val signatureKiller = patch("Signature Killer") {
-    description("Spoofs the original app signature.")
+val signatureKiller =
+    patch("Signature Killer") {
+        description("Spoofs the original app signature.")
 
-    val diagnostics = boolOption(
-        "diagnostics",
-        title = "Log diagnostics",
-        description = "Log detailed runtime diagnostics from the extension and its native library under the SignatureKiller logcat tag.",
-        default = false,
-    )
+        val diagnostics =
+            boolOption(
+                "diagnostics",
+                title = "Log diagnostics",
+                description =
+                    "Log detailed runtime diagnostics from the extension and its native library under the SignatureKiller logcat tag.",
+                default = false,
+            )
 
-    execute {
-        val packageName =
-            manifest.packageName ?: error("SignatureKiller: manifest has no package name")
+        execute {
+            val packageName =
+                manifest.packageName ?: error("SignatureKiller: manifest has no package name")
 
-        val signers = files.signers()
-        if (signers.isEmpty()) error("SignatureKiller: no v2/v3 signers found; unsigned or v1-only APKs are not supported")
+            val signers = files.signers()
+            if (signers.isEmpty())
+                error(
+                    "SignatureKiller: no v2/v3 signers found; unsigned or v1-only APKs are not supported",
+                )
 
-        log.info(
-            "SignatureKiller: $packageName has ${signers.size} original signer(s): ${
+            log.info(
+                "SignatureKiller: $packageName has ${signers.size} original signer(s): ${
             signers.joinToString {
                 certificateFingerprint(
-                    it
+                    it,
                 )
             }
-        }; the first is spoofed. Options: diagnostics=${options[diagnostics]}.")
+        }; the first is spoofed. Options: diagnostics=${options[diagnostics]}.",
+            )
 
-        // These APIs bypass PackageInfo.CREATOR. Redirect direct app calls; extension calls stay original.
-        val manager = "android.content.pm.PackageManager"
+            // These APIs bypass PackageInfo.CREATOR. Redirect direct app calls; extension calls
+            // stay original.
+            val manager = "android.content.pm.PackageManager"
 
-        val packageChecks = bytecode.redirectCalls(
-            manager, "hasSigningCertificate", SignatureChecks.hasSigningCertificate,
-        )
-        val uidChecks = bytecode.redirectCalls(
-            manager, "hasSigningCertificate", SignatureChecks.hasSigningCertificateForUid,
-        )
-
-        val archiveReads = bytecode.redirectCalls(
-            manager, "getPackageArchiveInfo", SignatureChecks.getPackageArchiveInfo,
-        )
-        val flaggedArchiveReads = bytecode.redirectCalls(
-            manager, "getPackageArchiveInfo", SignatureChecksApi33.getPackageArchiveInfoWithFlags,
-        )
-
-        log.info("SignatureKiller: redirected hasSigningCertificate calls by package ($packageChecks) and by uid ($uidChecks), getPackageArchiveInfo calls with int flags ($archiveReads) and PackageInfoFlags ($flaggedArchiveReads); reflection and JNI calls are not redirected.")
-        log.info("SignatureKiller: hooked $packageName (${signers.size} signer(s)).")
-
-    }
-
-    // Resolve the Application after dependent patches have finished editing the manifest.
-    afterDependents {
-        val packageName =
-            manifest.packageName ?: error("SignatureKiller: manifest has no package name")
-
-        val originalSignature =
-            files.signers().firstOrNull() ?: error("SignatureKiller: no original signer")
-
-        // Signature Killer (APK file access) embeds the original APK files.
-        val spoofApkFiles = ORIGIN_ASSET_PATH in files.list()
-        val encodedSignature = Base64.getEncoder().encodeToString(originalSignature)
-        log.info(
-            "SignatureKiller: runtime spoofs certificate ${
-                certificateFingerprint(
-                    originalSignature
+            val packageChecks =
+                bytecode.redirectCalls(
+                    manager,
+                    "hasSigningCertificate",
+                    SignatureChecks.hasSigningCertificate,
                 )
-            }; original APK file access ${if (spoofApkFiles) "on" else "off"}; runtime diagnostics ${if (options[diagnostics]) "on" else "off"}."
-        )
+            val uidChecks =
+                bytecode.redirectCalls(
+                    manager,
+                    "hasSigningCertificate",
+                    SignatureChecks.hasSigningCertificateForUid,
+                )
 
-        // Pairip signature checker can launch from a component class initializer, before attachBaseContext.
-        if (isPresent(pairipStartup)) {
-            pairipStartup.before {
+            val archiveReads =
+                bytecode.redirectCalls(
+                    manager,
+                    "getPackageArchiveInfo",
+                    SignatureChecks.getPackageArchiveInfo,
+                )
+            val flaggedArchiveReads =
+                bytecode.redirectCalls(
+                    manager,
+                    "getPackageArchiveInfo",
+                    SignatureChecksApi33.getPackageArchiveInfoWithFlags,
+                )
+
+            log.info(
+                "SignatureKiller: redirected hasSigningCertificate calls by package ($packageChecks) and by uid ($uidChecks), getPackageArchiveInfo calls with int flags ($archiveReads) and PackageInfoFlags ($flaggedArchiveReads); reflection and JNI calls are not redirected.",
+            )
+            log.info("SignatureKiller: hooked $packageName (${signers.size} signer(s)).")
+        }
+
+        // Resolve the Application after dependent patches have finished editing the manifest.
+        afterDependents {
+            val packageName =
+                manifest.packageName ?: error("SignatureKiller: manifest has no package name")
+
+            val originalSignature =
+                files.signers().firstOrNull() ?: error("SignatureKiller: no original signer")
+
+            // Signature Killer (APK file access) embeds the original APK files.
+            val spoofApkFiles = ORIGIN_ASSET_PATH in files.list()
+            val encodedSignature = Base64.getEncoder().encodeToString(originalSignature)
+            log.info(
+                "SignatureKiller: runtime spoofs certificate ${
+                certificateFingerprint(
+                    originalSignature,
+                )
+            }; original APK file access ${if (spoofApkFiles) "on" else "off"}; runtime diagnostics ${if (options[diagnostics]) "on" else "off"}.",
+            )
+
+            // Pairip signature checker can launch from a component class initializer, before
+            // attachBaseContext.
+            if (isPresent(pairipStartup)) {
+                pairipStartup.before {
+                    call(
+                        SignatureKiller.initializeEarly,
+                        string(packageName),
+                        string(encodedSignature),
+                        bool(spoofApkFiles),
+                        bool(options[diagnostics]),
+                    )
+                }
+
+                log.info(
+                    "SignatureKiller: early hook ${pairipStartup.descriptor} initializes before Pairip's startup checks.",
+                )
+            } else {
+                log.info(
+                    "SignatureKiller: no Pairip startup launcher; initialization starts in attachBaseContext only.",
+                )
+            }
+
+            val attachContext = signatureAttachContext()
+            attachContext.before {
                 call(
-                    SignatureKiller.initializeEarly,
+                    SignatureKiller.initialize,
+                    param(0),
                     string(packageName),
                     string(encodedSignature),
                     bool(spoofApkFiles),
                     bool(options[diagnostics]),
                 )
             }
-
-            log.info("SignatureKiller: early hook ${pairipStartup.descriptor} initializes before Pairip's startup checks.")
-        } else {
-            log.info("SignatureKiller: no Pairip startup launcher; initialization starts in attachBaseContext only.")
-        }
-
-        val attachContext = signatureAttachContext()
-        attachContext.before {
-            call(
-                SignatureKiller.initialize,
-                param(0),
-                string(packageName),
-                string(encodedSignature),
-                bool(spoofApkFiles),
-                bool(options[diagnostics]),
+            log.info(
+                "SignatureKiller: startup hook ${attachContext.descriptor} (original APK file access ${if (spoofApkFiles) "on" else "off"}).",
             )
         }
-        log.info("SignatureKiller: startup hook ${attachContext.descriptor} (original APK file access ${if (spoofApkFiles) "on" else "off"}).")
     }
-}
 
-val spoofApkFileAccess = patch("Signature Killer (APK file access)") {
-    description("Spoofs the original app signature and redirects reads of the installed APK files to embedded original copies. Only use this for apps that verify the APK files themselves; it roughly doubles the APK size.")
-    dependsOn(signatureKiller)
+val spoofApkFileAccess =
+    patch("Signature Killer (APK file access)") {
+        description(
+            "Spoofs the original app signature and redirects reads of the installed APK files to embedded original copies. Only use this for apps that verify the APK files themselves; it roughly doubles the APK size.",
+        )
+        dependsOn(signatureKiller)
 
-    // Signature Killer enables the runtime redirection once it finds the embedded original.
-    execute {
-        val packageName =
-            manifest.packageName ?: error("SignatureKiller: manifest has no package name")
-        val signers = files.signers()
-        val assetPaths = mutableSetOf<String>()
+        // Signature Killer enables the runtime redirection once it finds the embedded original.
+        execute {
+            val packageName =
+                manifest.packageName ?: error("SignatureKiller: manifest has no package name")
+            val signers = files.signers()
+            val assetPaths = mutableSetOf<String>()
 
-        for (component in files.components()) {
-            val splitName = manifest.component(component).splitName
+            for (component in files.components()) {
+                val splitName = manifest.component(component).splitName
 
-            if (splitName != null && (splitName.isEmpty() || '/' in splitName || '\\' in splitName)) error(
-                "SignatureKiller: invalid split name: $splitName"
-            )
+                if (
+                    splitName != null &&
+                        (splitName.isEmpty() || '/' in splitName || '\\' in splitName)
+                )
+                    error(
+                        "SignatureKiller: invalid split name: $splitName",
+                    )
 
-            val assetPath = if (splitName == null) ORIGIN_ASSET_PATH
-            else "assets/SignatureKiller/splits/$splitName.apk"
+                val assetPath =
+                    if (splitName == null) ORIGIN_ASSET_PATH
+                    else "assets/SignatureKiller/splits/$splitName.apk"
 
-            if (!assetPaths.add(assetPath)) error("SignatureKiller: duplicate original component: $component")
+                if (!assetPaths.add(assetPath))
+                    error("SignatureKiller: duplicate original component: $component")
 
-            files.component(component).sourceStream().use { original ->
-                files.writeStored(assetPath, original)
+                files.component(component).sourceStream().use { original ->
+                    files.writeStored(assetPath, original)
+                }
+                log.info(
+                    "SignatureKiller: embeds original $component (${splitName?.let { "split $it" } ?: "base"}) as $assetPath.",
+                )
             }
-            log.info("SignatureKiller: embeds original $component (${splitName?.let { "split $it" } ?: "base"}) as $assetPath.")
-        }
 
-        val nativeLibraries = files.components().flatMap { files.component(it).list() }
-            .filter { it.startsWith("lib/") && it.endsWith(".so") }
+            val nativeLibraries =
+                files
+                    .components()
+                    .flatMap { files.component(it).list() }
+                    .filter { it.startsWith("lib/") && it.endsWith(".so") }
 
-        // Adding another ABI can make Android stop extracting the app's own native libraries.
-        val nativeAbis = if (nativeLibraries.isEmpty()) NATIVE_ABIS else NATIVE_ABIS.filter { abi ->
-            nativeLibraries.any { it.startsWith("lib/$abi/") }
-        }
+            // Adding another ABI can make Android stop extracting the app's own native libraries.
+            val nativeAbis =
+                if (nativeLibraries.isEmpty()) NATIVE_ABIS
+                else
+                    NATIVE_ABIS.filter { abi ->
+                        nativeLibraries.any { it.startsWith("lib/$abi/") }
+                    }
 
-        if (nativeAbis.isEmpty()) error("SignatureKiller: no supported native ABI in the app")
+            if (nativeAbis.isEmpty()) error("SignatureKiller: no supported native ABI in the app")
 
-        val appAbis = nativeLibraries.map { it.split('/')[1] }.distinct()
-        log.info(
-            "SignatureKiller: adds libSignatureKiller.so for ${nativeAbis.joinToString()} (app native ABIs: ${
+            val appAbis = nativeLibraries.map { it.split('/')[1] }.distinct()
+            log.info(
+                "SignatureKiller: adds libSignatureKiller.so for ${nativeAbis.joinToString()} (app native ABIs: ${
                 appAbis.ifEmpty {
                     listOf(
-                        "none"
+                        "none",
                     )
                 }.joinToString()
-            })."
-        )
+            }).",
+            )
 
-        for (abi in nativeAbis) {
-            val libraries = listOf("libSignatureKiller.so", "libshadowhook.so", "libshadowhook_nothing.so")
-            for (name in libraries) {
-                val path = "lib/$abi/$name"
-                val library = SignatureResources.javaClass.classLoader.getResourceAsStream(path)
-                    ?: error("SignatureKiller: bundled native lib missing: $path")
-                library.use { files.write(path, it) }
+            for (abi in nativeAbis) {
+                val libraries =
+                    listOf("libSignatureKiller.so", "libshadowhook.so", "libshadowhook_nothing.so")
+                for (name in libraries) {
+                    val path = "lib/$abi/$name"
+                    val library =
+                        SignatureResources.javaClass.classLoader.getResourceAsStream(path)
+                            ?: error("SignatureKiller: bundled native lib missing: $path")
+                    library.use { files.write(path, it) }
+                }
             }
-        }
 
-        log.info("SignatureKiller: hooked $packageName with APK-path spoofing (${assetPaths.size} original component(s), ${signers.size} signer(s)).")
+            log.info(
+                "SignatureKiller: hooked $packageName with APK-path spoofing (${assetPaths.size} original component(s), ${signers.size} signer(s)).",
+            )
+        }
     }
-}
 
 /** The first 16 hex digits of a certificate's SHA-256, matching the extension's log. */
 internal fun certificateFingerprint(certificate: ByteArray): String =
-    MessageDigest.getInstance("SHA-256").digest(certificate).joinToString("") { "%02x".format(it) }
+    MessageDigest.getInstance("SHA-256")
+        .digest(certificate)
+        .joinToString("") { "%02x".format(it) }
         .take(16)
 
 private const val ORIGIN_ASSET_PATH = "assets/SignatureKiller/origin.apk"

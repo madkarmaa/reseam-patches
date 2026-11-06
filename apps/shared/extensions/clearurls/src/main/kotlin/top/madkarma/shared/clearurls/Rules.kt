@@ -3,18 +3,19 @@
 
 package top.madkarma.shared.clearurls
 
-import org.json.JSONArray
-import org.json.JSONObject
 import java.net.URLDecoder
 import java.util.regex.Pattern
 import java.util.regex.PatternSyntaxException
+import org.json.JSONArray
+import org.json.JSONObject
 
 /**
  * The provider list of the ClearURLs project (https://gitlab.com/ClearURLs/rules), applied the way
  * its add-on applies it. Format: https://docs.clearurls.xyz/specs/rules
  */
 internal class Rules private constructor(private val providers: List<Provider>) {
-    val size get() = providers.size
+    val size
+        get() = providers.size
 
     // The add-on reloads a changed URL, so every provider sees the result again.
     fun clean(url: String): String {
@@ -28,7 +29,8 @@ internal class Rules private constructor(private val providers: List<Provider>) 
         return current
     }
 
-    // Like the add-on's request handler, this returns the change of the first provider that makes one.
+    // Like the add-on's request handler, this returns the change of the first provider that makes
+    // one.
     private fun cleanOnce(url: String): String? {
         for (provider in providers) {
             if (!provider.matches(url)) continue
@@ -48,8 +50,10 @@ internal class Rules private constructor(private val providers: List<Provider>) 
 
         fun parse(json: String): Rules {
             val providers = JSONObject(json).getJSONObject("providers")
-            val parsed = providers.keys().asSequence()
-                .mapNotNull { Provider.parse(providers.getJSONObject(it)) }
+            val parsed =
+                providers.keys().asSequence().mapNotNull {
+                    Provider.parse(providers.getJSONObject(it))
+                }
 
             return Rules(parsed.toList())
         }
@@ -92,7 +96,8 @@ private class Provider(
         val fragment = cleaned.substring(fragmentStart).removePrefix("#")
         if (query.isEmpty() && fragment.isEmpty()) return cleaned
 
-        // Query names are compared decoded, fragment names as written, like URLSearchParams and URLHashParams.
+        // Query names are compared decoded, fragment names as written, like URLSearchParams and
+        // URLHashParams.
         val keptQuery =
             query.split('&').filter { it.isNotEmpty() && !isTracking(decodeName(nameOf(it))) }
         val keptFragment = fragment.split('&').filter { it.isNotEmpty() && !isTracking(nameOf(it)) }
@@ -137,26 +142,30 @@ private class Provider(
         }
 
         // The list is written for JavaScript; skip the rare pattern Java cannot compile.
-        private fun compile(pattern: String): Pattern? = try {
-            Pattern.compile(pattern, Pattern.CASE_INSENSITIVE)
-        } catch (_: PatternSyntaxException) {
-            null
-        }
+        private fun compile(pattern: String): Pattern? =
+            try {
+                Pattern.compile(pattern, Pattern.CASE_INSENSITIVE)
+            } catch (_: PatternSyntaxException) {
+                null
+            }
     }
 }
 
 private fun nameOf(parameter: String) = parameter.substringBefore('=')
 
-private fun decodeName(name: String) = try {
-    URLDecoder.decode(name, "UTF-8")
-} catch (_: IllegalArgumentException) {
-    name
-}
+private fun decodeName(name: String) =
+    try {
+        URLDecoder.decode(name, "UTF-8")
+    } catch (_: IllegalArgumentException) {
+        name
+    }
 
 private const val MAX_DECODES = 8
 
-// The add-on decodes the target until it stops changing. Decoding a decoded target leaves it as it is,
-// so the extra passes change nothing. A target without a scheme gets https here, where the add-on uses
+// The add-on decodes the target until it stops changing. Decoding a decoded target leaves it as it
+// is,
+// so the extra passes change nothing. A target without a scheme gets https here, where the add-on
+// uses
 // http, because the link is shared rather than opened.
 private fun decodeRedirect(target: String): String {
     var decoded = target
@@ -166,8 +175,9 @@ private fun decodeRedirect(target: String): String {
 }
 
 // decodeURIComponent leaves '+' alone, unlike URLDecoder.
-private fun decodeComponent(value: String) = try {
-    URLDecoder.decode(value.replace("+", "%2B"), "UTF-8")
-} catch (_: IllegalArgumentException) {
-    value
-}
+private fun decodeComponent(value: String) =
+    try {
+        URLDecoder.decode(value.replace("+", "%2B"), "UTF-8")
+    } catch (_: IllegalArgumentException) {
+        value
+    }

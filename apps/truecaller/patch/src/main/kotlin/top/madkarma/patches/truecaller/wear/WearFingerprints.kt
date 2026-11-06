@@ -9,18 +9,21 @@ private val settingCategory = klass("com.truecaller.settings.impl.ui.search.Sett
 
 private val watchCategory = settingCategory.field("WATCH")
 
-private val watchSearchCategory = method("watchSearchCategory") {
-    accesses { name(watchCategory.name) }
-    returns(settingCategory.descriptor)
-}
+private val watchSearchCategory =
+    method("watchSearchCategory") {
+        accesses { name(watchCategory.name) }
+        returns(settingCategory.descriptor)
+    }
 
-internal val watchSearchEntries = method("watchSearchEntries") {
-    inClass(klass(watchSearchCategory.owner))
-    returns(Type.Object)
-}
+internal val watchSearchEntries =
+    method("watchSearchEntries") {
+        inClass(klass(watchSearchCategory.owner))
+        returns(Type.Object)
+    }
 
-private val watchSearchModel = klass("watchSearchModel") {
-    strings("Category(subcategories=")
-}
+private val watchSearchModel =
+    klass("watchSearchModel") {
+        strings("Category(subcategories=")
+    }
 
 internal val watchSearchItems = watchSearchModel.fieldOfType("java.util.List")

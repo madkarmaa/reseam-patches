@@ -16,8 +16,7 @@ private constructor(private val context: Context, private val adapter: FlmAdapte
 
     private fun prefs() = context.getSharedPreferences("base", Context.MODE_PRIVATE)
 
-    @Export
-    fun needsSetup(): Boolean = !prefs().getBoolean(SETUP_DONE, false)
+    @Export fun needsSetup(): Boolean = !prefs().getBoolean(SETUP_DONE, false)
 
     @Export
     fun approvedAnnoyanceFilters(groupCode: Int): Set<Int> {
@@ -36,8 +35,7 @@ private constructor(private val context: Context, private val adapter: FlmAdapte
         }
     }
 
-    @Export
-    fun acceptTerms() = setBooleanPreference("privacy_policy", true)
+    @Export fun acceptTerms() = setBooleanPreference("privacy_policy", true)
 
     @Export
     fun disableAutomaticCrashReporting() = setBooleanPreference("automatic_crash_reporting", false)
@@ -45,11 +43,9 @@ private constructor(private val context: Context, private val adapter: FlmAdapte
     @Export
     fun disableUsageTelemetry() = setBooleanPreference("technical_and_interaction_data", false)
 
-    @Export
-    fun markFirstOnboardingShown() = setBooleanPreference("onboarding_first_shown", true)
+    @Export fun markFirstOnboardingShown() = setBooleanPreference("onboarding_first_shown", true)
 
-    @Export
-    fun markSecondOnboardingShown() = setBooleanPreference("onboarding_second_shown", true)
+    @Export fun markSecondOnboardingShown() = setBooleanPreference("onboarding_second_shown", true)
 
     @Export
     fun setNotificationPromptEnabled(enabled: Boolean) =
@@ -70,37 +66,32 @@ private constructor(private val context: Context, private val adapter: FlmAdapte
     private fun setFilterEnabled(filterId: Int, enabled: Boolean) {
         if (filterSetupFailed) return
         try {
-            if (adapter.enableFilterLists(
+            if (
+                adapter.enableFilterLists(
                     listOf(filterId),
                     enabled,
                 ) == null
-            ) throw IllegalStateException("Filter database did not accept setup")
+            )
+                throw IllegalStateException("Filter database did not accept setup")
         } catch (exception: Exception) {
             filterSetupFailed = true
             Log.e(TAG, "Could not configure filter $filterId", exception)
         }
     }
 
-    @Export
-    fun setSearchAdsBlockingEnabled(enabled: Boolean) = setFilterEnabled(10, !enabled)
+    @Export fun setSearchAdsBlockingEnabled(enabled: Boolean) = setFilterEnabled(10, !enabled)
 
-    @Export
-    fun setSocialMediaFilterEnabled(enabled: Boolean) = setFilterEnabled(4, enabled)
+    @Export fun setSocialMediaFilterEnabled(enabled: Boolean) = setFilterEnabled(4, enabled)
 
-    @Export
-    fun setCookieNoticesFilterEnabled(enabled: Boolean) = setFilterEnabled(18, enabled)
+    @Export fun setCookieNoticesFilterEnabled(enabled: Boolean) = setFilterEnabled(18, enabled)
 
-    @Export
-    fun setPopupsFilterEnabled(enabled: Boolean) = setFilterEnabled(19, enabled)
+    @Export fun setPopupsFilterEnabled(enabled: Boolean) = setFilterEnabled(19, enabled)
 
-    @Export
-    fun setMobileAppBannersFilterEnabled(enabled: Boolean) = setFilterEnabled(20, enabled)
+    @Export fun setMobileAppBannersFilterEnabled(enabled: Boolean) = setFilterEnabled(20, enabled)
 
-    @Export
-    fun setOtherAnnoyancesFilterEnabled(enabled: Boolean) = setFilterEnabled(21, enabled)
+    @Export fun setOtherAnnoyancesFilterEnabled(enabled: Boolean) = setFilterEnabled(21, enabled)
 
-    @Export
-    fun setWidgetsFilterEnabled(enabled: Boolean) = setFilterEnabled(22, enabled)
+    @Export fun setWidgetsFilterEnabled(enabled: Boolean) = setFilterEnabled(22, enabled)
 
     @Suppress("UseKtx")
     @Export
