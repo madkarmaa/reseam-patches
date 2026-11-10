@@ -30,6 +30,7 @@ target_include_directories(bytehook PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_library(SignatureKiller SHARED
         code_memory.cpp
+        creator_view.cpp
         file_hooks.cpp
         jni.cpp
         library_file_redirect.cpp
