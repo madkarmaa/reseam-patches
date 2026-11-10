@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top> -->
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<resources>
+    <string name="disable_device_checks_name">Disable device checks</string>
+    <string name="disable_device_checks_description">Starts Vi without the protection wrapper that blocks rooted devices and installed root-management apps.</string>
+</resources>
