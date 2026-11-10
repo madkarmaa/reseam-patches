@@ -7,10 +7,11 @@ package top.madkarma.patches.scrobbler.plus
 
 import app.reseam.patch.after
 import app.reseam.patch.patch
+import top.madkarma.patches.scrobbler.ScrobblerPatchStrings
 
 val unlockPlus =
-    patch("Unlock Plus") {
-        description("Unlocks Plus-only features.")
+    patch(ScrobblerPatchStrings.unlockPlusName) {
+        description(ScrobblerPatchStrings.unlockPlusDescription)
         compatibleWith("com.arn.scrobble")
 
         execute {

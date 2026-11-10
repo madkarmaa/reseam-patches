@@ -8,12 +8,13 @@ package top.madkarma.patches.mango.pro
 import app.reseam.patch.ExternalPatch
 import app.reseam.patch.after
 import app.reseam.patch.patch
+import top.madkarma.patches.mango.MangoPatchStrings
 import top.madkarma.patches.shared.PATCH_ATTRIBUTION
 import top.madkarma.patches.shared.setStringEverywhere
 
 val unlockPro =
-    patch("Unlock Pro") {
-        description("Unlocks Pro-only features.")
+    patch(MangoPatchStrings.unlockProName) {
+        description(MangoPatchStrings.unlockProDescription)
         compatibleWith("app.pinya.mango")
         dependsOn(ExternalPatch("reseam-patches", "app.reseam.patches.universal.removePairip"))
 

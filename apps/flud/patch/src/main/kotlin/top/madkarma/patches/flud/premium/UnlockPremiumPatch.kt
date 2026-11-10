@@ -6,10 +6,11 @@
 package top.madkarma.patches.flud.premium
 
 import app.reseam.patch.*
+import top.madkarma.patches.flud.FludPatchStrings
 
 val unlockPremium =
-    patch("Unlock Premium") {
-        description("Unlocks Premium-only features.")
+    patch(FludPatchStrings.unlockPremiumName) {
+        description(FludPatchStrings.unlockPremiumDescription)
         compatibleWith("com.delphicoder.flud")
         dependsOn(ExternalPatch("reseam-patches", "app.reseam.patches.universal.removePairip"))
 

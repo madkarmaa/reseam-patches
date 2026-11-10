@@ -6,19 +6,19 @@
 package top.madkarma.patches.universal.nativelibs
 
 import app.reseam.patch.patch
+import top.madkarma.patches.universal.UniversalPatchStrings
 
 val removeUnusedNativeLibs =
-    patch("Remove unused native libraries") {
+    patch(UniversalPatchStrings.removeUnusedNativeLibsName) {
         description(
-            "Removes native libraries for every CPU architecture except the selected one to shrink the APK.",
+            UniversalPatchStrings.removeUnusedNativeLibsDescription,
         )
 
         val architecture =
             stringOption(
                 "architecture",
-                title = "Keep architecture",
-                description =
-                    "Native libraries for other architectures under lib/ are deleted, including from split APKs.",
+                title = UniversalPatchStrings.removeUnusedNativeLibsArchitectureTitle,
+                description = UniversalPatchStrings.removeUnusedNativeLibsArchitectureDescription,
                 default = "arm64-v8a",
                 validValues = listOf("arm64-v8a", "armeabi-v7a", "x86", "x86_64"),
                 required = true,

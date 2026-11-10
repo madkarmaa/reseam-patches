@@ -11,6 +11,7 @@ import app.reseam.patch.dex.stringValue
 import app.reseam.patch.patch
 import top.madkarma.googlephotos.spoof.bindings.PixelXlIdentity
 import top.madkarma.patches.googlephotos.GOOGLE_PHOTOS
+import top.madkarma.patches.googlephotos.GooglePhotosPatchStrings
 import top.madkarma.patches.shared.isPresent
 
 private val ORIGINAL_PIXEL_FEATURES =
@@ -46,9 +47,9 @@ private val PIXEL_XL_FIELDS =
     )
 
 val unlimitedBackupStorage =
-    patch("Unlimited backup storage") {
+    patch(GooglePhotosPatchStrings.unlimitedBackupStorageName) {
         description(
-            "Reports a Pixel XL device identity to request Google's unlimited backup storage offer.",
+            GooglePhotosPatchStrings.unlimitedBackupStorageDescription,
         )
         compatibleWith(GOOGLE_PHOTOS)
 

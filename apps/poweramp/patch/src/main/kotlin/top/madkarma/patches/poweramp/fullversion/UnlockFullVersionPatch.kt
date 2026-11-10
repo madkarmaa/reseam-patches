@@ -7,13 +7,14 @@ package top.madkarma.patches.poweramp.fullversion
 
 import app.reseam.patch.*
 import top.madkarma.extensions.poweramp.bindings.FullVersion
+import top.madkarma.patches.poweramp.PowerampPatchStrings
 import top.madkarma.patches.shared.PATCH_ATTRIBUTION
 import top.madkarma.patches.shared.setStringEverywhere
 import top.madkarma.patches.universal.signature.spoofApkFileAccess
 
 val unlockFullVersion =
-    patch("Unlock full version") {
-        description("Unlocks the full version features.")
+    patch(PowerampPatchStrings.unlockFullVersionName) {
+        description(PowerampPatchStrings.unlockFullVersionDescription)
         compatibleWith("com.maxmpz.audioplayer")
         // The native library verifies the installed APK's certificate itself.
         dependsOn(spoofApkFileAccess)

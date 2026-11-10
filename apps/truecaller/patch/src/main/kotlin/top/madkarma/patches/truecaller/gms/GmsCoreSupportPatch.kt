@@ -8,17 +8,18 @@ package top.madkarma.patches.truecaller.gms
 import app.reseam.patch.*
 import top.madkarma.patches.shared.gmscore.signInThroughGmsCore
 import top.madkarma.patches.shared.originalSignerSha1
+import top.madkarma.patches.truecaller.TruecallerPatchStrings
 import top.madkarma.truecaller.gms.bindings.*
 
 val gmsCoreSupport =
-    patch("GmsCore support") {
-        description("Signs in with Google through separately installed Reseam GmsCore.")
+    patch(TruecallerPatchStrings.gmsCoreSupportName) {
+        description(TruecallerPatchStrings.gmsCoreSupportDescription)
         compatibleWith("com.truecaller")
 
         val vendorGroupId =
             stringOption(
                 "gmsCoreVendorGroupId",
-                title = "GmsCore vendor group ID",
+                title = TruecallerPatchStrings.gmsCoreSupportGmsCoreVendorGroupIdTitle,
                 default = "app.reseam",
                 required = true,
             )

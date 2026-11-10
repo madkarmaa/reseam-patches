@@ -6,21 +6,22 @@
 package top.madkarma.patches.iconpackstudio.gms
 
 import app.reseam.patch.*
+import top.madkarma.patches.iconpackstudio.IconPackStudioPatchStrings
 import top.madkarma.patches.shared.gmscore.signInThroughGmsCore
 import top.madkarma.patches.shared.originalSignerSha1
 import top.madkarma.shared.gmscore.bindings.GmsCore
 
 val gmsCoreSupport =
-    patch("GmsCore support") {
+    patch(IconPackStudioPatchStrings.gmsCoreSupportName) {
         description(
-            "Uses separately installed Reseam GmsCore for Google sign-in and Drive authorization.",
+            IconPackStudioPatchStrings.gmsCoreSupportDescription,
         )
         compatibleWith("ginlemon.iconpackstudio")
 
         val vendorGroupId =
             stringOption(
                 "gmsCoreVendorGroupId",
-                title = "GmsCore vendor group ID",
+                title = IconPackStudioPatchStrings.gmsCoreSupportGmsCoreVendorGroupIdTitle,
                 default = "app.reseam",
                 required = true,
             )

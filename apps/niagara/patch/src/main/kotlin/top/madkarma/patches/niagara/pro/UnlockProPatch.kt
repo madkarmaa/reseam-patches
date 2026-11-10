@@ -7,12 +7,13 @@ package top.madkarma.patches.niagara.pro
 
 import app.reseam.patch.before
 import app.reseam.patch.patch
+import top.madkarma.patches.niagara.NiagaraPatchStrings
 import top.madkarma.patches.shared.PATCH_ATTRIBUTION
 import top.madkarma.patches.shared.setStringEverywhere
 
 val unlockPro =
-    patch("Unlock Pro") {
-        description("Unlocks Pro-only features.")
+    patch(NiagaraPatchStrings.unlockProName) {
+        description(NiagaraPatchStrings.unlockProDescription)
         compatibleWith("bitpit.launcher")
 
         execute {

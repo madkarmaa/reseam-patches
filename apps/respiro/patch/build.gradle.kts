@@ -8,3 +8,5 @@ plugins {
 dependencies {
     compileOnly(project(":apps:shared:patch"))
 }
+
+reseamStrings { objectName = "top.madkarma.patches.respiro.RespiroPatchStrings" }

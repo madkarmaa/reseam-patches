@@ -8,13 +8,14 @@ package top.madkarma.patches.capcut.premium
 import app.reseam.patch.*
 import top.madkarma.capcut.premium.bindings.Profile
 import top.madkarma.capcut.premium.bindings.SubscriptionUpsell
+import top.madkarma.patches.capcut.CapCutPatchStrings
 import top.madkarma.patches.capcut.integrity.bypassIntegrityChecks
 import top.madkarma.patches.shared.PATCH_ATTRIBUTION
 
 val unlockPremium =
-    patch("Unlock Premium") {
+    patch(CapCutPatchStrings.unlockPremiumName) {
         description(
-            "Unlocks Premium-only features and removes subscription offers. Most, if not all, AI tools run on CapCut's servers and cannot be unlocked by this patch.",
+            CapCutPatchStrings.unlockPremiumDescription,
         )
         compatibleWith("com.lemon.lvoverseas")
         dependsOn(bypassIntegrityChecks)

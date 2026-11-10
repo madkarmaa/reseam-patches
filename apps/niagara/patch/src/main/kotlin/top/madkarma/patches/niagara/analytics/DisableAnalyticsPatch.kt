@@ -8,10 +8,11 @@ package top.madkarma.patches.niagara.analytics
 import app.reseam.patch.appEntry
 import app.reseam.patch.patch
 import top.madkarma.extensions.bindings.NiagaraSetup
+import top.madkarma.patches.niagara.NiagaraPatchStrings
 
 val disableAnalytics =
-    patch("Disable analytics") {
-        description("Refuses and blocks analytics collection.")
+    patch(NiagaraPatchStrings.disableAnalyticsName) {
+        description(NiagaraPatchStrings.disableAnalyticsDescription)
         compatibleWith("bitpit.launcher")
 
         execute {

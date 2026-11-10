@@ -7,6 +7,7 @@ package top.madkarma.patches.shared.clearurls
 
 import app.reseam.patch.*
 import app.reseam.patch.types.MethodRef
+import top.madkarma.patches.shared.SharedPatchStrings
 import top.madkarma.patches.shared.hasPermission
 import top.madkarma.shared.clearurls.bindings.ClearUrls
 
@@ -19,9 +20,9 @@ private const val INTERNET_PERMISSION = "android.permission.INTERNET"
  * because it removes nothing on its own.
  */
 val clearUrls =
-    patch("Load ClearURLs rules") {
+    patch(SharedPatchStrings.clearUrlsName) {
         description(
-            "Downloads the ClearURLs tracking rules when the app starts, and caches them for offline launches. Adds internet access to apps that lack it. Rules by the ClearURLs project: https://gitlab.com/ClearURLs/rules",
+            SharedPatchStrings.clearUrlsDescription,
         )
         hidden()
 

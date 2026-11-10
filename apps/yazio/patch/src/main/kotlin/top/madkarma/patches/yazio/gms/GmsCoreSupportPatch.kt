@@ -8,18 +8,19 @@ package top.madkarma.patches.yazio.gms
 import app.reseam.patch.*
 import top.madkarma.patches.shared.gmscore.signInThroughGmsCore
 import top.madkarma.patches.shared.originalSignerSha1
+import top.madkarma.patches.yazio.YazioPatchStrings
 import top.madkarma.shared.gmscore.bindings.GmsCore
 import top.madkarma.yazio.gms.bindings.GmsCoreSupport
 
 val gmsCoreSupport =
-    patch("GmsCore support") {
-        description("Signs in with Google through separately installed Reseam GmsCore.")
+    patch(YazioPatchStrings.gmsCoreSupportName) {
+        description(YazioPatchStrings.gmsCoreSupportDescription)
         compatibleWith("com.yazio.android")
 
         val vendorGroupId =
             stringOption(
                 "gmsCoreVendorGroupId",
-                title = "GmsCore vendor group ID",
+                title = YazioPatchStrings.gmsCoreSupportGmsCoreVendorGroupIdTitle,
                 default = "app.reseam",
                 required = true,
             )

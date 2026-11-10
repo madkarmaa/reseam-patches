@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top> -->
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<resources>
+    <string name="gms_core_support_description">Installs Google Photos alongside the original app. Uses a separate Reseam GmsCore installation for sign-in.</string>
+    <string name="gms_core_support_gms_core_vendor_group_id_description">The group ID the installed GmsCore build was published under</string>
+    <string name="gms_core_support_gms_core_vendor_group_id_title">GmsCore vendor group ID</string>
+    <string name="gms_core_support_name">GmsCore support</string>
+    <string name="gms_core_support_package_name_title">Package name</string>
+    <string name="places_map_fix_description">Enter a Mapbox access token in Reseam settings to show map tiles in Places and photo-detail maps.</string>
+    <string name="places_map_fix_name">Places map fix</string>
+    <string name="unlimited_backup_storage_description">Reports a Pixel XL device identity to request Google\'s unlimited backup storage offer.</string>
+    <string name="unlimited_backup_storage_name">Unlimited backup storage</string>
+</resources>

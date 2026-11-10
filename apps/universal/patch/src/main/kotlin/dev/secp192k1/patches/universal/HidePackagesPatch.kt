@@ -10,20 +10,21 @@ import app.reseam.patch.before
 import app.reseam.patch.patch
 import app.reseam.patch.redirectTo
 import dev.secp192k1.universal.hidepackages.bindings.HiddenPackages
+import top.madkarma.patches.universal.UniversalPatchStrings
 
 private val packageNamePattern = Regex("^[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z][A-Za-z0-9_]*)+$")
 
 val hidePackages =
-    patch("Hide packages") {
+    patch(UniversalPatchStrings.hidePackagesName) {
         description(
-            "Hides the chosen packages from the app's PackageManager queries, as if they were not installed.",
+            UniversalPatchStrings.hidePackagesDescription,
         )
 
         val packageNamesOption =
             stringListOption(
                 "packageNames",
-                title = "Packages to hide",
-                description = "Package names the app must not see.",
+                title = UniversalPatchStrings.hidePackagesPackageNamesTitle,
+                description = UniversalPatchStrings.hidePackagesPackageNamesDescription,
                 required = true,
             )
 

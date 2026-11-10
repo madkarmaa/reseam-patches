@@ -9,14 +9,15 @@ import app.reseam.patch.ExternalPatch
 import app.reseam.patch.after
 import app.reseam.patch.alwaysReturn
 import app.reseam.patch.patch
+import top.madkarma.patches.respiro.RespiroPatchStrings
 import top.madkarma.patches.respiro.preferences.readPreference
 import top.madkarma.patches.shared.PATCH_ATTRIBUTION
 import top.madkarma.patches.shared.setStringEverywhere
 import top.madkarma.respiro.preferences.bindings.Preferences
 
 val unlockPremium =
-    patch("Unlock premium") {
-        description("Unlocks Premium-only features.")
+    patch(RespiroPatchStrings.unlockPremiumName) {
+        description(RespiroPatchStrings.unlockPremiumDescription)
         compatibleWith("com.sgnoogle.respiro")
         dependsOn(ExternalPatch("reseam-patches", "app.reseam.patches.universal.removePairip"))
 

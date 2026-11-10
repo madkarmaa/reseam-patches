@@ -8,19 +8,20 @@ package top.madkarma.patches.picsart.gms
 import app.reseam.patch.Type
 import app.reseam.patch.before
 import app.reseam.patch.patch
+import top.madkarma.patches.picsart.PicsartPatchStrings
 import top.madkarma.patches.shared.gmscore.signInThroughGmsCore
 import top.madkarma.patches.shared.originalSignerSha1
 import top.madkarma.shared.gmscore.bindings.GmsCore
 
 val gmsCoreSupport =
-    patch("GmsCore support") {
-        description("Signs in with Google through separately installed Reseam GmsCore.")
+    patch(PicsartPatchStrings.gmsCoreSupportName) {
+        description(PicsartPatchStrings.gmsCoreSupportDescription)
         compatibleWith("com.picsart.studio")
 
         val vendorGroupId =
             stringOption(
                 "gmsCoreVendorGroupId",
-                title = "GmsCore vendor group ID",
+                title = PicsartPatchStrings.gmsCoreSupportGmsCoreVendorGroupIdTitle,
                 default = "app.reseam",
                 required = true,
             )

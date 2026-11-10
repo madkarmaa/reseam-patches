@@ -12,13 +12,14 @@ import top.madkarma.googlephotos.maps.bindings.MapTiles
 import top.madkarma.googlephotos.settings.GooglePhotosSettings
 import top.madkarma.googlephotos.settings.GooglePhotosStrings
 import top.madkarma.patches.googlephotos.GOOGLE_PHOTOS
+import top.madkarma.patches.googlephotos.GooglePhotosPatchStrings
 import top.madkarma.patches.googlephotos.gms.gmsCoreSupport
 import top.madkarma.patches.googlephotos.settings.googlePhotosSettings
 
 val placesMapFix =
-    patch("Places map fix") {
+    patch(GooglePhotosPatchStrings.placesMapFixName) {
         description(
-            "Enter a Mapbox access token in Reseam settings to show map tiles in Places and photo-detail maps.",
+            GooglePhotosPatchStrings.placesMapFixDescription,
         )
         compatibleWith(GOOGLE_PHOTOS)
         dependsOn(gmsCoreSupport)

@@ -8,17 +8,18 @@ package top.madkarma.patches.turuta.gms
 import app.reseam.patch.*
 import top.madkarma.patches.shared.gmscore.signInThroughGmsCore
 import top.madkarma.patches.shared.originalSignerSha1
+import top.madkarma.patches.turuta.TurutaPatchStrings
 import top.madkarma.shared.gmscore.bindings.GmsCore
 
 val gmsCoreSupport =
-    patch("GmsCore support") {
-        description("Signs in through separately installed Reseam GmsCore.")
+    patch(TurutaPatchStrings.gmsCoreSupportName) {
+        description(TurutaPatchStrings.gmsCoreSupportDescription)
         compatibleWith("pe.tumicro.android")
 
         val vendorGroupId =
             stringOption(
                 "gmsCoreVendorGroupId",
-                title = "GmsCore vendor group ID",
+                title = TurutaPatchStrings.gmsCoreSupportGmsCoreVendorGroupIdTitle,
                 default = "app.reseam",
                 required = true,
             )

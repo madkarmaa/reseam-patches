@@ -9,19 +9,19 @@ import app.reseam.patch.ExternalPatch
 import app.reseam.patch.after
 import app.reseam.patch.patch
 import top.madkarma.motioncam.recording.bindings.Recording
+import top.madkarma.patches.motioncam.MotioncamPatchStrings
 
 val unlimitedRecording =
-    patch("Unlimited recording") {
-        description("Removes the trial's five-second video recording limit.")
+    patch(MotioncamPatchStrings.unlimitedRecordingName) {
+        description(MotioncamPatchStrings.unlimitedRecordingDescription)
         compatibleWith("com.motioncam")
         dependsOn(ExternalPatch("reseam-patches", "app.reseam.patches.universal.removePairip"))
 
         val diagnostics =
             boolOption(
                 "diagnostics",
-                title = "Log diagnostics",
-                description =
-                    "Log native recording-limit discovery and installation under the MotionCamRecording logcat tag.",
+                title = MotioncamPatchStrings.unlimitedRecordingDiagnosticsTitle,
+                description = MotioncamPatchStrings.unlimitedRecordingDiagnosticsDescription,
                 default = false,
             )
 

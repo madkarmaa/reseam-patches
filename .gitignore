@@ -5,6 +5,7 @@ build/
 node_modules/
 out/
 kls_database.db
+resources/legal/
 
 # IDE
 .idea/

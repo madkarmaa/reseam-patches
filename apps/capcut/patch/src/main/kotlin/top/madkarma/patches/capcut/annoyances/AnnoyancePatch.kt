@@ -8,11 +8,12 @@ package top.madkarma.patches.capcut.annoyances
 import app.reseam.patch.alwaysReturn
 import app.reseam.patch.patch
 import app.reseam.patch.replace
+import top.madkarma.patches.capcut.CapCutPatchStrings
 import top.madkarma.patches.capcut.integrity.bypassIntegrityChecks
 
 val removeAnnoyances =
-    patch("Remove annoyances") {
-        description("Removes app annoyances, upsells and popups.")
+    patch(CapCutPatchStrings.removeAnnoyancesName) {
+        description(CapCutPatchStrings.removeAnnoyancesDescription)
         compatibleWith("com.lemon.lvoverseas")
         dependsOn(bypassIntegrityChecks)
 

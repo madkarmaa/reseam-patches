@@ -10,13 +10,14 @@ import app.reseam.patch.patch
 import app.reseam.patch.replace
 import top.madkarma.patches.shared.PATCH_ATTRIBUTION
 import top.madkarma.patches.shared.setStringEverywhere
+import top.madkarma.patches.truecaller.TruecallerPatchStrings
 import top.madkarma.patches.truecaller.ads.disableAds
 import top.madkarma.truecaller.behavior.bindings.Premium
 
 val unlockPremium =
-    patch("Unlock premium") {
+    patch(TruecallerPatchStrings.unlockPremiumName) {
         description(
-            "Unlocks Premium-only features. Paid server-side services still need a subscription.",
+            TruecallerPatchStrings.unlockPremiumDescription,
         )
         compatibleWith("com.truecaller")
         dependsOn(disableAds)

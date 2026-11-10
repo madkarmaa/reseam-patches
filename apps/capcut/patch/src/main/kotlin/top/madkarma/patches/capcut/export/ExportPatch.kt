@@ -6,11 +6,12 @@
 package top.madkarma.patches.capcut.export
 
 import app.reseam.patch.*
+import top.madkarma.patches.capcut.CapCutPatchStrings
 import top.madkarma.patches.capcut.premium.unlockPremium
 
 val unlockUltraHdExport =
-    patch("Unlock Ultra HD export") {
-        description("Unlocks editor 2K/4K and template Ultra HD export.")
+    patch(CapCutPatchStrings.unlockUltraHdExportName) {
+        description(CapCutPatchStrings.unlockUltraHdExportDescription)
         compatibleWith("com.lemon.lvoverseas")
         dependsOn(unlockPremium)
 

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top> -->
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<resources>
+    <string name="disable_ads_description">Disables in-app ads.</string>
+    <string name="disable_ads_name">Disable ads</string>
+    <string name="disable_annoyances_description">Hides permission banners, surveys, update prompts, and automatic Premium offers.</string>
+    <string name="disable_annoyances_name">Disable annoyances</string>
+    <string name="disable_auto_launch_description">Disables automatic after-call screens.</string>
+    <string name="disable_auto_launch_name">Disable auto-launch</string>
+    <string name="disable_telemetry_description">Disables analytics and Firebase crash reports.</string>
+    <string name="disable_telemetry_name">Disable telemetry</string>
+    <string name="gms_core_support_description">Signs in with Google through separately installed Reseam GmsCore.</string>
+    <string name="gms_core_support_gms_core_vendor_group_id_title">GmsCore vendor group ID</string>
+    <string name="gms_core_support_name">GmsCore support</string>
+    <string name="hide_scam_feed_description">Hides Scam Feed and stops its notifications.</string>
+    <string name="hide_scam_feed_name">Hide scam feed</string>
+    <string name="hide_tabs_description">Hides selected tabs.</string>
+    <string name="hide_tabs_name">Hide tabs</string>
+    <string name="hide_wear_settings_description">Hides Wear OS settings and shortcuts.</string>
+    <string name="hide_wear_settings_name">Hide Wear OS settings</string>
+    <string name="unlock_premium_description">Unlocks Premium-only features. Paid server-side services still need a subscription.</string>
+    <string name="unlock_premium_name">Unlock premium</string>
+    <string name="use_sms_verification_description">Reads verification codes from SMS. Uses Google SMS retrieval without SMS permission.</string>
+    <string name="use_sms_verification_name">Use SMS for verification codes</string>
+</resources>

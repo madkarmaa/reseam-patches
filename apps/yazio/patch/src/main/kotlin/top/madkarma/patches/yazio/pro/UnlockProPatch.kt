@@ -11,12 +11,13 @@ import app.reseam.patch.patch
 import app.reseam.patch.replace
 import top.madkarma.patches.shared.PATCH_ATTRIBUTION
 import top.madkarma.patches.shared.setStringEverywhere
+import top.madkarma.patches.yazio.YazioPatchStrings
 
 private const val SUBSCRIPTION_LABEL_KEY = "user.settings.label.subscription"
 
 val unlockPro =
-    patch("Unlock Pro") {
-        description("Unlocks Pro-only features.")
+    patch(YazioPatchStrings.unlockProName) {
+        description(YazioPatchStrings.unlockProDescription)
         compatibleWith("com.yazio.android")
 
         execute {

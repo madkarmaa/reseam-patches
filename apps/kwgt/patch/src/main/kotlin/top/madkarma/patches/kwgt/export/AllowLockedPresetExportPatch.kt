@@ -7,10 +7,11 @@ package top.madkarma.patches.kwgt.export
 
 import app.reseam.patch.after
 import app.reseam.patch.patch
+import top.madkarma.patches.kwgt.KWGTPatchStrings
 
 val allowLockedPresetExport =
-    patch("Allow locked preset export") {
-        description("Allows exporting author-locked KWGT presets.")
+    patch(KWGTPatchStrings.allowLockedPresetExportName) {
+        description(KWGTPatchStrings.allowLockedPresetExportDescription)
         compatibleWith("org.kustom.widget")
 
         execute {

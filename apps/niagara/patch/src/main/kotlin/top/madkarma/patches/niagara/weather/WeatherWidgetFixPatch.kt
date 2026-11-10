@@ -11,13 +11,14 @@ import app.reseam.patch.patch
 import app.reseam.patch.replace
 import top.madkarma.extensions.bindings.WeatherApiKeyField
 import top.madkarma.extensions.bindings.WeatherRepository
+import top.madkarma.patches.niagara.NiagaraPatchStrings
 import top.madkarma.patches.niagara.pro.unlockPro
 import top.madkarma.patches.shared.setStringEverywhere
 
 val weatherWidgetFix =
-    patch("Weather widget fix") {
+    patch(NiagaraPatchStrings.weatherWidgetFixName) {
         description(
-            "Replaces the Niagara weather service with WeatherAPI.com. Enter your API key in the weather settings.",
+            NiagaraPatchStrings.weatherWidgetFixDescription,
         )
         compatibleWith("bitpit.launcher")
 

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top> -->
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<resources>
+    <string name="skip_setup_block_annoyances_description">Remove cookie notifications, live chats, and newsletter signups.</string>
+    <string name="skip_setup_block_annoyances_title">Block annoyances</string>
+    <string name="skip_setup_block_dangerous_sites_description">Be alerted before you access phishing and malicious websites.</string>
+    <string name="skip_setup_block_dangerous_sites_title">Block dangerous websites</string>
+    <string name="skip_setup_block_search_ads_description">Remove ads from your search engine results.</string>
+    <string name="skip_setup_block_search_ads_title">Block ads in web search</string>
+    <string name="skip_setup_block_social_widgets_description">Get rid of Like, Share, and other social buttons on websites.</string>
+    <string name="skip_setup_block_social_widgets_title">Block social media widgets</string>
+    <string name="skip_setup_description">Skips onboarding and applies the selected setup options on first startup. Configure advanced filters in the app settings.</string>
+    <string name="skip_setup_hide_notification_prompt_description">Disables the \"Enable notifications\" prompt shown post-setup.</string>
+    <string name="skip_setup_hide_notification_prompt_title">Hide \"Enable notifications\" prompt</string>
+    <string name="skip_setup_name">Skip setup</string>
+    <string name="skip_setup_privacy_level_description">Protect yourself from online trackers and analytics systems.</string>
+    <string name="skip_setup_privacy_level_title">Protect your privacy</string>
+    <string name="skip_setup_skip_approval_popups_description">Treat all annoyance filters as approved to skip consent dialogs when enabling them.</string>
+    <string name="skip_setup_skip_approval_popups_title">Skip approval popups</string>
+    <string name="unlock_lifetime_description">Unlocks Premium-only features.</string>
+    <string name="unlock_lifetime_name">Unlock Lifetime premium</string>
+</resources>

@@ -6,10 +6,11 @@
 package top.madkarma.patches.universal.nativelibs
 
 import app.reseam.patch.patch
+import top.madkarma.patches.universal.UniversalPatchStrings
 
 val forceExtractNativeLibs =
-    patch("Force extract native libs") {
-        description("Sets android:extractNativeLibs to true when it is false.")
+    patch(UniversalPatchStrings.forceExtractNativeLibsName) {
+        description(UniversalPatchStrings.forceExtractNativeLibsDescription)
 
         execute {
             var flipped = false

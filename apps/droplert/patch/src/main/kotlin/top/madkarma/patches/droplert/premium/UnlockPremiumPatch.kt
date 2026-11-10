@@ -7,12 +7,13 @@ package top.madkarma.patches.droplert.premium
 
 import app.reseam.patch.*
 import top.madkarma.droplert.extensions.bindings.Prefs
+import top.madkarma.patches.droplert.DroplertPatchStrings
 import top.madkarma.patches.shared.PATCH_ATTRIBUTION
 import top.madkarma.patches.shared.isPresent
 
 val unlockPremium =
-    patch("Unlock Lifetime Premium") {
-        description("Unlocks Premium-only features.")
+    patch(DroplertPatchStrings.unlockPremiumName) {
+        description(DroplertPatchStrings.unlockPremiumDescription)
         compatibleWith(
             "com.shahzaman.pricetracker"(
                 "2.2.1",

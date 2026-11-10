@@ -7,21 +7,21 @@ package top.madkarma.patches.protonmail.accounts
 
 import app.reseam.patch.after
 import app.reseam.patch.patch
+import top.madkarma.patches.protonmail.ProtonmailPatchStrings
 import top.madkarma.patches.universal.nativelibs.removeUnusedNativeLibs
 import top.madkarma.protonmail.accounts.bindings.Accounts
 
 val unlimitedAccounts =
-    patch("Unlimited accounts") {
-        description("Allows multiple free Proton Mail accounts.")
+    patch(ProtonmailPatchStrings.unlimitedAccountsName) {
+        description(ProtonmailPatchStrings.unlimitedAccountsDescription)
         compatibleWith("ch.protonmail.android")
         dependsOn(removeUnusedNativeLibs)
 
         val diagnostics =
             boolOption(
                 "diagnostics",
-                title = "Log diagnostics",
-                description =
-                    "Log native account-limit discovery and installation under the ProtonAccounts logcat tag.",
+                title = ProtonmailPatchStrings.unlimitedAccountsDiagnosticsTitle,
+                description = ProtonmailPatchStrings.unlimitedAccountsDiagnosticsDescription,
                 default = false,
             )
 

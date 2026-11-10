@@ -6,11 +6,12 @@
 package top.madkarma.patches.droplert.ads
 
 import app.reseam.patch.*
+import top.madkarma.patches.droplert.DroplertPatchStrings
 import top.madkarma.patches.shared.isPresent
 
 val disableAds =
-    patch("Disable ads") {
-        description("Disables in-app ads and their consent prompt.")
+    patch(DroplertPatchStrings.disableAdsName) {
+        description(DroplertPatchStrings.disableAdsDescription)
         compatibleWith(
             "com.shahzaman.pricetracker"(
                 "2.2.1",

@@ -7,10 +7,11 @@ package top.madkarma.patches.niagara.bugfixes
 
 import app.reseam.patch.alwaysReturn
 import app.reseam.patch.patch
+import top.madkarma.patches.niagara.NiagaraPatchStrings
 
 val bugFixes =
-    patch("Bug fixes") {
-        description("Fixes app bugs.")
+    patch(NiagaraPatchStrings.bugFixesName) {
+        description(NiagaraPatchStrings.bugFixesDescription)
         compatibleWith("bitpit.launcher")
 
         execute {

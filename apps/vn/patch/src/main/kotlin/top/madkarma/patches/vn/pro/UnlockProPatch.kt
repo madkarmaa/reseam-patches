@@ -8,11 +8,12 @@ package top.madkarma.patches.vn.pro
 import app.reseam.patch.*
 import top.madkarma.patches.shared.PATCH_ATTRIBUTION
 import top.madkarma.patches.shared.setStringEverywhere
+import top.madkarma.patches.vn.VNPatchStrings
 import top.madkarma.vn.extensions.bindings.Pro
 
 val unlockPro =
-    patch("Unlock Pro") {
-        description("Unlocks Pro-only features.")
+    patch(VNPatchStrings.unlockProName) {
+        description(VNPatchStrings.unlockProDescription)
         compatibleWith("com.frontrow.vlog")
 
         execute {

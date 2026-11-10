@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top> -->
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<resources>
+    <string name="bypass_effects_region_restrictions_description">Keeps locally blocked effects accessible. Server restrictions may still apply.</string>
+    <string name="bypass_effects_region_restrictions_name">Bypass effects region restrictions</string>
+    <string name="bypass_geographic_restrictions_description">Keeps locally blocked tools, pages, and links accessible.</string>
+    <string name="bypass_geographic_restrictions_name">Bypass geographic restrictions</string>
+    <string name="bypass_integrity_checks_description">Spoofs the original signature and registers a fresh device identity to avoid device bans.</string>
+    <string name="bypass_integrity_checks_name">Bypass integrity checks</string>
+    <string name="remove_annoyances_description">Removes app annoyances, upsells and popups.</string>
+    <string name="remove_annoyances_name">Remove annoyances</string>
+    <string name="unlock_premium_description">Unlocks Premium-only features and removes subscription offers. Most, if not all, AI tools run on CapCut\'s servers and cannot be unlocked by this patch.</string>
+    <string name="unlock_premium_name">Unlock Premium</string>
+    <string name="unlock_premium_templates_description">Allows local premium effects and template export.</string>
+    <string name="unlock_premium_templates_name">Unlock premium effects and templates</string>
+    <string name="unlock_ultra_hd_export_description">Unlocks editor 2K/4K and template Ultra HD export.</string>
+    <string name="unlock_ultra_hd_export_name">Unlock Ultra HD export</string>
+</resources>

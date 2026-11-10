@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top> -->
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<resources>
+    <string name="unlimited_recording_description">Removes the trial\'s five-second video recording limit.</string>
+    <string name="unlimited_recording_diagnostics_description">Log native recording-limit discovery and installation under the MotionCamRecording logcat tag.</string>
+    <string name="unlimited_recording_diagnostics_title">Log diagnostics</string>
+    <string name="unlimited_recording_name">Unlimited recording</string>
+</resources>

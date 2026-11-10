@@ -10,20 +10,20 @@ import app.reseam.patch.patch
 import java.security.MessageDigest
 import java.util.*
 import top.madkarma.patches.shared.isPresent
+import top.madkarma.patches.universal.UniversalPatchStrings
 import top.madkarma.universal.signature.bindings.SignatureChecks
 import top.madkarma.universal.signature.bindings.SignatureChecksApi33
 import top.madkarma.universal.signature.bindings.SignatureKiller
 
 val signatureKiller =
-    patch("Signature Killer") {
-        description("Spoofs the original app signature.")
+    patch(UniversalPatchStrings.signatureKillerName) {
+        description(UniversalPatchStrings.signatureKillerDescription)
 
         val diagnostics =
             boolOption(
                 "diagnostics",
-                title = "Log diagnostics",
-                description =
-                    "Log detailed runtime diagnostics from the extension and its native library under the SignatureKiller logcat tag.",
+                title = UniversalPatchStrings.signatureKillerDiagnosticsTitle,
+                description = UniversalPatchStrings.signatureKillerDiagnosticsDescription,
                 default = false,
             )
 
@@ -142,9 +142,9 @@ val signatureKiller =
     }
 
 val spoofApkFileAccess =
-    patch("Signature Killer (APK file access)") {
+    patch(UniversalPatchStrings.spoofApkFileAccessName) {
         description(
-            "Spoofs the original app signature and redirects reads of the installed APK files to embedded original copies. Only use this for apps that verify the APK files themselves; it roughly doubles the APK size.",
+            UniversalPatchStrings.spoofApkFileAccessDescription,
         )
         dependsOn(signatureKiller)
 

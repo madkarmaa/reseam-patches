@@ -4,3 +4,5 @@
 plugins {
     id("app.reseam.patches")
 }
+
+reseamStrings { objectName = "top.madkarma.patches.scrobbler.ScrobblerPatchStrings" }

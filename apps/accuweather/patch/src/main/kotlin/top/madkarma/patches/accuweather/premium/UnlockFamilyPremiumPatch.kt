@@ -8,11 +8,12 @@ package top.madkarma.patches.accuweather.premium
 import app.reseam.patch.before
 import app.reseam.patch.patch
 import top.madkarma.extensions.accuweather.bindings.MembershipAttribution
+import top.madkarma.patches.accuweather.AccuweatherPatchStrings
 import top.madkarma.patches.shared.PATCH_ATTRIBUTION
 
 val unlockFamilyPremium =
-    patch("Unlock Family Premium+") {
-        description("Unlocks Premium-only features.")
+    patch(AccuweatherPatchStrings.unlockFamilyPremiumName) {
+        description(AccuweatherPatchStrings.unlockFamilyPremiumDescription)
         compatibleWith("com.accuweather.android")
 
         execute {

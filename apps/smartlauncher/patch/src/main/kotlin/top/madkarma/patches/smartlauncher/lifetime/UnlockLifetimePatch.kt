@@ -10,12 +10,13 @@ import app.reseam.patch.before
 import app.reseam.patch.patch
 import top.madkarma.patches.shared.PATCH_ATTRIBUTION
 import top.madkarma.patches.shared.setStringEverywhere
+import top.madkarma.patches.smartlauncher.SmartLauncherPatchStrings
 import top.madkarma.patches.universal.signature.signatureKiller
 import top.madkarma.smartlauncher.extensions.bindings.PreferenceOverrides
 
 val unlockLifetime =
-    patch("Unlock Lifetime premium") {
-        description("Unlocks Premium-only features.")
+    patch(SmartLauncherPatchStrings.unlockLifetimeName) {
+        description(SmartLauncherPatchStrings.unlockLifetimeDescription)
         compatibleWith("ginlemon.flowerfree")
         dependsOn(signatureKiller)
 

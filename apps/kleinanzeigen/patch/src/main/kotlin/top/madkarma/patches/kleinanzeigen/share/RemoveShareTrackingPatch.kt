@@ -6,13 +6,14 @@
 package top.madkarma.patches.kleinanzeigen.share
 
 import app.reseam.patch.patch
+import top.madkarma.patches.kleinanzeigen.KleinanzeigenPatchStrings
 import top.madkarma.patches.shared.clearurls.cleanSharedLinks
 import top.madkarma.patches.shared.clearurls.clearUrls
 
 val removeShareTracking =
-    patch("Remove share tracking") {
+    patch(KleinanzeigenPatchStrings.removeShareTrackingName) {
         description(
-            "Removes tracking parameters from shared ad, seller, profile, and search links.",
+            KleinanzeigenPatchStrings.removeShareTrackingDescription,
         )
         compatibleWith("com.ebay.kleinanzeigen")
         dependsOn(clearUrls)

@@ -9,10 +9,11 @@ import app.reseam.patch.className
 import app.reseam.patch.patch
 import app.reseam.patch.replace
 import top.madkarma.nyx.annoyances.bindings.Rating
+import top.madkarma.patches.nyx.NyxPatchStrings
 
 val removeAnnoyances =
-    patch("Remove annoyances") {
-        description("Removes the rating popup and the Rate button in the navigation drawer.")
+    patch(NyxPatchStrings.removeAnnoyancesName) {
+        description(NyxPatchStrings.removeAnnoyancesDescription)
         compatibleWith("com.awedea.nyx")
 
         execute {

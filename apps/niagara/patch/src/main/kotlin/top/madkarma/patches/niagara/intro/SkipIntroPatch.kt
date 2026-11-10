@@ -8,25 +8,26 @@ package top.madkarma.patches.niagara.intro
 import app.reseam.patch.appEntry
 import app.reseam.patch.patch
 import top.madkarma.extensions.bindings.NiagaraSetup
+import top.madkarma.patches.niagara.NiagaraPatchStrings
 
 val skipIntro =
-    patch("Skip intro") {
-        description("Skips the promo and terms screens and opens favorites setup.")
+    patch(NiagaraPatchStrings.skipIntroName) {
+        description(NiagaraPatchStrings.skipIntroDescription)
         compatibleWith("bitpit.launcher")
 
         val acceptTermsOption =
             boolOption(
                 "acceptTerms",
-                title = "Accept terms",
-                description = "Marks the terms as accepted, skipping the terms screen.",
+                title = NiagaraPatchStrings.skipIntroAcceptTermsTitle,
+                description = NiagaraPatchStrings.skipIntroAcceptTermsDescription,
                 default = true,
             )
 
         val skipToFavoritesOption =
             boolOption(
                 "skipToFavorites",
-                title = "Skip to favorites",
-                description = "Jumps the onboarding flow straight to the favorites setup step.",
+                title = NiagaraPatchStrings.skipIntroSkipToFavoritesTitle,
+                description = NiagaraPatchStrings.skipIntroSkipToFavoritesDescription,
                 default = true,
             )
 

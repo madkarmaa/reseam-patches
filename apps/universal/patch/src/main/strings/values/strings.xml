@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top> -->
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<resources>
+    <string name="expose_pairip_dex_diagnostics_title">Log loaded methods</string>
+    <string name="expose_pairip_dex_description">Makes lifted methods from an embedded Pairip DEX available to Reseam patches and uses the patched methods at runtime. Keeps Pairip running. Does not support encrypted or VM-only method bodies.</string>
+    <string name="expose_pairip_dex_name">Expose Pairip DEX</string>
+    <string name="force_extract_native_libs_description">Sets android:extractNativeLibs to true when it is false.</string>
+    <string name="force_extract_native_libs_name">Force extract native libs</string>
+    <string name="hide_packages_description">Hides the chosen packages from the app\'s PackageManager queries, as if they were not installed.</string>
+    <string name="hide_packages_name">Hide packages</string>
+    <string name="hide_packages_package_names_description">Package names the app must not see.</string>
+    <string name="hide_packages_package_names_title">Packages to hide</string>
+    <string name="remove_unused_native_libs_architecture_description">Native libraries for other architectures under lib/ are deleted, including from split APKs.</string>
+    <string name="remove_unused_native_libs_architecture_title">Keep architecture</string>
+    <string name="remove_unused_native_libs_description">Removes native libraries for every CPU architecture except the selected one to shrink the APK.</string>
+    <string name="remove_unused_native_libs_name">Remove unused native libraries</string>
+    <string name="signature_killer_description">Spoofs the original app signature.</string>
+    <string name="signature_killer_diagnostics_description">Log detailed runtime diagnostics from the extension and its native library under the SignatureKiller logcat tag.</string>
+    <string name="signature_killer_diagnostics_title">Log diagnostics</string>
+    <string name="signature_killer_name">Signature Killer</string>
+    <string name="spoof_apk_file_access_description">Spoofs the original app signature and redirects reads of the installed APK files to embedded original copies. Only use this for apps that verify the APK files themselves; it roughly doubles the APK size.</string>
+    <string name="spoof_apk_file_access_name">Signature Killer (APK file access)</string>
+</resources>

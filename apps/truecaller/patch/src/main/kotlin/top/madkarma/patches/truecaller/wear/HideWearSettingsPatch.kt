@@ -8,6 +8,7 @@ package top.madkarma.patches.truecaller.wear
 import app.reseam.patch.patch
 import app.reseam.patch.settings.gate
 import app.reseam.patch.settings.section
+import top.madkarma.patches.truecaller.TruecallerPatchStrings
 import top.madkarma.patches.truecaller.settings.truecallerSettings
 import top.madkarma.patches.truecaller.shared.disableFeatureFlag
 import top.madkarma.truecaller.settings.TruecallerSettings
@@ -15,8 +16,8 @@ import top.madkarma.truecaller.settings.TruecallerStrings
 import top.madkarma.truecaller.ui.bindings.Interface
 
 val hideWearSettings =
-    patch("Hide Wear OS settings") {
-        description("Hides Wear OS settings and shortcuts.")
+    patch(TruecallerPatchStrings.hideWearSettingsName) {
+        description(TruecallerPatchStrings.hideWearSettingsDescription)
         compatibleWith("com.truecaller")
 
         settings(

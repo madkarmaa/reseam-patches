@@ -7,10 +7,11 @@ package top.madkarma.patches.nyx.pro
 
 import app.reseam.patch.alwaysReturn
 import app.reseam.patch.patch
+import top.madkarma.patches.nyx.NyxPatchStrings
 
 val unlockPro =
-    patch("Unlock Pro") {
-        description("Unlocks Pro-only features.")
+    patch(NyxPatchStrings.unlockProName) {
+        description(NyxPatchStrings.unlockProDescription)
         compatibleWith("com.awedea.nyx")
 
         execute {

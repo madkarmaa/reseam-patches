@@ -6,11 +6,12 @@
 package top.madkarma.patches.capcut.region
 
 import app.reseam.patch.*
+import top.madkarma.patches.capcut.CapCutPatchStrings
 import top.madkarma.patches.capcut.integrity.bypassIntegrityChecks
 
 val bypassGeographicRestrictions =
-    patch("Bypass geographic restrictions") {
-        description("Keeps locally blocked tools, pages, and links accessible.")
+    patch(CapCutPatchStrings.bypassGeographicRestrictionsName) {
+        description(CapCutPatchStrings.bypassGeographicRestrictionsDescription)
         compatibleWith("com.lemon.lvoverseas")
         dependsOn(bypassIntegrityChecks)
 
@@ -31,9 +32,9 @@ val bypassGeographicRestrictions =
     }
 
 val bypassEffectsRegionRestrictions =
-    patch("Bypass effects region restrictions") {
+    patch(CapCutPatchStrings.bypassEffectsRegionRestrictionsName) {
         description(
-            "Keeps locally blocked effects accessible. Server restrictions may still apply.",
+            CapCutPatchStrings.bypassEffectsRegionRestrictionsDescription,
         )
         compatibleWith("com.lemon.lvoverseas")
         dependsOn(bypassIntegrityChecks)

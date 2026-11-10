@@ -9,14 +9,15 @@ import app.reseam.patch.Type
 import app.reseam.patch.after
 import app.reseam.patch.appEntry
 import app.reseam.patch.patch
+import top.madkarma.patches.truecaller.TruecallerPatchStrings
 import top.madkarma.patches.truecaller.shared.disableFeatureFlag
 import top.madkarma.patches.truecaller.shared.featureFlagOverrides
 import top.madkarma.truecaller.verification.bindings.SmsVerification
 
 val useSmsVerification =
-    patch("Use SMS for verification codes") {
+    patch(TruecallerPatchStrings.useSmsVerificationName) {
         description(
-            "Reads verification codes from SMS. Uses Google SMS retrieval without SMS permission.",
+            TruecallerPatchStrings.useSmsVerificationDescription,
         )
         compatibleWith("com.truecaller")
         dependsOn(featureFlagOverrides)

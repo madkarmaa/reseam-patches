@@ -8,19 +8,20 @@ package top.madkarma.patches.liftoff.gms
 import app.reseam.patch.alwaysReturn
 import app.reseam.patch.before
 import app.reseam.patch.patch
+import top.madkarma.patches.liftoff.LiftoffPatchStrings
 import top.madkarma.patches.shared.gmscore.signInThroughGmsCore
 import top.madkarma.patches.shared.originalSignerSha1
 import top.madkarma.shared.gmscore.bindings.GmsCore
 
 val gmsCoreSupport =
-    patch("GmsCore support") {
-        description("Signs in with Google through separately installed Reseam GmsCore.")
+    patch(LiftoffPatchStrings.gmsCoreSupportName) {
+        description(LiftoffPatchStrings.gmsCoreSupportDescription)
         compatibleWith("com.gymbros.app")
 
         val vendorGroupId =
             stringOption(
                 "gmsCoreVendorGroupId",
-                title = "GmsCore vendor group ID",
+                title = LiftoffPatchStrings.gmsCoreSupportGmsCoreVendorGroupIdTitle,
                 default = "app.reseam",
                 required = true,
             )

@@ -7,11 +7,12 @@ package top.madkarma.patches.mapy.premium
 
 import app.reseam.patch.*
 import top.madkarma.extensions.mapy.bindings.Premium
+import top.madkarma.patches.mapy.MapyPatchStrings
 import top.madkarma.patches.shared.PATCH_ATTRIBUTION
 
 val unlockPremium =
-    patch("Unlock Premium") {
-        description("Unlocks Premium-only features.")
+    patch(MapyPatchStrings.unlockPremiumName) {
+        description(MapyPatchStrings.unlockPremiumDescription)
         compatibleWith("cz.seznam.mapy")
 
         execute {

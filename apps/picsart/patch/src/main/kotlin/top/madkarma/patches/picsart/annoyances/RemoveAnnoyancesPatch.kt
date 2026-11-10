@@ -7,10 +7,11 @@ package top.madkarma.patches.picsart.annoyances
 
 import app.reseam.patch.alwaysReturn
 import app.reseam.patch.patch
+import top.madkarma.patches.picsart.PicsartPatchStrings
 
 val removeAnnoyances =
-    patch("Remove annoyances") {
-        description("Removes promotional popups from the app.")
+    patch(PicsartPatchStrings.removeAnnoyancesName) {
+        description(PicsartPatchStrings.removeAnnoyancesDescription)
         compatibleWith("com.picsart.studio")
 
         execute {

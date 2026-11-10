@@ -8,10 +8,11 @@ package top.madkarma.patches.kleinanzeigen.ads
 import app.reseam.patch.after
 import app.reseam.patch.patch
 import top.madkarma.kleinanzeigen.ads.bindings.Ads
+import top.madkarma.patches.kleinanzeigen.KleinanzeigenPatchStrings
 
 val removeAds =
-    patch("Remove ads") {
-        description("Removes banner, native, and interstitial ads.")
+    patch(KleinanzeigenPatchStrings.removeAdsName) {
+        description(KleinanzeigenPatchStrings.removeAdsDescription)
         compatibleWith("com.ebay.kleinanzeigen")
 
         execute {

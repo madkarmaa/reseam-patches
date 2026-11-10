@@ -9,3 +9,5 @@ dependencies {
     compileOnly(project(":apps:shared:patch"))
     compileOnly(project(":apps:universal:patch"))
 }
+
+reseamStrings { objectName = "top.madkarma.patches.smartlauncher.SmartLauncherPatchStrings" }

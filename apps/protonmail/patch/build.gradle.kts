@@ -10,6 +10,8 @@ dependencies {
 }
 
 // Rebuild the checked-in native libraries from extensions/accounts/src/main/cpp with
- // ANDROID_NDK_HOME set.
+// ANDROID_NDK_HOME set.
 // For each ABI (arm64-v8a, armeabi-v7a, x86_64): cmake --preset <abi> && cmake --build --preset
 // <abi>
+
+reseamStrings { objectName = "top.madkarma.patches.protonmail.ProtonmailPatchStrings" }

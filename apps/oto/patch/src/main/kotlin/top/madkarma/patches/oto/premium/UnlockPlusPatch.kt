@@ -9,12 +9,13 @@ import app.reseam.patch.Type
 import app.reseam.patch.after
 import app.reseam.patch.alwaysReturn
 import app.reseam.patch.patch
+import top.madkarma.patches.oto.OtoPatchStrings
 import top.madkarma.patches.shared.PATCH_ATTRIBUTION
 import top.madkarma.patches.universal.signature.signatureKiller
 
 val unlockPlus =
-    patch("Unlock Plus") {
-        description("Unlocks Plus-only features.")
+    patch(OtoPatchStrings.unlockPlusName) {
+        description(OtoPatchStrings.unlockPlusDescription)
         compatibleWith("com.piyush.music")
         // Startup kills the process unless the signing certificate is the developer's.
         dependsOn(signatureKiller)

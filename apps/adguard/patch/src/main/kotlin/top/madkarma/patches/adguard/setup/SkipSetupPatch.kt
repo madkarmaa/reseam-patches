@@ -7,44 +7,45 @@ package top.madkarma.patches.adguard.setup
 
 import app.reseam.patch.*
 import top.madkarma.extensions.adguard.bindings.AdGuardSetup
+import top.madkarma.patches.adguard.AdguardPatchStrings
 import top.madkarma.patches.shared.isPresent
 
 val skipSetup =
-    patch("Skip setup") {
+    patch(AdguardPatchStrings.skipSetupName) {
         description(
-            "Skips onboarding and applies the selected setup options on first startup. Configure advanced filters in the app settings.",
+            AdguardPatchStrings.skipSetupDescription,
         )
         compatibleWith("com.adguard.android")
 
         val blockSearchAds =
             boolOption(
                 "blockSearchAds",
-                title = "Block ads in web search",
-                description = "Remove ads from your search engine results.",
+                title = AdguardPatchStrings.skipSetupBlockSearchAdsTitle,
+                description = AdguardPatchStrings.skipSetupBlockSearchAdsDescription,
                 default = true,
             )
 
         val blockSocialWidgets =
             boolOption(
                 "blockSocialWidgets",
-                title = "Block social media widgets",
-                description = "Get rid of Like, Share, and other social buttons on websites.",
+                title = AdguardPatchStrings.skipSetupBlockSocialWidgetsTitle,
+                description = AdguardPatchStrings.skipSetupBlockSocialWidgetsDescription,
                 default = true,
             )
 
         val blockAnnoyances =
             boolOption(
                 "blockAnnoyances",
-                title = "Block annoyances",
-                description = "Remove cookie notifications, live chats, and newsletter signups.",
+                title = AdguardPatchStrings.skipSetupBlockAnnoyancesTitle,
+                description = AdguardPatchStrings.skipSetupBlockAnnoyancesDescription,
                 default = true,
             )
 
         val privacyLevel =
             stringOption(
                 "privacyLevel",
-                title = "Protect your privacy",
-                description = "Protect yourself from online trackers and analytics systems.",
+                title = AdguardPatchStrings.skipSetupPrivacyLevelTitle,
+                description = AdguardPatchStrings.skipSetupPrivacyLevelDescription,
                 default = "Standard",
                 validValues = listOf("None", "Standard", "High"),
             )
@@ -52,25 +53,24 @@ val skipSetup =
         val blockDangerousSites =
             boolOption(
                 "blockDangerousSites",
-                title = "Block dangerous websites",
-                description = "Be alerted before you access phishing and malicious websites.",
+                title = AdguardPatchStrings.skipSetupBlockDangerousSitesTitle,
+                description = AdguardPatchStrings.skipSetupBlockDangerousSitesDescription,
                 default = true,
             )
 
         val hideNotificationPrompt =
             boolOption(
                 "hideNotificationPrompt",
-                title = "Hide \"Enable notifications\" prompt",
-                description = "Disables the \"Enable notifications\" prompt shown post-setup.",
+                title = AdguardPatchStrings.skipSetupHideNotificationPromptTitle,
+                description = AdguardPatchStrings.skipSetupHideNotificationPromptDescription,
                 default = true,
             )
 
         val skipApprovalPopups =
             boolOption(
                 "skipApprovalPopups",
-                title = "Skip approval popups",
-                description =
-                    "Treat all annoyance filters as approved to skip consent dialogs when enabling them.",
+                title = AdguardPatchStrings.skipSetupSkipApprovalPopupsTitle,
+                description = AdguardPatchStrings.skipSetupSkipApprovalPopupsDescription,
                 default = true,
             )
 

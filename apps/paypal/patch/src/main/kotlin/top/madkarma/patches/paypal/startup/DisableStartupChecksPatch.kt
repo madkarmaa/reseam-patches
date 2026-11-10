@@ -7,12 +7,13 @@ package top.madkarma.patches.paypal.startup
 
 import app.reseam.patch.alwaysReturn
 import app.reseam.patch.patch
+import top.madkarma.patches.paypal.PayPalPatchStrings
 import top.madkarma.patches.universal.signature.signatureKiller
 
 val disableStartupChecks =
-    patch("Disable startup checks") {
+    patch(PayPalPatchStrings.disableStartupChecksName) {
         description(
-            "Prevents local integrity and emulator checks from crashing the app at startup.",
+            PayPalPatchStrings.disableStartupChecksDescription,
         )
         compatibleWith("com.paypal.android.p2pmobile")
         // app still reads the signing certificate after the startup verifier has been disabled.

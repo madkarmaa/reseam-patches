@@ -10,6 +10,7 @@ import app.reseam.patch.before
 import app.reseam.patch.patch
 import app.reseam.patch.settings.gate
 import app.reseam.patch.settings.section
+import top.madkarma.patches.truecaller.TruecallerPatchStrings
 import top.madkarma.patches.truecaller.settings.truecallerSettings
 import top.madkarma.truecaller.behavior.bindings.Decisions
 import top.madkarma.truecaller.settings.TruecallerSettings
@@ -17,8 +18,8 @@ import top.madkarma.truecaller.settings.TruecallerStrings
 import top.madkarma.truecaller.ui.bindings.Navigation
 
 val hideTabs =
-    patch("Hide tabs") {
-        description("Hides selected tabs.")
+    patch(TruecallerPatchStrings.hideTabsName) {
+        description(TruecallerPatchStrings.hideTabsDescription)
         compatibleWith("com.truecaller")
 
         settings(

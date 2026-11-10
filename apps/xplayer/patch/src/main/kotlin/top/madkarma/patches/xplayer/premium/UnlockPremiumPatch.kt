@@ -12,12 +12,13 @@ import app.reseam.patch.patch
 import top.madkarma.extensions.xplayer.bindings.XPlayerPremium
 import top.madkarma.patches.shared.PATCH_ATTRIBUTION
 import top.madkarma.patches.shared.setStringEverywhere
+import top.madkarma.patches.xplayer.XPlayerPatchStrings
 
 private const val ALREADY_PREMIUM_TOAST_KEY = "toast_already_vip"
 
 val unlockPremium =
-    patch("Unlock premium") {
-        description("Unlocks Premium-only features.")
+    patch(XPlayerPatchStrings.unlockPremiumName) {
+        description(XPlayerPatchStrings.unlockPremiumDescription)
         compatibleWith("video.player.videoplayer")
 
         execute {

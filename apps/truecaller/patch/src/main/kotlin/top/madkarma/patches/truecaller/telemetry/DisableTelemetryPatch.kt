@@ -9,13 +9,14 @@ import app.reseam.patch.alwaysReturn
 import app.reseam.patch.alwaysReturnNull
 import app.reseam.patch.patch
 import app.reseam.patch.replace
+import top.madkarma.patches.truecaller.TruecallerPatchStrings
 import top.madkarma.patches.truecaller.shared.disableFeatureFlag
 import top.madkarma.patches.truecaller.shared.featureFlagOverrides
 import top.madkarma.truecaller.behavior.bindings.Decisions
 
 val disableTelemetry =
-    patch("Disable telemetry") {
-        description("Disables analytics and Firebase crash reports.")
+    patch(TruecallerPatchStrings.disableTelemetryName) {
+        description(TruecallerPatchStrings.disableTelemetryDescription)
         compatibleWith("com.truecaller")
         dependsOn(featureFlagOverrides)
 

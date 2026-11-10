@@ -7,12 +7,13 @@ package top.madkarma.patches.cloudflare.unlimited
 
 import app.reseam.patch.before
 import app.reseam.patch.patch
+import top.madkarma.patches.cloudflare.CloudflarePatchStrings
 import top.madkarma.patches.shared.PATCH_ATTRIBUTION
 
 val unlockUnlimited =
-    patch("Unlock WARP+ Unlimited") {
+    patch(CloudflarePatchStrings.unlockUnlimitedName) {
         description(
-            "Unlocks the local WARP+ Unlimited account state. Does not unlock server-side WARP+.",
+            CloudflarePatchStrings.unlockUnlimitedDescription,
         )
         compatibleWith("com.cloudflare.onedotonedotonedotone")
 

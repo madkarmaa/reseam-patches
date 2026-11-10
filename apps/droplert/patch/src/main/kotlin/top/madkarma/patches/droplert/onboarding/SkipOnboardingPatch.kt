@@ -10,10 +10,11 @@ import app.reseam.patch.appEntry
 import app.reseam.patch.invoke
 import app.reseam.patch.patch
 import top.madkarma.droplert.extensions.bindings.Prefs
+import top.madkarma.patches.droplert.DroplertPatchStrings
 
 val skipOnboarding =
-    patch("Skip onboarding") {
-        description("Skips the setup screens and opens the home screen.")
+    patch(DroplertPatchStrings.skipOnboardingName) {
+        description(DroplertPatchStrings.skipOnboardingDescription)
         compatibleWith(
             "com.shahzaman.pricetracker"(
                 "2.2.1",

@@ -7,12 +7,13 @@ package top.madkarma.patches.alltrails.peak
 
 import app.reseam.patch.alwaysReturn
 import app.reseam.patch.patch
+import top.madkarma.patches.alltrails.AllTrailsPatchStrings
 import top.madkarma.patches.shared.PATCH_ATTRIBUTION
 import top.madkarma.patches.shared.setStringEverywhere
 
 val unlockPeak =
-    patch("Unlock Peak") {
-        description("Unlocks Peak-only features.")
+    patch(AllTrailsPatchStrings.unlockPeakName) {
+        description(AllTrailsPatchStrings.unlockPeakDescription)
         compatibleWith("com.alltrails.alltrails")
 
         execute {

@@ -7,10 +7,11 @@ package top.madkarma.patches.truecaller.ads
 
 import app.reseam.patch.alwaysReturn
 import app.reseam.patch.patch
+import top.madkarma.patches.truecaller.TruecallerPatchStrings
 
 val disableAds =
-    patch("Disable ads") {
-        description("Disables in-app ads.")
+    patch(TruecallerPatchStrings.disableAdsName) {
+        description(TruecallerPatchStrings.disableAdsDescription)
         compatibleWith("com.truecaller")
 
         execute {

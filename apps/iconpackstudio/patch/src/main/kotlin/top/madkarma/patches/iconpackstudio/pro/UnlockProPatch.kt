@@ -8,12 +8,13 @@ package top.madkarma.patches.iconpackstudio.pro
 import app.reseam.patch.alwaysReturn
 import app.reseam.patch.before
 import app.reseam.patch.patch
+import top.madkarma.patches.iconpackstudio.IconPackStudioPatchStrings
 import top.madkarma.patches.shared.PATCH_ATTRIBUTION
 import top.madkarma.patches.shared.setStringEverywhere
 
 val unlockPro =
-    patch("Unlock Pro") {
-        description("Unlocks Pro-only features.")
+    patch(IconPackStudioPatchStrings.unlockProName) {
+        description(IconPackStudioPatchStrings.unlockProDescription)
         compatibleWith("ginlemon.iconpackstudio")
 
         execute {

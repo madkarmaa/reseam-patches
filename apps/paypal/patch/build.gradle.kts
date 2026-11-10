@@ -8,3 +8,5 @@ plugins {
 dependencies {
     compileOnly(project(":apps:universal:patch"))
 }
+
+reseamStrings { objectName = "top.madkarma.patches.paypal.PayPalPatchStrings" }

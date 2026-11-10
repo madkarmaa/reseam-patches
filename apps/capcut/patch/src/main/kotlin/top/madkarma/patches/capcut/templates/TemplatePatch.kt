@@ -10,12 +10,13 @@ import app.reseam.patch.alwaysReturn
 import app.reseam.patch.before
 import app.reseam.patch.patch
 import top.madkarma.capcut.templates.bindings.ExportCheckers
+import top.madkarma.patches.capcut.CapCutPatchStrings
 import top.madkarma.patches.capcut.integrity.bypassIntegrityChecks
 import top.madkarma.patches.capcut.premium.unlockPremium
 
 val unlockPremiumTemplates =
-    patch("Unlock premium effects and templates") {
-        description("Allows local premium effects and template export.")
+    patch(CapCutPatchStrings.unlockPremiumTemplatesName) {
+        description(CapCutPatchStrings.unlockPremiumTemplatesDescription)
         compatibleWith("com.lemon.lvoverseas")
         dependsOn(bypassIntegrityChecks, unlockPremium)
 

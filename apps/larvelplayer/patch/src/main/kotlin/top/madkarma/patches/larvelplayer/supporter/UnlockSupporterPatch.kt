@@ -9,11 +9,12 @@ import app.reseam.patch.ExternalPatch
 import app.reseam.patch.before
 import app.reseam.patch.patch
 import top.madkarma.larvelplayer.supporter.bindings.Supporter
+import top.madkarma.patches.larvelplayer.LarvelPlayerPatchStrings
 import top.madkarma.patches.shared.PATCH_ATTRIBUTION
 
 val unlockSupporter =
-    patch("Unlock supporter") {
-        description("Unlocks lifetime ad removal and supporter access to rewarded features.")
+    patch(LarvelPlayerPatchStrings.unlockSupporterName) {
+        description(LarvelPlayerPatchStrings.unlockSupporterDescription)
         compatibleWith("com.larvelplayer.app")
         dependsOn(ExternalPatch("reseam-patches", "app.reseam.patches.universal.removePairip"))
 

@@ -9,12 +9,13 @@ import app.reseam.patch.ExternalPatch
 import app.reseam.patch.after
 import app.reseam.patch.appEntry
 import app.reseam.patch.patch
+import top.madkarma.patches.respiro.RespiroPatchStrings
 import top.madkarma.patches.respiro.preferences.readPreference
 import top.madkarma.respiro.preferences.bindings.Preferences
 
 val skipIntro =
-    patch("Skip intro") {
-        description("Skips the first-launch tutorial, release tour, and long welcome animation.")
+    patch(RespiroPatchStrings.skipIntroName) {
+        description(RespiroPatchStrings.skipIntroDescription)
         compatibleWith("com.sgnoogle.respiro")
         dependsOn(ExternalPatch("reseam-patches", "app.reseam.patches.universal.removePairip"))
 

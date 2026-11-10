@@ -8,11 +8,12 @@ package top.madkarma.patches.kwgt.pro
 import app.reseam.patch.alwaysReturn
 import app.reseam.patch.patch
 import app.reseam.patch.replace
+import top.madkarma.patches.kwgt.KWGTPatchStrings
 import top.madkarma.patches.shared.PATCH_ATTRIBUTION
 
 val unlockPro =
-    patch("Unlock Pro") {
-        description("Unlocks Pro-only features.")
+    patch(KWGTPatchStrings.unlockProName) {
+        description(KWGTPatchStrings.unlockProDescription)
         compatibleWith("org.kustom.widget")
 
         execute {

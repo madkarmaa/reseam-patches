@@ -8,19 +8,20 @@ package top.madkarma.patches.alltrails.gms
 import app.reseam.patch.Type
 import app.reseam.patch.before
 import app.reseam.patch.patch
+import top.madkarma.patches.alltrails.AllTrailsPatchStrings
 import top.madkarma.patches.shared.gmscore.signInThroughGmsCore
 import top.madkarma.patches.shared.originalSignerSha1
 import top.madkarma.shared.gmscore.bindings.GmsCore
 
 val gmsCoreSupport =
-    patch("GmsCore support") {
-        description("Signs in with Google through separately installed Reseam GmsCore.")
+    patch(AllTrailsPatchStrings.gmsCoreSupportName) {
+        description(AllTrailsPatchStrings.gmsCoreSupportDescription)
         compatibleWith("com.alltrails.alltrails")
 
         val vendorGroupId =
             stringOption(
                 "gmsCoreVendorGroupId",
-                title = "GmsCore vendor group ID",
+                title = AllTrailsPatchStrings.gmsCoreSupportGmsCoreVendorGroupIdTitle,
                 default = "app.reseam",
                 required = true,
             )

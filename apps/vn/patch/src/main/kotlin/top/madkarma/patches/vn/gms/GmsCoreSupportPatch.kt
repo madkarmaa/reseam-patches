@@ -8,17 +8,18 @@ package top.madkarma.patches.vn.gms
 import app.reseam.patch.*
 import top.madkarma.patches.shared.gmscore.signInThroughGmsCore
 import top.madkarma.patches.shared.originalSignerSha1
+import top.madkarma.patches.vn.VNPatchStrings
 import top.madkarma.shared.gmscore.bindings.GmsCore
 
 val gmsCoreSupport =
-    patch("GmsCore support") {
-        description("Signs in with Google through separately installed Reseam GmsCore.")
+    patch(VNPatchStrings.gmsCoreSupportName) {
+        description(VNPatchStrings.gmsCoreSupportDescription)
         compatibleWith("com.frontrow.vlog")
 
         val vendorGroupId =
             stringOption(
                 "gmsCoreVendorGroupId",
-                title = "GmsCore vendor group ID",
+                title = VNPatchStrings.gmsCoreSupportGmsCoreVendorGroupIdTitle,
                 default = "app.reseam",
                 required = true,
             )

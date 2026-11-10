@@ -10,6 +10,7 @@ import java.security.MessageDigest
 import java.util.*
 import top.madkarma.capcut.integrity.bindings.DeviceRegistration
 import top.madkarma.capcut.integrity.bindings.UnsafePackageNotice
+import top.madkarma.patches.capcut.CapCutPatchStrings
 import top.madkarma.patches.universal.signature.spoofApkFileAccess
 import top.madkarma.universal.signature.bindings.SignatureKiller
 
@@ -21,9 +22,9 @@ private const val TEMPLATE_PORTAL =
     "capcut://lynxview?channel=image_lynx_template_portal&bundle=template.js"
 
 val bypassIntegrityChecks =
-    patch("Bypass integrity checks") {
+    patch(CapCutPatchStrings.bypassIntegrityChecksName) {
         description(
-            "Spoofs the original signature and registers a fresh device identity to avoid device bans.",
+            CapCutPatchStrings.bypassIntegrityChecksDescription,
         )
         compatibleWith("com.lemon.lvoverseas")
         dependsOn(spoofApkFileAccess)

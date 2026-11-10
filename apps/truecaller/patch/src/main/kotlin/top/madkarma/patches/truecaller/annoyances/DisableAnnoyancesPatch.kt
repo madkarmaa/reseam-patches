@@ -6,15 +6,16 @@
 package top.madkarma.patches.truecaller.annoyances
 
 import app.reseam.patch.*
+import top.madkarma.patches.truecaller.TruecallerPatchStrings
 import top.madkarma.patches.truecaller.shared.disableFeatureFlag
 import top.madkarma.patches.truecaller.shared.featureFlagOverrides
 import top.madkarma.truecaller.behavior.bindings.Decisions
 import top.madkarma.truecaller.ui.bindings.Interface
 
 val disableAnnoyances =
-    patch("Disable annoyances") {
+    patch(TruecallerPatchStrings.disableAnnoyancesName) {
         description(
-            "Hides permission banners, surveys, update prompts, and automatic Premium offers.",
+            TruecallerPatchStrings.disableAnnoyancesDescription,
         )
         compatibleWith("com.truecaller")
         dependsOn(featureFlagOverrides)

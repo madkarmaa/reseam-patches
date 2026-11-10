@@ -8,11 +8,12 @@ package top.madkarma.patches.turuta.premium
 import app.reseam.patch.after
 import app.reseam.patch.before
 import app.reseam.patch.patch
+import top.madkarma.patches.turuta.TurutaPatchStrings
 import top.madkarma.turuta.extensions.bindings.PremiumPreferences
 
 val unlockPremium =
-    patch("Unlock Lifetime Premium") {
-        description("Unlocks Premium-only features.")
+    patch(TurutaPatchStrings.unlockPremiumName) {
+        description(TurutaPatchStrings.unlockPremiumDescription)
         compatibleWith("pe.tumicro.android")
 
         execute {

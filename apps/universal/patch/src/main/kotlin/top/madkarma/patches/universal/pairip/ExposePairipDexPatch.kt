@@ -7,6 +7,7 @@ package top.madkarma.patches.universal.pairip
 
 import app.reseam.patch.*
 import app.reseam.patch.types.EncodedVal
+import top.madkarma.patches.universal.UniversalPatchStrings
 import top.madkarma.universal.pairip.bindings.PairipDex
 
 private val importedDexEntries = RunList<String>()
@@ -14,12 +15,17 @@ private const val PATCHED_DEX_ASSET = "assets/reseam/pairip/patched.dex"
 private const val PATCHED_CLASSES_ASSET = "assets/reseam/pairip/classes.txt"
 
 val exposePairipDex =
-    patch("Expose Pairip DEX") {
+    patch(UniversalPatchStrings.exposePairipDexName) {
         description(
-            "Makes lifted methods from an embedded Pairip DEX available to Reseam patches and uses the patched methods at runtime. Keeps Pairip running. Does not support encrypted or VM-only method bodies.",
+            UniversalPatchStrings.exposePairipDexDescription,
         )
 
-        val diagnostics = boolOption("diagnostics", title = "Log loaded methods", default = false)
+        val diagnostics =
+            boolOption(
+                "diagnostics",
+                title = UniversalPatchStrings.exposePairipDexDiagnosticsTitle,
+                default = false,
+            )
 
         execute {
             val startup = pairipStartup.method.classDef
