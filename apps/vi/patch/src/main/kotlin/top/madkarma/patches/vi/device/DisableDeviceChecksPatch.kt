@@ -7,14 +7,13 @@ package top.madkarma.patches.vi.device
 
 import app.reseam.patch.className
 import app.reseam.patch.descriptor
-import app.reseam.patch.invoke
 import app.reseam.patch.patch
 import top.madkarma.patches.vi.ViPatchStrings
 
 val disableDeviceChecks =
     patch(ViPatchStrings.disableDeviceChecksName) {
         description(ViPatchStrings.disableDeviceChecksDescription)
-        compatibleWith("com.mventus.selfcare.activity"("10.33.1"))
+        compatibleWith("com.mventus.selfcare.activity")
 
         execute {
             val wrapper = manifest.applicationClass ?: error("Vi has no Application class")
