@@ -4,7 +4,7 @@
 #pragma once
 
 // ReSharper disable CppUnusedIncludeDirective
-#include "seccomp_open.h"
+#include "redirect/seccomp_open.h"
 // ReSharper restore CppUnusedIncludeDirective
 
 struct library_view_options {

@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // ReSharper disable CppUnusedIncludeDirective
-#include "seccomp_open.h"
+#include "redirect/seccomp_open.h"
 #include "logging.h"
-#include "library_view.h"
-#include "native_file_hooks.h"
+#include "view/library_view.h"
+#include "hooks/native_file_hooks.h"
 
 #include "shadowhook.h"
 

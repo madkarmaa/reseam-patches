@@ -32,14 +32,12 @@ struct raw_open_mapping {
 // installed path instead. Descriptor mode also handles readlink/readlinkat, fstat/fstat64 and fstatat
 // where the ABI provides them. Strings must remain valid until process exit. Only one library can be
 // configured per process. Logs according to the diagnostics flag in logging.h.
-[[nodiscard]] bool install_raw_open_redirect(const char *library,
-                                             std::span<const raw_open_mapping> paths,
+[[nodiscard]] bool install_raw_open_redirect(const char *library, std::span<const raw_open_mapping> paths,
                                              const raw_redirect_options &options = {});
 
 // Installs after dlopen completes and before Android calls the library's JNI_OnLoad.
-[[nodiscard]] bool prepare_library_file_redirect(const char *library,
-                                                std::span<const raw_open_mapping> paths,
-                                                bool redirect_contents = false);
+[[nodiscard]] bool prepare_library_file_redirect(const char *library, std::span<const raw_open_mapping> paths,
+                                                 bool redirect_contents = false);
 
 // Unpacked code retains its own disjoint range; replay code must never enter that range.
 [[nodiscard]] bool raw_redirect_contains_address(uintptr_t address);
@@ -47,6 +45,6 @@ struct raw_open_mapping {
 [[nodiscard]] unsigned raw_redirect_filter_count();
 
 // Caller-aware libc hooks share the raw redirect logic. Unrelated callers retain installed files.
-[[nodiscard]] std::optional<long> redirect_native_file_syscall(
-        uintptr_t caller, int number, long first, long second, long third,
-        long fourth, long fifth, long sixth);
+[[nodiscard]] std::optional<long> redirect_native_file_syscall(uintptr_t caller, int number, long first,
+                                                               long second, long third, long fourth,
+                                                               long fifth, long sixth);

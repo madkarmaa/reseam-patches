@@ -18,7 +18,9 @@
 #undef st_ctime
 #define stat signature_kernel_stat
 #define stat64 signature_kernel_stat64
+// ReSharper disable CppUnusedIncludeDirective
 #include <asm/stat.h>
+// ReSharper restore CppUnusedIncludeDirective
 #pragma pop_macro("st_ctime")
 #pragma pop_macro("st_mtime")
 #pragma pop_macro("st_atime")

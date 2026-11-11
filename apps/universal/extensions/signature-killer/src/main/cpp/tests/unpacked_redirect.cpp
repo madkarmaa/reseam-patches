@@ -1,8 +1,9 @@
 // SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-#include "seccomp_open.h"
-#include "native_file_hooks.h"
+// ReSharper disable CppUnusedIncludeDirective
+#include "redirect/seccomp_open.h"
+#include "hooks/native_file_hooks.h"
 
 #include <dlfcn.h>
 #include <fcntl.h>
@@ -16,6 +17,7 @@
 #endif
 
 #include <array>
+#include <charconv>
 #include <cassert>
 #include <cstdint>
 #include <cstdio>
@@ -23,23 +25,31 @@
 #include <cstring>
 #include <string>
 #include <thread>
+#include <utility>
+// ReSharper restore CppUnusedIncludeDirective
 
 extern "C" long signature_raw_syscall(long, long, long, long, long, long, long);
 
 namespace {
-    void create_file(const std::string &path, const char *contents) {
+    void create_file(const std::string &path, const char *const contents) {
         FILE *const file = fopen(path.c_str(), "w");
         assert(file != nullptr);
         assert(fputs(contents, file) >= 0);
         assert(fclose(file) == 0);
     }
 
-    unsigned filters(const char *status) {
-        const char *field = strstr(status, "Seccomp_filters:");
+    unsigned read_unsigned_field(const char *value) {
+        value += strspn(value, " \t");
+        unsigned result = 0;
+        const auto [end, error] = std::from_chars(value, value + strcspn(value, "\n"), result);
+        assert(error == std::errc{} && end != value);
+        return result;
+    }
+
+    unsigned filters(const char *const status) {
+        const char *const field = strstr(status, "Seccomp_filters:");
         assert(field != nullptr);
-        unsigned value = 0;
-        assert(sscanf(field, "Seccomp_filters: %u", &value) == 1);
-        return value;
+        return read_unsigned_field(field + sizeof("Seccomp_filters:") - 1);
     }
 
 #ifdef __aarch64__
@@ -72,13 +82,14 @@ namespace {
 #endif
 
 #ifdef __aarch64__
-    void verify_forwarded_read(void *probe, const std::string &installed, void (*verify)()) {
+    void verify_forwarded_read(void *const probe, const std::string &installed, void (*const verify)()) {
         auto *const entry = static_cast<uint32_t *>(dlsym(RTLD_DEFAULT, "read"));
         assert(entry != nullptr && (*entry & 0xfc000000U) == 0x14000000U);
-        const auto immediate = static_cast<int64_t>(*entry & 0x03ffffffU);
-        const auto displacement = ((immediate ^ 0x02000000) - 0x02000000) * 4;
-        auto set_forwarder = reinterpret_cast<void (*)(void *)>(dlsym(probe, "signature_set_read_forwarder"));
-        void *const forwarder = dlsym(probe, "signature_forward_read");
+        const auto immediate = *entry & 0x03ffffffU;
+        const auto displacement = (static_cast<int64_t>(immediate ^ 0x02000000U) - 0x02000000) * 4;
+        const auto set_forwarder =
+            reinterpret_cast<void (*)(void *)>(dlsym(probe, "signature_set_read_forwarder"));
+        const void *const forwarder = dlsym(probe, "signature_forward_read");
         assert(set_forwarder != nullptr && forwarder != nullptr);
         set_forwarder(reinterpret_cast<void *>(reinterpret_cast<uintptr_t>(entry) + displacement));
         std::array<uint32_t, 4> saved{};
@@ -93,7 +104,8 @@ namespace {
         __builtin___clear_cache(reinterpret_cast<char *>(entry), reinterpret_cast<char *>(entry + 4));
         // Model a protector that never restores RX after writing the branch.
         refresh_native_file_hooks();
-        const int descriptor = open(installed.c_str(), O_RDONLY);
+        int (*const open_file)(const char *, int, ...) = open;
+        const int descriptor = open_file(installed.c_str(), O_RDONLY);
         assert(descriptor >= 0);
         std::array<char, 32> contents{};
         assert(read(descriptor, contents.data(), contents.size()) == 9);
@@ -111,15 +123,15 @@ namespace {
         assert(file != nullptr);
         std::string contents;
         std::array<char, 1024> bytes{};
-        size_t length;
+        size_t length = 0;
         while ((length = fread(bytes.data(), 1, bytes.size(), file)) != 0)
             contents.append(bytes.data(), length);
         assert(fclose(file) == 0);
         return contents;
     }
-}
+} // namespace
 
-int main(const int count, char **arguments) {
+int main(const int count, const char *const *const arguments) {
     assert(count == 2);
     const std::string directory = arguments[1];
     const std::string installed = directory + "/unpacked-installed.apk";
@@ -128,15 +140,22 @@ int main(const int count, char **arguments) {
     create_file(original, "original contents");
     const unsigned baseline = filters(process_status().c_str());
     const auto page_size = static_cast<size_t>(sysconf(_SC_PAGESIZE));
-    void *const foreign = mmap(nullptr, page_size, PROT_READ | PROT_WRITE,
-                               MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    void *const foreign =
+        mmap(nullptr, page_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     assert(foreign != MAP_FAILED);
     memcpy(foreign, reinterpret_cast<void *>(signature_raw_syscall), 64);
     __builtin___clear_cache(static_cast<char *>(foreign), static_cast<char *>(foreign) + 64);
     const std::string foreign_address = std::to_string(reinterpret_cast<uintptr_t>(foreign));
+    // NOLINTNEXTLINE(concurrency-mt-unsafe): setup is single-threaded; the environment stays read-only.
     assert(setenv("SIGNATURE_FOREIGN_MAPPING", foreign_address.c_str(), 1) == 0);
+    // NOLINTNEXTLINE(concurrency-mt-unsafe): setup is single-threaded; the environment stays read-only.
     assert(setenv("SIGNATURE_UNPACKED_APK", installed.c_str(), 1) == 0);
-    const std::array mappings{raw_open_mapping{installed.c_str(), original.c_str()}};
+    const std::array mappings{
+        raw_open_mapping{
+            .installed = installed.c_str(),
+            .replacement = original.c_str(),
+        },
+    };
     assert(prepare_library_file_redirect("libsignature_unpacked_probe.so", mappings, true));
     void *const probe = dlopen("libsignature_unpacked_probe.so", RTLD_NOW | RTLD_LOCAL);
     assert(probe != nullptr);
@@ -162,18 +181,17 @@ int main(const int count, char **arguments) {
     assert(child >= 0);
     if (child == 0) {
         const std::string child_path = "/proc/" + std::to_string(getpid()) + "/status";
-        const char *child_status = status(child_path.c_str());
+        const char *const child_status = status(child_path.c_str());
         assert(filters(child_status) == baseline);
         const char *identity = strstr(child_status, "\nPid:");
-        unsigned reported_process = 0;
-        assert(identity != nullptr && sscanf(identity, "\nPid: %u", &reported_process) == 1);
-        assert(reported_process == static_cast<unsigned>(getpid()));
+        assert(identity != nullptr);
+        assert(std::cmp_equal(read_unsigned_field(identity + sizeof("\nPid:") - 1), getpid()));
         const std::string parent_path = "/proc/" + std::to_string(parent) + "/status";
-        const char *parent_status = status(parent_path.c_str());
+        const char *const parent_status = status(parent_path.c_str());
         identity = strstr(parent_status, "\nPid:");
         assert(filters(parent_status) == baseline);
-        assert(identity != nullptr && sscanf(identity, "\nPid: %u", &reported_process) == 1);
-        assert(reported_process == static_cast<unsigned>(parent));
+        assert(identity != nullptr);
+        assert(std::cmp_equal(read_unsigned_field(identity + sizeof("\nPid:") - 1), parent));
         _exit(0);
     }
     int child_status = 0;
@@ -188,11 +206,12 @@ int main(const int count, char **arguments) {
     assert(strcmp(bytes.data(), "installed") == 0);
     assert(fclose(file) == 0);
     const auto unowned_call = reinterpret_cast<decltype(&signature_raw_syscall)>(foreign);
-    const long descriptor = unowned_call(__NR_openat, AT_FDCWD,
-            reinterpret_cast<long>(installed.c_str()), O_RDONLY, 0, 0, 0);
+    const long descriptor =
+        unowned_call(__NR_openat, AT_FDCWD, reinterpret_cast<long>(installed.c_str()), O_RDONLY, 0, 0, 0);
     assert(descriptor >= 0);
     bytes.fill('\0');
-    assert(unowned_call(__NR_read, descriptor, reinterpret_cast<long>(bytes.data()), bytes.size(), 0, 0, 0) == 9);
+    assert(unowned_call(__NR_read, descriptor, reinterpret_cast<long>(bytes.data()), bytes.size(), 0, 0, 0) ==
+           9);
     assert(strcmp(bytes.data(), "installed") == 0);
     assert(unowned_call(__NR_close, descriptor, 0, 0, 0, 0, 0) == 0);
 #ifdef __aarch64__
