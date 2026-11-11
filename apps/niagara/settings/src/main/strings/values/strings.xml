@@ -6,39 +6,17 @@
     <string name="mindful_launch">Mindful launch</string>
     <string name="mindful_launch_summary">Before a leisure app opens, ask to pause when it is opened too often or used too long today. Works while Usage Breaker is on.</string>
     <string name="open_limit">Opens before pausing</string>
-    <string name="open_limit_summary">Pause once a leisure app has been opened this many times within the time window.</string>
-    <string name="open_window">Time window</string>
-    <string name="open_window_summary">How far back opens are counted.</string>
-    <string name="daily_limit">Daily time before pausing</string>
-    <string name="daily_limit_summary">Pause once a leisure app has been used this long today.</string>
-    <string name="countdown">Open button countdown</string>
-    <string name="countdown_summary">How long the open button stays locked.</string>
+    <string name="open_limit_summary">Pause once a leisure app has been opened this many times within the time window. 0 turns this off.</string>
+    <string name="open_window">Time window (minutes)</string>
+    <string name="open_window_summary">How far back opens are counted, in minutes.</string>
+    <string name="daily_limit">Daily time before pausing (minutes)</string>
+    <string name="daily_limit_summary">Pause once a leisure app has been used this many minutes today. 0 turns this off.</string>
+    <string name="countdown">Open button countdown (seconds)</string>
+    <string name="countdown_summary">How many seconds the open button stays locked. 0 leaves it unlocked.</string>
 
     <string name="section_weather">Weather</string>
     <string name="weather_api_key">WeatherAPI.com key</string>
     <string name="weather_api_key_summary">Used by the weather widget. Never share this key with anybody - keep it safe.</string>
-
-    <string name="rule_off">Off</string>
-    <string name="open_limit_3">3 opens</string>
-    <string name="open_limit_5">5 opens</string>
-    <string name="open_limit_10">10 opens</string>
-    <string name="open_limit_15">15 opens</string>
-    <string name="open_limit_20">20 opens</string>
-    <string name="duration_15_minutes">15 minutes</string>
-    <string name="duration_30_minutes">30 minutes</string>
-    <string name="duration_45_minutes">45 minutes</string>
-    <string name="duration_1_hour">1 hour</string>
-    <string name="duration_90_minutes">90 minutes</string>
-    <string name="duration_2_hours">2 hours</string>
-    <string name="duration_3_hours">3 hours</string>
-    <string name="duration_4_hours">4 hours</string>
-    <string name="countdown_3">3 seconds</string>
-    <string name="countdown_5">5 seconds</string>
-    <string name="countdown_10">10 seconds</string>
-    <string name="countdown_15">15 seconds</string>
-    <string name="countdown_20">20 seconds</string>
-    <string name="countdown_30">30 seconds</string>
-    <string name="countdown_60">1 minute</string>
 
     <string name="pause_title">Take a breath</string>
     <string name="pause_opens">You\'ve opened <xliff:g id="app">%1$s</xliff:g> <xliff:g id="count">%2$d</xliff:g> times within <xliff:g id="window">%3$s</xliff:g>.</string>
@@ -48,5 +26,6 @@
     <string name="pause_open_countdown">Available in <xliff:g id="seconds">%1$d</xliff:g> s</string>
     <string name="pause_dismiss">Not now</string>
     <string name="usage_hours_minutes"><xliff:g id="hours">%1$d</xliff:g> h <xliff:g id="minutes">%2$d</xliff:g> min</string>
+    <string name="usage_hours"><xliff:g id="hours">%1$d</xliff:g> h</string>
     <string name="usage_minutes"><xliff:g id="minutes">%1$d</xliff:g> min</string>
 </resources>

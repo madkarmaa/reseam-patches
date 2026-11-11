@@ -15,6 +15,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import app.reseam.runtime.Export
+import app.reseam.runtime.TextValue
 import java.lang.ref.WeakReference
 import java.util.Calendar
 import top.madkarma.niagara.settings.MindfulLaunchSettings
@@ -89,7 +90,7 @@ private fun pauseFor(view: View, item: Any?, intent: Intent): Pause? {
             openLabel = NiagaraStrings.pauseOpen(appName),
             countdownLabel = { seconds -> NiagaraStrings.pauseOpenCountdown(seconds) },
             dismissLabel = NiagaraStrings.pauseDismiss,
-            countdownSeconds = MindfulLaunchSettings.countdown.value.toIntOrNull() ?: 0,
+            countdownSeconds = MindfulLaunchSettings.countdown.wholeNumber(),
         )
     return Pause(activity, themed, content)
 }
@@ -111,9 +112,11 @@ private fun appLabel(context: Context, intent: Intent): String? =
 
 /** The reasons to pause, or null when [packageName] is within every limit. */
 private fun pauseMessage(context: Context, packageName: String, appName: String): String? {
-    val openLimit = MindfulLaunchSettings.openLimit.value.toIntOrNull() ?: 0
-    val windowMinutes = MindfulLaunchSettings.openWindow.value.toLongOrNull() ?: 60
-    val dailyMinutes = MindfulLaunchSettings.dailyLimit.value.toLongOrNull() ?: 0
+    val openLimit = MindfulLaunchSettings.openLimit.wholeNumber()
+    val windowMinutes =
+        MindfulLaunchSettings.openWindow.wholeNumber().takeIf { it > 0 }
+            ?: MindfulLaunchSettings.openWindow.default.toInt()
+    val dailyMinutes = MindfulLaunchSettings.dailyLimit.wholeNumber()
     if (openLimit <= 0 && dailyMinutes <= 0) return null
 
     val now = System.currentTimeMillis()
@@ -128,7 +131,12 @@ private fun pauseMessage(context: Context, packageName: String, appName: String)
 
     val reasons = mutableListOf<String>()
     if (openLimit > 0 && usage.opens >= openLimit)
-        reasons += NiagaraStrings.pauseOpens(appName, usage.opens, windowLabel(windowMinutes))
+        reasons +=
+            NiagaraStrings.pauseOpens(
+                appName,
+                usage.opens,
+                durationLabel(windowMinutes * MINUTE_MS),
+            )
     if (dailyMinutes > 0 && usage.foregroundToday >= dailyMinutes * MINUTE_MS)
         reasons += NiagaraStrings.pauseUsage(appName, durationLabel(usage.foregroundToday))
     if (reasons.isEmpty()) return null
@@ -151,19 +159,14 @@ private fun startOfToday(now: Long): Long =
         }
         .timeInMillis
 
-private fun windowLabel(minutes: Long): String =
-    when (minutes) {
-        15L -> NiagaraStrings.duration15Minutes
-        30L -> NiagaraStrings.duration30Minutes
-        60L -> NiagaraStrings.duration1Hour
-        120L -> NiagaraStrings.duration2Hours
-        240L -> NiagaraStrings.duration4Hours
-        else -> durationLabel(minutes * MINUTE_MS)
-    }
+/** The typed whole number, at least 0; text that is not one reads as the default. */
+private fun TextValue.wholeNumber(): Int =
+    (value.trim().toIntOrNull() ?: default.toInt()).coerceAtLeast(0)
 
 private fun durationLabel(millis: Long): String {
     val minutes = millis / MINUTE_MS
     if (minutes < 60) return NiagaraStrings.usageMinutes(minutes.toInt())
+    if (minutes % 60 == 0L) return NiagaraStrings.usageHours((minutes / 60).toInt())
     return NiagaraStrings.usageHoursMinutes((minutes / 60).toInt(), (minutes % 60).toInt())
 }
 
