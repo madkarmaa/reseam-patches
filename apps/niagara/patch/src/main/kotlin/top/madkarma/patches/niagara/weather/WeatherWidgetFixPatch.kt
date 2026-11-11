@@ -5,14 +5,16 @@
 
 package top.madkarma.patches.niagara.weather
 
-import app.reseam.patch.after
 import app.reseam.patch.className
 import app.reseam.patch.patch
 import app.reseam.patch.replace
-import top.madkarma.extensions.bindings.WeatherApiKeyField
+import app.reseam.patch.settings.section
 import top.madkarma.extensions.bindings.WeatherRepository
+import top.madkarma.niagara.settings.NiagaraStrings
+import top.madkarma.niagara.settings.WeatherSettings
 import top.madkarma.patches.niagara.NiagaraPatchStrings
 import top.madkarma.patches.niagara.pro.unlockPro
+import top.madkarma.patches.niagara.settings.niagaraSettings
 import top.madkarma.patches.shared.setStringEverywhere
 
 val weatherWidgetFix =
@@ -24,6 +26,11 @@ val weatherWidgetFix =
 
         // Niagara exposes the weather widget only to Pro users.
         dependsOn(unlockPro)
+
+        settings(
+            niagaraSettings,
+            section(NiagaraStrings.sectionWeather, WeatherSettings.weatherApiKey),
+        )
 
         execute {
             val hint =
@@ -78,13 +85,6 @@ val weatherWidgetFix =
             }
             log.info(
                 "Weather widget fix: ${weatherFetch.descriptor} fetches and caches WeatherAPI.com forecasts.",
-            )
-
-            weatherContentBind.after {
-                call(WeatherApiKeyField.attach, lastParam)
-            }
-            log.info(
-                "Weather widget fix: ${weatherContentBind.descriptor} adds the API key field to weather settings.",
             )
         }
     }

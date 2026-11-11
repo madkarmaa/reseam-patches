@@ -10,12 +10,14 @@ import android.location.Location
 import android.location.LocationManager
 import android.os.Build
 import app.reseam.runtime.Export
+import app.reseam.runtime.Reseam
 import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.net.ssl.HttpsURLConnection
 import org.json.JSONArray
 import org.json.JSONObject
+import top.madkarma.niagara.settings.WeatherSettings
 
 /** Supplies Niagara's weather response through its existing parser, cache and UI. */
 class WeatherApi private constructor(context: Context) {
@@ -62,6 +64,10 @@ class WeatherApi private constructor(context: Context) {
         val at = preferences.getLong(KEY_CACHE_TIME, 0)
         if (at <= 0 || now() - at > CACHE_TTL_MS) return null
 
+        // A forecast fetched with another key may belong to another account or have failed.
+        if (preferences.getString(KEY_CACHE_API_KEY, null) != keyFingerprint(currentApiKey()))
+            return null
+
         val json = preferences.getString(KEY_CACHE_JSON, null)
         if (json.isNullOrEmpty()) return null
 
@@ -69,9 +75,17 @@ class WeatherApi private constructor(context: Context) {
     }
 
     @Suppress("UseKtx")
-    private fun storeCache(json: String) {
-        prefs().edit().putString(KEY_CACHE_JSON, json).putLong(KEY_CACHE_TIME, now()).apply()
+    private fun storeCache(json: String, apiKey: String) {
+        prefs()
+            .edit()
+            .putString(KEY_CACHE_JSON, json)
+            .putLong(KEY_CACHE_TIME, now())
+            .putString(KEY_CACHE_API_KEY, keyFingerprint(apiKey))
+            .apply()
     }
+
+    // Only detects a changed key, so the key itself is not copied into the cache.
+    private fun keyFingerprint(apiKey: String): String = apiKey.hashCode().toString()
 
     private fun asNoWeather(failure: Throwable): Throwable {
         val message = failure.message?.takeIf { it.isNotEmpty() } ?: "Failed to read weather data"
@@ -161,12 +175,18 @@ class WeatherApi private constructor(context: Context) {
         return "en"
     }
 
-    private fun download(latitude: Double, longitude: Double, language: String): String {
+    private fun download(
+        apiKey: String,
+        latitude: Double,
+        longitude: Double,
+        language: String,
+    ): String {
         var connection: HttpsURLConnection? = null
         try {
             connection =
                 URL(
                         requestUrl(
+                            apiKey,
                             latitude,
                             longitude,
                             language,
@@ -182,7 +202,7 @@ class WeatherApi private constructor(context: Context) {
             val stream = if (status == 200) connection.inputStream else connection.errorStream
             val body = stream.readBytes().toString(Charsets.UTF_8)
 
-            if (status != 200) throw apiError(parseError(body), null)
+            if (status != 200) throw apiError(parseError(body))
             return body
         } catch (exception: RuntimeException) {
             throw exception
@@ -193,21 +213,31 @@ class WeatherApi private constructor(context: Context) {
         }
     }
 
-    private fun requestUrl(latitude: Double, longitude: Double, language: String): String =
-        "$ENDPOINT?key=${currentApiKey()}&q=$latitude,$longitude&days=$FORECAST_DAYS&aqi=no&alerts=no&lang=$language"
+    private fun requestUrl(
+        apiKey: String,
+        latitude: Double,
+        longitude: Double,
+        language: String,
+    ): String =
+        "$ENDPOINT?key=$apiKey&q=$latitude,$longitude&days=$FORECAST_DAYS&aqi=no&alerts=no&lang=$language"
 
-    fun currentApiKey(): String =
-        prefs().getString(KEY_API_RUNTIME, null)?.takeIf { it.isNotEmpty() } ?: ""
+    private fun currentApiKey(): String {
+        migrateLegacyApiKey()
+        return WeatherSettings.weatherApiKey.value.trim()
+    }
 
+    // Earlier builds stored the key in Niagara's preferences, entered in the weather sheet.
     @Suppress("UseKtx")
-    fun saveApiKey(key: String?) {
-        val value = key?.trim { it <= ' ' } ?: ""
-        prefs()
-            .edit()
-            .putString(KEY_API_RUNTIME, value)
-            .remove(KEY_CACHE_JSON)
-            .remove(KEY_CACHE_TIME)
-            .apply()
+    private fun migrateLegacyApiKey() {
+        if (!Reseam.isStarted) return
+
+        val preferences = prefs()
+        val legacyKey = preferences.getString(KEY_LEGACY_API_KEY, null) ?: return
+
+        if (WeatherSettings.weatherApiKey.value.isEmpty() && legacyKey.isNotBlank())
+            WeatherSettings.weatherApiKey.value = legacyKey.trim()
+
+        preferences.edit().remove(KEY_LEGACY_API_KEY).apply()
     }
 
     private fun parseError(body: String): JSONObject? {
@@ -387,22 +417,21 @@ class WeatherApi private constructor(context: Context) {
         return FALLBACK_CONDITION
     }
 
-    private fun apiError(error: JSONObject?, cause: Exception?): RuntimeException {
-        if (error == null) return RuntimeException("Weather service returned an error", cause)
+    private fun apiError(error: JSONObject?): RuntimeException {
+        if (error == null) return RuntimeException("Weather service returned an error")
         val message = error.optString("message", "Weather service returned an error")
 
         return when (error.optInt("code", -1)) {
             1002,
-            2006 -> RuntimeException("WeatherAPI key invalid ($message)", cause)
+            2006 -> RuntimeException("WeatherAPI key invalid ($message)")
 
-            2007 -> RuntimeException("WeatherAPI quota exceeded ($message)", cause)
+            2007 -> RuntimeException("WeatherAPI quota exceeded ($message)")
             1006 ->
                 RuntimeException(
                     "Location unavailable - allow location access or set a fixed location",
-                    cause,
                 )
 
-            else -> RuntimeException(message, cause)
+            else -> RuntimeException(message)
         }
     }
 
@@ -429,19 +458,20 @@ class WeatherApi private constructor(context: Context) {
 
         override fun run() {
             try {
-                if (currentApiKey().isEmpty())
+                val apiKey = currentApiKey()
+                if (apiKey.isEmpty())
                     throw RuntimeException(
-                        "No WeatherAPI key - enter one below the temperature-units button",
+                        "No WeatherAPI key - add one in Niagara settings > Reseam settings",
                     )
                 val coordinates = resolveCoords()
                 val language = mapLang(readLang())
 
-                val root = JSONObject(download(coordinates[0], coordinates[1], language))
-                if (root.has("error")) throw apiError(root.getJSONObject("error"), null)
+                val root = JSONObject(download(apiKey, coordinates[0], coordinates[1], language))
+                if (root.has("error")) throw apiError(root.getJSONObject("error"))
 
                 val response = translate(root, coordinates[0], coordinates[1], language).toString()
                 json = response
-                storeCache(response)
+                storeCache(response, apiKey)
             } catch (exception: Throwable) {
                 failure = exception
             } finally {
@@ -459,7 +489,7 @@ class WeatherApi private constructor(context: Context) {
         private const val KEY_LAT = "bitpit.launcher.key.WEATHER_LOCATION_LAT"
         private const val KEY_LONG = "bitpit.launcher.key.WEATHER_LOCATION_LONG"
         private const val KEY_LANG = "bitpit.launcher.key.WEATHER_LANGUAGE"
-        private const val KEY_API_RUNTIME = "madkarma.weather.apiKey"
+        private const val KEY_LEGACY_API_KEY = "madkarma.weather.apiKey"
         private const val ENDPOINT = "https://api.weatherapi.com/v1/forecast.json"
         private const val FORECAST_DAYS = 3
         private const val USER_AGENT =
@@ -470,6 +500,7 @@ class WeatherApi private constructor(context: Context) {
         private const val FETCH_GRACE_MS = 2500
         private const val KEY_CACHE_JSON = "madkarma.weather.lastJson"
         private const val KEY_CACHE_TIME = "madkarma.weather.lastTime"
+        private const val KEY_CACHE_API_KEY = "madkarma.weather.lastKeyHash"
         private const val CACHE_TTL_MS = 10L * 60L * 1000L
         private val fetchLock = Any()
         private val FALLBACK_CONDITION = ConditionMapping(-1, 804, 4)
