@@ -26,9 +26,11 @@ universal patches that work on any app. Want an app supported?
 | --- | --- | --- |
 | Bug fixes | Fixes app bugs. | None |
 | Disable analytics | Refuses and blocks analytics collection. | None |
+| Mindful launch | Before a leisure app opens too often or for too long, shows a pause with a countdown on the open button. Configure it in Reseam settings. | None |
 | Skip intro | Skips the promo and terms screens and opens favorites setup. | None |
+| top.madkarma.patches.niagara.settings.niagaraSettings |  | None |
 | Unlock Pro | Unlocks Pro-only features. | None |
-| Weather widget fix | Replaces the Niagara weather service with WeatherAPI.com. Enter your API key in the weather settings. | None |
+| Weather widget fix | Replaces the Niagara weather service with WeatherAPI.com. Enter your API key in Reseam settings, opened from Niagara settings. | None |
 
 </details>
 
