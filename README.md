@@ -255,9 +255,10 @@ universal patches that work on any app. Want an app supported?
 
 | Name | Description | Version pins |
 | --- | --- | --- |
-| Disable ads | Disables in-app ads and their consent prompt. | 2.2.1, 2.4.0, 2.4.1, 2.5.0, 2.5.1, 2.5.2, 2.5.3, 2.5.4 |
-| Skip onboarding | Skips the setup screens and opens the home screen. | 2.2.1, 2.4.0, 2.4.1, 2.5.0, 2.5.1, 2.5.2, 2.5.3, 2.5.4 |
-| Unlock Lifetime Premium | Unlocks Premium-only features. | 2.2.1, 2.4.0, 2.4.1, 2.5.0, 2.5.1, 2.5.2, 2.5.3, 2.5.4 |
+| Disable ads | Disables in-app ads and their consent prompt. | 2.2.1, 2.4.0, 2.4.1, 2.5.0, 2.5.1, 2.5.2, 2.5.3, 2.5.4, 2.6.0 |
+| Remove annoyances | Removes rating prompts and their review activity. | 2.6.0 |
+| Skip onboarding | Skips the setup screens and opens the home screen. | 2.2.1, 2.4.0, 2.4.1, 2.5.0, 2.5.1, 2.5.2, 2.5.3, 2.5.4, 2.6.0 |
+| Unlock Lifetime Premium | Unlocks Premium-only features. | 2.2.1, 2.4.0, 2.4.1, 2.5.0, 2.5.1, 2.5.2, 2.5.3, 2.5.4, 2.6.0 |
 
 </details>
 
