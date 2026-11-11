@@ -31,9 +31,7 @@
         {
             "name": "arm64-v8a",
             "configurePreset": "arm64-v8a",
-            "targets": [
-                "install"
-            ]
+            "targets": ["install"]
         }
     ]
 }

@@ -1,20 +1,19 @@
 // SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-@file:JvmName("Credentials") @file:Suppress("unused")
+@file:JvmName("Credentials")
+@file:Suppress("unused")
 
 package top.madkarma.truecaller.gms
 
 import android.util.Log
 import app.reseam.runtime.Export
 
-@Export
-interface GoogleOption
+@Export interface GoogleOption
 
 @Export
 interface CredentialRequest {
-    @Export
-    fun reseamOptions(): List<*>
+    @Export fun reseamOptions(): List<*>
 }
 
 @Export
@@ -32,11 +31,9 @@ fun useModernCredentials(available: Boolean, request: Any?): Boolean =
 
 @Export
 interface CredentialProviderFactory {
-    @Export
-    fun reseamBundledProvider(): Any?
+    @Export fun reseamBundledProvider(): Any?
 
-    @Export
-    fun reseamDefaultProvider(request: Any?): Any?
+    @Export fun reseamDefaultProvider(request: Any?): Any?
 }
 
 @Export

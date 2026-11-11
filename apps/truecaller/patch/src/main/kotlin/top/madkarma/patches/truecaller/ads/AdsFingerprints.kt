@@ -7,12 +7,14 @@ import app.reseam.patch.Type
 import app.reseam.patch.klass
 import app.reseam.patch.method
 
-private val adManager = klass("adManager") {
-    strings("featureDisableGamInitForPremium", "adsFeatureHouseAdsTimeout")
-}
+private val adManager =
+    klass("adManager") {
+        strings("featureDisableGamInitForPremium", "adsFeatureHouseAdsTimeout")
+    }
 
-internal val shouldShowAds = method("shouldShowAds") {
-    inClass(adManager)
-    returns(Type.Boolean)
-    params()
-}
+internal val shouldShowAds =
+    method("shouldShowAds") {
+        inClass(adManager)
+        returns(Type.Boolean)
+        params()
+    }

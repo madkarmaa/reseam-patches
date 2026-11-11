@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top> -->
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<resources>
+    <string name="gms_core_support_description">Signs in through separately installed Reseam GmsCore.</string>
+    <string name="gms_core_support_gms_core_vendor_group_id_title">GmsCore vendor group ID</string>
+    <string name="gms_core_support_name">GmsCore support</string>
+    <string name="unlock_premium_description">Unlocks Premium-only features.</string>
+    <string name="unlock_premium_name">Unlock Lifetime Premium</string>
+</resources>

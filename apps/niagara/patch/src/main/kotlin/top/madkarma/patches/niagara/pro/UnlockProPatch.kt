@@ -7,29 +7,33 @@ package top.madkarma.patches.niagara.pro
 
 import app.reseam.patch.before
 import app.reseam.patch.patch
+import top.madkarma.patches.niagara.NiagaraPatchStrings
 import top.madkarma.patches.shared.PATCH_ATTRIBUTION
 import top.madkarma.patches.shared.setStringEverywhere
 
-val unlockPro = patch("Unlock Pro") {
-    description("Unlocks Pro-only features.")
-    compatibleWith("bitpit.launcher")
+val unlockPro =
+    patch(NiagaraPatchStrings.unlockProName) {
+        description(NiagaraPatchStrings.unlockProDescription)
+        compatibleWith("bitpit.launcher")
 
-    execute {
-        // Only the first flag grants Pro; retain the other entitlement flags.
-        proCheckerConstructor.before {
-            param(0).assign(bool(true))
+        execute {
+            // Only the first flag grants Pro; retain the other entitlement flags.
+            proCheckerConstructor.before {
+                param(0).assign(bool(true))
+            }
+
+            val thankYou =
+                resources.getString("purchase_pro_thank_you")
+                    ?: error("Unlock Pro: purchase_pro_thank_you string missing")
+
+            val tagged =
+                resources.setStringEverywhere(
+                    "purchase_pro_thank_you",
+                    "$thankYou\n\n$PATCH_ATTRIBUTION",
+                )
+            if (!tagged) error("Unlock Pro: purchase_pro_thank_you string not writable")
+            log.info("Pro: thank-you label tagged.")
+
+            log.info("Pro: unlocked via ${proCheckerConstructor.descriptor}.")
         }
-
-        val thankYou = resources.getString("purchase_pro_thank_you")
-            ?: error("Unlock Pro: purchase_pro_thank_you string missing")
-
-        val tagged = resources.setStringEverywhere(
-            "purchase_pro_thank_you",
-            "$thankYou\n\n$PATCH_ATTRIBUTION",
-        )
-        if (!tagged) error("Unlock Pro: purchase_pro_thank_you string not writable")
-        log.info("Pro: thank-you label tagged.")
-
-        log.info("Pro: unlocked via ${proCheckerConstructor.descriptor}.")
     }
-}

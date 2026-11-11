@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top> -->
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<resources>
+    <string name="unlock_family_premium_description">Unlocks Premium-only features.</string>
+    <string name="unlock_family_premium_name">Unlock Family Premium+</string>
+</resources>

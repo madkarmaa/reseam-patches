@@ -8,20 +8,23 @@ import app.reseam.patch.fieldOfType
 import app.reseam.patch.klass
 import app.reseam.patch.method
 
-private val userEntitlement = klass("userEntitlement") {
-    enumConstants("FAMILY_PREMIUM_PLUS", "SMB")
-}
+private val userEntitlement =
+    klass("userEntitlement") {
+        enumConstants("FAMILY_PREMIUM_PLUS", "SMB")
+    }
 
 private val userEntitlementValueOf = userEntitlement.method("valueOf")
 
-internal val reconcileSubscriptions = method("reconcileSubscriptions") {
-    strings("Reconciliation requested: conclusive=")
-    calls(userEntitlementValueOf)
-}
+internal val reconcileSubscriptions =
+    method("reconcileSubscriptions") {
+        strings("Reconciliation requested: conclusive=")
+        calls(userEntitlementValueOf)
+    }
 
 // The reconciliation coroutine stores its override in its only String field.
 internal val subscriptionOverride = klass(reconcileSubscriptions.owner).fieldOfType(Type.String)
 
-internal val weatherPageFinished = method("weatherPageFinished") {
-    strings("Clearing WebView History in onPageFinished()")
-}
+internal val weatherPageFinished =
+    method("weatherPageFinished") {
+        strings("Clearing WebView History in onPageFinished()")
+    }

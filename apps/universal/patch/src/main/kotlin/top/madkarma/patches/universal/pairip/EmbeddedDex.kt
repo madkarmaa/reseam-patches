@@ -3,13 +3,13 @@
 
 package top.madkarma.patches.universal.pairip
 
-import org.jf.dexlib2.AccessFlags
-import org.jf.dexlib2.dexbacked.DexBackedDexFile
-import org.jf.dexlib2.dexbacked.raw.HeaderItem
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.security.MessageDigest
 import java.util.zip.Adler32
+import org.jf.dexlib2.AccessFlags
+import org.jf.dexlib2.dexbacked.DexBackedDexFile
+import org.jf.dexlib2.dexbacked.raw.HeaderItem
 
 internal data class LiftedMethod(
     val owner: String,
@@ -17,19 +17,23 @@ internal data class LiftedMethod(
     val parameters: List<String>,
     val returnType: String,
 ) {
-    val prototype: String get() = "(${parameters.joinToString("")})$returnType"
+    val prototype: String
+        get() = "(${parameters.joinToString("")})$returnType"
 
     // Pairip's lifted static bodies take the original instance before its parameters.
-    val receiver: String get() = parameters.first()
+    val receiver: String
+        get() = parameters.first()
 }
 
 internal data class EmbeddedDex(
-    val bytes: ByteArray, val classes: Set<String>, val methods: List<LiftedMethod>
+    val bytes: ByteArray,
+    val classes: Set<String>,
+    val methods: List<LiftedMethod>,
 )
 
 internal fun extractEmbeddedDex(program: ByteArray): EmbeddedDex {
     require(
-        program.size >= 8 && program.copyOfRange(0, 4).contentEquals(byteArrayOf(0, 73, 65, 80))
+        program.size >= 8 && program.copyOfRange(0, 4).contentEquals(byteArrayOf(0, 73, 65, 80)),
     ) {
         "Pairip DEX: startup asset is not an IAP program"
     }
@@ -61,24 +65,30 @@ internal fun extractEmbeddedDex(program: ByteArray): EmbeddedDex {
         offset += size
     }
 
-    val bytes = payloads.singleOrNull()
-        ?: error("Pairip DEX: expected one embedded DEX, found ${payloads.size}; runtime-only payloads are unsupported")
+    val bytes =
+        payloads.singleOrNull()
+            ?: error(
+                "Pairip DEX: expected one embedded DEX, found ${payloads.size}; runtime-only payloads are unsupported",
+            )
 
     val dex = DexBackedDexFile(null, bytes)
-    val methods = dex.classes.flatMap { definition ->
-        definition.methods.map { method ->
-            require(AccessFlags.STATIC.isSet(method.accessFlags) && method.implementation != null) {
-                "Pairip DEX: unsupported lifted method ${definition.type}->${method.name}"
-            }
+    val methods =
+        dex.classes.flatMap { definition ->
+            definition.methods.map { method ->
+                require(
+                    AccessFlags.STATIC.isSet(method.accessFlags) && method.implementation != null,
+                ) {
+                    "Pairip DEX: unsupported lifted method ${definition.type}->${method.name}"
+                }
 
-            val parameters = method.parameterTypes.map(CharSequence::toString)
-            require(parameters.firstOrNull()?.startsWith("L") == true) {
-                "Pairip DEX: lifted method ${definition.type}->${method.name} has no receiver"
-            }
+                val parameters = method.parameterTypes.map(CharSequence::toString)
+                require(parameters.firstOrNull()?.startsWith("L") == true) {
+                    "Pairip DEX: lifted method ${definition.type}->${method.name} has no receiver"
+                }
 
-            LiftedMethod(definition.type, method.name, parameters, method.returnType)
+                LiftedMethod(definition.type, method.name, parameters, method.returnType)
+            }
         }
-    }
 
     require(methods.isNotEmpty()) { "Pairip DEX: embedded DEX has no lifted methods" }
     return EmbeddedDex(bytes, dex.classes.map { it.type }.toSet(), methods)
@@ -90,18 +100,24 @@ private fun validateDex(bytes: ByteArray) {
     val header = HeaderItem(dex)
     require(header.headerSize == HeaderItem.ITEM_SIZE) { "Pairip DEX: unsupported DEX header" }
 
-    val checksum = Adler32().apply {
-        update(
-            bytes,
-            HeaderItem.CHECKSUM_DATA_START_OFFSET,
-            bytes.size - HeaderItem.CHECKSUM_DATA_START_OFFSET
-        )
-    }.value
+    val checksum =
+        Adler32()
+            .apply {
+                update(
+                    bytes,
+                    HeaderItem.CHECKSUM_DATA_START_OFFSET,
+                    bytes.size - HeaderItem.CHECKSUM_DATA_START_OFFSET,
+                )
+            }
+            .value
     require(
-        checksum == dex.buffer.readInt(HeaderItem.CHECKSUM_OFFSET).toUInt().toLong()
-    ) { "Pairip DEX: invalid DEX checksum" }
+        checksum == dex.buffer.readInt(HeaderItem.CHECKSUM_OFFSET).toUInt().toLong(),
+    ) {
+        "Pairip DEX: invalid DEX checksum"
+    }
 
-    val digest = MessageDigest.getInstance("SHA-1")
-        .digest(bytes.copyOfRange(HeaderItem.SIGNATURE_DATA_START_OFFSET, bytes.size))
+    val digest =
+        MessageDigest.getInstance("SHA-1")
+            .digest(bytes.copyOfRange(HeaderItem.SIGNATURE_DATA_START_OFFSET, bytes.size))
     require(digest.contentEquals(header.signature)) { "Pairip DEX: invalid DEX signature" }
 }

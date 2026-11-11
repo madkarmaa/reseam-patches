@@ -1,7 +1,8 @@
 // SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-@file:JvmName("SmsVerification") @file:Suppress("unused")
+@file:JvmName("SmsVerification")
+@file:Suppress("unused")
 
 package top.madkarma.truecaller.verification
 
@@ -24,7 +25,11 @@ fun start(context: Context?) {
 @Export
 fun prepare(activity: Activity?) {
     if (activity == null || activity.isFinishing || permissionRequested) return
-    if (activity.checkSelfPermission(Manifest.permission.RECEIVE_SMS) == PackageManager.PERMISSION_GRANTED) return
+    if (
+        activity.checkSelfPermission(Manifest.permission.RECEIVE_SMS) ==
+            PackageManager.PERMISSION_GRANTED
+    )
+        return
 
     permissionRequested = true
     try {
@@ -33,7 +38,7 @@ fun prepare(activity: Activity?) {
         Log.w(
             "TruecallerSms",
             "SMS permission request failed. The app will use Google SMS retrieval.",
-            exception
+            exception,
         )
     }
 }
@@ -42,11 +47,13 @@ fun prepare(activity: Activity?) {
 fun api(): Int {
     val context = application
     val granted =
-        context?.checkSelfPermission(Manifest.permission.RECEIVE_SMS) == PackageManager.PERMISSION_GRANTED
+        context?.checkSelfPermission(Manifest.permission.RECEIVE_SMS) ==
+            PackageManager.PERMISSION_GRANTED
 
     Log.i(
         "TruecallerSms",
-        if (granted) "Using Android's SMS receiver" else "No SMS permission. Using Google SMS retrieval"
+        if (granted) "Using Android's SMS receiver"
+        else "No SMS permission. Using Google SMS retrieval",
     )
     return (if (granted) OtpSmsApi.SMS else OtpSmsApi.GOOGLE).value
 }

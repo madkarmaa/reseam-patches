@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top> -->
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<resources>
+    <string name="unlimited_accounts_description">Allows multiple free Proton Mail accounts.</string>
+    <string name="unlimited_accounts_diagnostics_description">Log native account-limit discovery and installation under the ProtonAccounts logcat tag.</string>
+    <string name="unlimited_accounts_diagnostics_title">Log diagnostics</string>
+    <string name="unlimited_accounts_name">Unlimited accounts</string>
+</resources>

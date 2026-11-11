@@ -6,12 +6,14 @@ package top.madkarma.patches.niagara.pro
 import app.reseam.patch.Type
 import app.reseam.patch.method
 
-private val decodeSession = method("decodeSession") {
-    strings("session missing")
-}
+private val decodeSession =
+    method("decodeSession") {
+        strings("session missing")
+    }
 
 // The session decoder constructs the entitlement's three Boolean flags.
-internal val proCheckerConstructor = method("proCheckerConstructor") {
-    calledBy(decodeSession)
-    params(Type.Boolean, Type.Boolean, Type.Boolean)
-}
+internal val proCheckerConstructor =
+    method("proCheckerConstructor") {
+        calledBy(decodeSession)
+        params(Type.Boolean, Type.Boolean, Type.Boolean)
+    }

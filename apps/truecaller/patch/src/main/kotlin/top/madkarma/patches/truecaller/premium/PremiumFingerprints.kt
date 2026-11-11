@@ -10,32 +10,38 @@ import app.reseam.patch.method
 
 private val premiumTier = klass("com.truecaller.premium.data.tier.PremiumTierType")
 
-internal val premiumTierGetter = method("premiumTierGetter") {
-    strings("premiumLevel")
-    returns(premiumTier.descriptor)
-}
+internal val premiumTierGetter =
+    method("premiumTierGetter") {
+        strings("premiumLevel")
+        returns(premiumTier.descriptor)
+    }
 
-internal val isPremiumActive = method("isPremiumActive") {
-    strings("isPremiumExpired")
-    custom { indexOfFirstString("isInGracePeriod") == null }
-}
+internal val isPremiumActive =
+    method("isPremiumActive") {
+        strings("isPremiumExpired")
+        custom { indexOfFirstString("isInGracePeriod") == null }
+    }
 
 private val premiumFeature = klass("com.truecaller.premium.data.feature.PremiumFeature")
 
 private val noAds = premiumFeature.field("NO_ADS")
 
-internal val featureIncluded = method("featureIncluded") {
-    strings("disabledPremiumFeatures")
-    params(premiumFeature.descriptor, Type.Boolean)
-}
+internal val featureIncluded =
+    method("featureIncluded") {
+        strings("disabledPremiumFeatures")
+        params(premiumFeature.descriptor, Type.Boolean)
+    }
 
-private val adFreeEntitlement = method("adFreeEntitlement") {
-    inClass(klass(featureIncluded.owner))
-    accesses { name(noAds.name) }
-}
+private val adFreeEntitlement =
+    method("adFreeEntitlement") {
+        inClass(klass(featureIncluded.owner))
+        accesses { name(noAds.name) }
+    }
 
-// The ad-free check calls both entitlement and catalog checks. Only the catalog check takes one feature.
-internal val featureOffered = method("featureOffered") {
-    calledBy(adFreeEntitlement)
-    params(premiumFeature.descriptor)
-}
+// The ad-free check calls both entitlement and catalog checks. Only the catalog check takes one
+// feature.
+internal val featureOffered =
+    method("featureOffered") {
+        calledBy(adFreeEntitlement)
+        params(premiumFeature.descriptor)
+    }

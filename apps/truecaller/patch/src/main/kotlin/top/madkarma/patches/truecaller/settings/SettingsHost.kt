@@ -10,40 +10,49 @@ import app.reseam.patch.settings.settingsHost
 import top.madkarma.patches.truecaller.shared.featureFlagOverrides
 import top.madkarma.truecaller.settings.bindings.SettingsEntry
 
-val truecallerSettings = settingsHost("truecaller") {
-    compatibleWith("com.truecaller")
-    dependsOn(featureFlagOverrides)
+val truecallerSettings =
+    settingsHost("truecaller") {
+        compatibleWith("com.truecaller")
+        dependsOn(featureFlagOverrides)
 
-    install {
-        val rowId =
-            resources.addId("reseam_settings_entry") ?: error("Could not add the settings row ID")
+        install {
+            val rowId =
+                resources.addId("reseam_settings_entry")
+                    ?: error("Could not add the settings row ID")
 
-        val titleId = resources.addString("reseam_settings_title", "Reseam settings")
-            ?: error("Could not add the settings title")
+            val titleId =
+                resources.addString("reseam_settings_title", "Reseam settings")
+                    ?: error("Could not add the settings title")
 
-        val generalId = resources.id("id", "item_general")
-            ?: error("Truecaller General settings row is missing")
+            val generalId =
+                resources.id("id", "item_general")
+                    ?: error("Truecaller General settings row is missing")
 
-        resources.editXml("layout", "fragment_categories") {
-            val general =
-                findByTag("TextView").single { it["android:id"]?.let(::resourceRef) == generalId }
+            resources.editXml("layout", "fragment_categories") {
+                val general =
+                    findByTag("TextView").single {
+                        it["android:id"]?.let(::resourceRef) == generalId
+                    }
 
-            val row = general.clone().apply {
-                setResourceRef("android:id", rowId)
-                setResourceRef("android:text", titleId)
+                val row =
+                    general.clone().apply {
+                        setResourceRef("android:id", rowId)
+                        setResourceRef("android:text", titleId)
+                    }
+
+                val group = general.parent ?: error("Truecaller settings group is missing")
+                group.insertBefore(row, general)
+
+                val divider =
+                    createElement("include").apply { this["layout"] = "@layout/layout_divider" }
+                group.insertBefore(divider, general)
             }
 
-            val group = general.parent ?: error("Truecaller settings group is missing")
-            group.insertBefore(row, general)
-
-            val divider =
-                createElement("include").apply { this["layout"] = "@layout/layout_divider" }
-            group.insertBefore(divider, general)
+            settingsCategoriesCreated.after {
+                SettingsEntry.bind(paramOfType(Type.View), int(rowId.toInt()))
+            }
+            log.info(
+                "Settings: ${settingsCategoriesCreated.descriptor} opens Reseam settings when its row is tapped.",
+            )
         }
-
-        settingsCategoriesCreated.after {
-            SettingsEntry.bind(paramOfType(Type.View), int(rowId.toInt()))
-        }
-        log.info("Settings: ${settingsCategoriesCreated.descriptor} opens Reseam settings when its row is tapped.")
     }
-}

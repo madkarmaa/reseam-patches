@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top> -->
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<resources>
+    <string name="remove_ads_description">Removes banner, native, and interstitial ads.</string>
+    <string name="remove_ads_name">Remove ads</string>
+    <string name="remove_pur_popups_description">Skips the consent screen that advertises Kleinanzeigen Pur, without giving tracking consent.</string>
+    <string name="remove_pur_popups_name">Remove Pur popups</string>
+    <string name="remove_share_tracking_description">Removes tracking parameters from shared ad, seller, profile, and search links.</string>
+    <string name="remove_share_tracking_name">Remove share tracking</string>
+</resources>

@@ -2,7 +2,8 @@
 // SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-@file:JvmName("HiddenPackagesApi28") @file:Suppress("unused")
+@file:JvmName("HiddenPackagesApi28")
+@file:Suppress("unused")
 
 package dev.secp192k1.universal.hidepackages
 
@@ -17,11 +18,12 @@ fun hasSigningCertificate(
     certificate: ByteArray,
     type: Int,
 ): Boolean {
-    return !isHidden(packageName) && packageManager.hasSigningCertificate(
-        packageName,
-        certificate,
-        type,
-    )
+    return !isHidden(packageName) &&
+        packageManager.hasSigningCertificate(
+            packageName,
+            certificate,
+            type,
+        )
 }
 
 @Export(name = "hasSigningCertificateForUid")

@@ -14,48 +14,57 @@ import app.reseam.patch.types.NewMethod
 
 internal val pairipStartup = klass("com.pairip.StartupLauncher").method("launch")
 
-internal fun signatureAttachContext(): MethodTarget = methodTarget("signatureAttachContext") {
-    val applicationName =
-        manifest.applicationClass ?: error("SignatureKiller: manifest has no Application class")
+internal fun signatureAttachContext(): MethodTarget =
+    methodTarget("signatureAttachContext") {
+        val applicationName =
+            manifest.applicationClass ?: error("SignatureKiller: manifest has no Application class")
 
-    val application = klass(applicationName).classDef
+        val application = klass(applicationName).classDef
 
-    val prototype = "(Landroid/content/Context;)V"
+        val prototype = "(Landroid/content/Context;)V"
 
-    application.method("attachBaseContext", prototype)?.let {
-        log.info("SignatureKiller: $applicationName declares attachBaseContext.")
-        return@methodTarget it
-    }
+        application.method("attachBaseContext", prototype)?.let {
+            log.info("SignatureKiller: $applicationName declares attachBaseContext.")
+            return@methodTarget it
+        }
 
-    val inherited = application.superclassChain.firstNotNullOfOrNull {
-        it.method(
-            "attachBaseContext", prototype
+        val inherited =
+            application.superclassChain.firstNotNullOfOrNull {
+                it.method(
+                    "attachBaseContext",
+                    prototype,
+                )
+            }
+        if (inherited != null && AccessFlags.FINAL.isSet(inherited.info.accessFlags)) {
+            log.info(
+                "SignatureKiller: $applicationName inherits a final attachBaseContext from ${inherited.owner}.",
+            )
+            return@methodTarget inherited
+        }
+
+        val superclass =
+            application.superclass ?: error("SignatureKiller: Application has no superclass")
+        log.info(
+            "SignatureKiller: $applicationName adds an attachBaseContext override that calls $superclass first.",
+        )
+
+        // The DSL hooks existing methods; an inherited platform method needs a forwarding override
+        // first.
+        application.addMethod(
+            NewMethod(
+                name = "attachBaseContext",
+                proto = prototype,
+                accessFlags = AccessFlags.PROTECTED.toUInt(),
+                registersSize = 2u,
+                insSize = 2u,
+                outsSize = 2u,
+                instructions =
+                    buildInstructions {
+                        invokeSuper(superclass, "attachBaseContext", prototype, 0, 1)
+                        returnVoid()
+                    },
+                tries = emptyList(),
+                catchHandlers = emptyList(),
+            ),
         )
     }
-    if (inherited != null && AccessFlags.FINAL.isSet(inherited.info.accessFlags)) {
-        log.info("SignatureKiller: $applicationName inherits a final attachBaseContext from ${inherited.owner}.")
-        return@methodTarget inherited
-    }
-
-    val superclass =
-        application.superclass ?: error("SignatureKiller: Application has no superclass")
-    log.info("SignatureKiller: $applicationName adds an attachBaseContext override that calls $superclass first.")
-
-    // The DSL hooks existing methods; an inherited platform method needs a forwarding override first.
-    application.addMethod(
-        NewMethod(
-            name = "attachBaseContext",
-            proto = prototype,
-            accessFlags = AccessFlags.PROTECTED.toUInt(),
-            registersSize = 2u,
-            insSize = 2u,
-            outsSize = 2u,
-            instructions = buildInstructions {
-                invokeSuper(superclass, "attachBaseContext", prototype, 0, 1)
-                returnVoid()
-            },
-            tries = emptyList(),
-            catchHandlers = emptyList()
-        )
-    )
-}

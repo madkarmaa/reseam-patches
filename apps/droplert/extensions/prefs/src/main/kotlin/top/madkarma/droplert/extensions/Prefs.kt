@@ -1,7 +1,8 @@
 // SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-@file:JvmName("Prefs") @file:Suppress("unused")
+@file:JvmName("Prefs")
+@file:Suppress("unused")
 
 package top.madkarma.droplert.extensions
 
@@ -31,15 +32,17 @@ fun putBoolean(context: Context, key: String, value: Boolean) {
 
 private fun mergeKey(file: File, key: String, value: PreferencesProto.Value) {
     try {
-        val preferences = if (file.isFile) {
-            val length = file.length()
-            if (length > 1 shl 20) throw IOException("preferences file implausibly large: $length")
+        val preferences =
+            if (file.isFile) {
+                val length = file.length()
+                if (length > 1 shl 20)
+                    throw IOException("preferences file implausibly large: $length")
 
-            val data = ByteArray(length.toInt())
-            DataInputStream(file.inputStream()).use { it.readFully(data) }
+                val data = ByteArray(length.toInt())
+                DataInputStream(file.inputStream()).use { it.readFully(data) }
 
-            PreferencesProto.PreferenceMap.parseFrom(data).toBuilder()
-        } else PreferencesProto.PreferenceMap.newBuilder()
+                PreferencesProto.PreferenceMap.parseFrom(data).toBuilder()
+            } else PreferencesProto.PreferenceMap.newBuilder()
 
         preferences.putPreferences(key, value)
 

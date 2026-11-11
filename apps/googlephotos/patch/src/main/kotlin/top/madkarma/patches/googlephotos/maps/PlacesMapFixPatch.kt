@@ -12,24 +12,32 @@ import top.madkarma.googlephotos.maps.bindings.MapTiles
 import top.madkarma.googlephotos.settings.GooglePhotosSettings
 import top.madkarma.googlephotos.settings.GooglePhotosStrings
 import top.madkarma.patches.googlephotos.GOOGLE_PHOTOS
+import top.madkarma.patches.googlephotos.GooglePhotosPatchStrings
 import top.madkarma.patches.googlephotos.gms.gmsCoreSupport
 import top.madkarma.patches.googlephotos.settings.googlePhotosSettings
 
-val placesMapFix = patch("Places map fix") {
-    description("Enter a Mapbox access token in Reseam settings to show map tiles in Places and photo-detail maps.")
-    compatibleWith(GOOGLE_PHOTOS)
-    dependsOn(gmsCoreSupport)
+val placesMapFix =
+    patch(GooglePhotosPatchStrings.placesMapFixName) {
+        description(
+            GooglePhotosPatchStrings.placesMapFixDescription,
+        )
+        compatibleWith(GOOGLE_PHOTOS)
+        dependsOn(gmsCoreSupport)
 
-    settings(
-        googlePhotosSettings,
-        section(GooglePhotosStrings.sectionMaps, GooglePhotosSettings.mapboxAccessToken),
-    )
+        settings(
+            googlePhotosSettings,
+            section(GooglePhotosStrings.sectionMaps, GooglePhotosSettings.mapboxAccessToken),
+        )
 
-    execute {
-        mapsModuleContext.after { call(MapTiles.rememberMapsContext, result) }
-        log.info("Places map fix: ${mapsModuleContext.descriptor} remembers GmsCore's map renderer.")
+        execute {
+            mapsModuleContext.after { call(MapTiles.rememberMapsContext, result) }
+            log.info(
+                "Places map fix: ${mapsModuleContext.descriptor} remembers GmsCore's map renderer.",
+            )
 
-        mapLifecycleCallback.after { call(MapTiles.applyAccessToken) }
-        log.info("Places map fix: ${mapLifecycleCallback.descriptor} gives each new map a Mapbox key.")
+            mapLifecycleCallback.after { call(MapTiles.applyAccessToken) }
+            log.info(
+                "Places map fix: ${mapLifecycleCallback.descriptor} gives each new map a Mapbox key.",
+            )
+        }
     }
-}

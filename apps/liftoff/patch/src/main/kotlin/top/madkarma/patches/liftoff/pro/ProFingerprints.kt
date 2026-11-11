@@ -10,9 +10,11 @@ import app.reseam.patch.method
 internal val revenueCatEntitlementIsActive =
     klass("com.revenuecat.purchases.EntitlementInfo").method("isActive")
 
-internal val revenueCatEntitlementsMapper = klass(
-    "com.revenuecat.purchases.hybridcommon.mappers.EntitlementInfosMapperKt"
-).method("map")
+internal val revenueCatEntitlementsMapper =
+    klass(
+            "com.revenuecat.purchases.hybridcommon.mappers.EntitlementInfosMapperKt",
+        )
+        .method("map")
 
 internal val revenueCatActiveSubscriptions =
     klass("com.revenuecat.purchases.CustomerInfo").method("getActiveSubscriptions")

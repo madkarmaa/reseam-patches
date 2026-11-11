@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top> -->
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<resources>
+    <string name="allow_locked_preset_export_description">Allows exporting author-locked KWGT presets.</string>
+    <string name="allow_locked_preset_export_name">Allow locked preset export</string>
+    <string name="unlock_pro_description">Unlocks Pro-only features.</string>
+    <string name="unlock_pro_name">Unlock Pro</string>
+</resources>

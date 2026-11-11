@@ -9,3 +9,5 @@ dependencies {
     compileOnly(project(":apps:universal:patch"))
     compileOnly(project(":apps:shared:patch"))
 }
+
+reseamStrings { objectName = "top.madkarma.patches.picsart.PicsartPatchStrings" }

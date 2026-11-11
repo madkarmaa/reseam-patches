@@ -1,7 +1,8 @@
 // SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-@file:JvmName("NiagaraSetup") @file:Suppress("unused")
+@file:JvmName("NiagaraSetup")
+@file:Suppress("unused")
 
 package top.madkarma.extensions
 
@@ -45,6 +46,9 @@ fun refuseAnalytics(context: Context) {
 @Suppress("UseKtx")
 @Export
 fun disableAnalyticsFlags(context: Context) {
-    prefs(context).edit().putBoolean(KEY_MARKETING_ANALYTICS_ENABLED, false)
-        .putBoolean(KEY_ANALYTICS, false).apply()
+    prefs(context)
+        .edit()
+        .putBoolean(KEY_MARKETING_ANALYTICS_ENABLED, false)
+        .putBoolean(KEY_ANALYTICS, false)
+        .apply()
 }

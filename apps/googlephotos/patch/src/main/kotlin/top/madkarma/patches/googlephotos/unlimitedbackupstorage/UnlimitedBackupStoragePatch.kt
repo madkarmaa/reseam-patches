@@ -11,81 +11,108 @@ import app.reseam.patch.dex.stringValue
 import app.reseam.patch.patch
 import top.madkarma.googlephotos.spoof.bindings.PixelXlIdentity
 import top.madkarma.patches.googlephotos.GOOGLE_PHOTOS
+import top.madkarma.patches.googlephotos.GooglePhotosPatchStrings
 import top.madkarma.patches.shared.isPresent
 
-private val ORIGINAL_PIXEL_FEATURES = setOf(
-    "$GOOGLE_PHOTOS.NEXUS_PRELOAD",
-    "$GOOGLE_PHOTOS.nexus_preload",
-    "com.google.android.feature.PIXEL_EXPERIENCE",
-    "$GOOGLE_PHOTOS.PIXEL_PRELOAD",
-    "$GOOGLE_PHOTOS.PIXEL_2016_PRELOAD",
-)
+private val ORIGINAL_PIXEL_FEATURES =
+    setOf(
+        "$GOOGLE_PHOTOS.NEXUS_PRELOAD",
+        "$GOOGLE_PHOTOS.nexus_preload",
+        "com.google.android.feature.PIXEL_EXPERIENCE",
+        "$GOOGLE_PHOTOS.PIXEL_PRELOAD",
+        "$GOOGLE_PHOTOS.PIXEL_2016_PRELOAD",
+    )
 
-private val NEWER_PIXEL_FEATURE = Regex(
-    "com\\.google\\.android\\.feature\\.PIXEL_20(?:1[7-9]|[2-9][0-9])(?:_MIDYEAR)?_EXPERIENCE|" + "com\\.google\\.android\\.apps\\.photos\\.PIXEL_20(?:1[7-9]|[2-9][0-9])(?:_MIDYEAR)?_PRELOAD",
-)
+private val NEWER_PIXEL_FEATURE =
+    Regex(
+        "com\\.google\\.android\\.feature\\.PIXEL_20(?:1[7-9]|[2-9][0-9])(?:_MIDYEAR)?_EXPERIENCE|" +
+            "com\\.google\\.android\\.apps\\.photos\\.PIXEL_20(?:1[7-9]|[2-9][0-9])(?:_MIDYEAR)?_PRELOAD",
+    )
 
-private val PIXEL_XL_FIELDS = mapOf(
-    "BRAND" to "google",
-    "MANUFACTURER" to "Google",
-    "BOARD" to "marlin",
-    "DEVICE" to "marlin",
-    "PRODUCT" to "marlin",
-    "HARDWARE" to "marlin",
-    "MODEL" to "Pixel XL",
-    "ID" to "QP1A.191005.007.A3",
-    "DISPLAY" to "QP1A.191005.007.A3",
-    "FINGERPRINT" to "google/marlin/marlin:10/QP1A.191005.007.A3/5972272:user/release-keys",
-    "TAGS" to "release-keys",
-    "TYPE" to "user",
-    "USER" to "android-build",
-)
+private val PIXEL_XL_FIELDS =
+    mapOf(
+        "BRAND" to "google",
+        "MANUFACTURER" to "Google",
+        "BOARD" to "marlin",
+        "DEVICE" to "marlin",
+        "PRODUCT" to "marlin",
+        "HARDWARE" to "marlin",
+        "MODEL" to "Pixel XL",
+        "ID" to "QP1A.191005.007.A3",
+        "DISPLAY" to "QP1A.191005.007.A3",
+        "FINGERPRINT" to "google/marlin/marlin:10/QP1A.191005.007.A3/5972272:user/release-keys",
+        "TAGS" to "release-keys",
+        "TYPE" to "user",
+        "USER" to "android-build",
+    )
 
-val unlimitedBackupStorage = patch("Unlimited backup storage") {
-    description("Reports a Pixel XL device identity to request Google's unlimited backup storage offer.")
-    compatibleWith(GOOGLE_PHOTOS)
-
-    execute {
-        val features =
-            initializePixelFeatures.method.instructions.mapNotNull { it.stringValue }.toSet()
-
-        val enabled = features.intersect(ORIGINAL_PIXEL_FEATURES)
-
-        val disabled =
-            features.filter { it !in ORIGINAL_PIXEL_FEATURES && NEWER_PIXEL_FEATURE.matches(it) }
-
-        check(enabled.isNotEmpty() && disabled.isNotEmpty()) { "Unsupported Pixel feature catalogue" }
-
-        enabled.forEach { initializePixelFeatures.method.replaceAllStrings(it, "android.hardware.wifi") }
-        disabled.forEach { initializePixelFeatures.method.replaceAllStrings(it, "dummy") }
-        log.info("Unlimited backup storage: ${initializePixelFeatures.descriptor} selects the original Pixel offer.")
-
-        // Override values at their read sites; Android 17 refuses reflective writes to final Build fields.
-        val readTargets =
-            if (isPresent(pixelBackupSettings)) deviceIdentityReads + pixelBackupIdentityReads
-            else deviceIdentityReads
-
-        val identityReads = readTargets.flatMap { target ->
-            target.all.filter { it.field().name in PIXEL_XL_FIELDS }.also {
-                check(it.isNotEmpty()) { "No Google Photos device identity reads matched ${target.debugName}" }
-            }
-        }
-
-        for (read in identityReads) {
-            val value = PIXEL_XL_FIELDS.getValue(read.field().name)
-            read.captureAs("identity", Type.String)
-                .after { capture("identity").assign(string(value)) }
-        }
-        for (target in identityReads.map { it.method.descriptor }.distinct())
-            log.info("Unlimited backup storage: $target reads the Pixel XL identity.")
-
-        val properties =
-            bytecode.redirectCalls("android.os.SystemProperties", "get", PixelXlIdentity.get)
-
-        val propertiesWithDefault = bytecode.redirectCalls(
-            "android.os.SystemProperties", "get", PixelXlIdentity.getWithDefault,
+val unlimitedBackupStorage =
+    patch(GooglePhotosPatchStrings.unlimitedBackupStorageName) {
+        description(
+            GooglePhotosPatchStrings.unlimitedBackupStorageDescription,
         )
+        compatibleWith(GOOGLE_PHOTOS)
 
-        log.info("Unlimited backup storage: spoofed ${identityReads.size} Build reads, enabled ${enabled.size}, disabled ${disabled.size} features; redirected ${properties + propertiesWithDefault} property reads.")
+        execute {
+            val features =
+                initializePixelFeatures.method.instructions.mapNotNull { it.stringValue }.toSet()
+
+            val enabled = features.intersect(ORIGINAL_PIXEL_FEATURES)
+
+            val disabled = features.filter {
+                it !in ORIGINAL_PIXEL_FEATURES && NEWER_PIXEL_FEATURE.matches(it)
+            }
+
+            check(enabled.isNotEmpty() && disabled.isNotEmpty()) {
+                "Unsupported Pixel feature catalogue"
+            }
+
+            enabled.forEach {
+                initializePixelFeatures.method.replaceAllStrings(it, "android.hardware.wifi")
+            }
+            disabled.forEach { initializePixelFeatures.method.replaceAllStrings(it, "dummy") }
+            log.info(
+                "Unlimited backup storage: ${initializePixelFeatures.descriptor} selects the original Pixel offer.",
+            )
+
+            // Override values at their read sites; Android 17 refuses reflective writes to final
+            // Build fields.
+            val readTargets =
+                if (isPresent(pixelBackupSettings)) deviceIdentityReads + pixelBackupIdentityReads
+                else deviceIdentityReads
+
+            val identityReads = readTargets.flatMap { target ->
+                target.all
+                    .filter { it.field().name in PIXEL_XL_FIELDS }
+                    .also {
+                        check(it.isNotEmpty()) {
+                            "No Google Photos device identity reads matched ${target.debugName}"
+                        }
+                    }
+            }
+
+            for (read in identityReads) {
+                val value = PIXEL_XL_FIELDS.getValue(read.field().name)
+                read.captureAs("identity", Type.String).after {
+                    capture("identity").assign(string(value))
+                }
+            }
+            for (target in identityReads.map { it.method.descriptor }.distinct()) log.info(
+                "Unlimited backup storage: $target reads the Pixel XL identity.",
+            )
+
+            val properties =
+                bytecode.redirectCalls("android.os.SystemProperties", "get", PixelXlIdentity.get)
+
+            val propertiesWithDefault =
+                bytecode.redirectCalls(
+                    "android.os.SystemProperties",
+                    "get",
+                    PixelXlIdentity.getWithDefault,
+                )
+
+            log.info(
+                "Unlimited backup storage: spoofed ${identityReads.size} Build reads, enabled ${enabled.size}, disabled ${disabled.size} features; redirected ${properties + propertiesWithDefault} property reads.",
+            )
+        }
     }
-}

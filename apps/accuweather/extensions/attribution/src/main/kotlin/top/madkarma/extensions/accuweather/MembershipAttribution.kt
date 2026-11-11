@@ -1,7 +1,8 @@
 // SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-@file:JvmName("MembershipAttribution") @file:Suppress("unused")
+@file:JvmName("MembershipAttribution")
+@file:Suppress("unused")
 
 package top.madkarma.extensions.accuweather
 
@@ -15,7 +16,8 @@ fun install(webView: WebView?, attribution: String?) {
     if (webView == null) return
 
     try {
-        val script = """
+        val script =
+            """
             (() => {
               if (window.reseamMembershipAttribution) return;
 
@@ -57,7 +59,9 @@ fun install(webView: WebView?, attribution: String?) {
 
               replaceMessage(document.body);
             })();
-            """.trimIndent().format(JSONObject.quote(attribution)) + "\n"
+            """
+                .trimIndent()
+                .format(JSONObject.quote(attribution)) + "\n"
         webView.evaluateJavascript(script, null)
     } catch (exception: RuntimeException) {
         Log.w("ReseamAccuWeather", "Could not install membership attribution", exception)

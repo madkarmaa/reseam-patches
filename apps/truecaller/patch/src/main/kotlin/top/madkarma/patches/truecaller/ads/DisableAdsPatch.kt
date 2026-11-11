@@ -7,13 +7,15 @@ package top.madkarma.patches.truecaller.ads
 
 import app.reseam.patch.alwaysReturn
 import app.reseam.patch.patch
+import top.madkarma.patches.truecaller.TruecallerPatchStrings
 
-val disableAds = patch("Disable ads") {
-    description("Disables in-app ads.")
-    compatibleWith("com.truecaller")
+val disableAds =
+    patch(TruecallerPatchStrings.disableAdsName) {
+        description(TruecallerPatchStrings.disableAdsDescription)
+        compatibleWith("com.truecaller")
 
-    execute {
-        shouldShowAds.alwaysReturn(false)
-        log.info("Ads: ${shouldShowAds.descriptor} disables ads.")
+        execute {
+            shouldShowAds.alwaysReturn(false)
+            log.info("Ads: ${shouldShowAds.descriptor} disables ads.")
+        }
     }
-}

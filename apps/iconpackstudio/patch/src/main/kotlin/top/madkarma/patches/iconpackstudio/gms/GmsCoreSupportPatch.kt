@@ -6,99 +6,125 @@
 package top.madkarma.patches.iconpackstudio.gms
 
 import app.reseam.patch.*
+import top.madkarma.patches.iconpackstudio.IconPackStudioPatchStrings
 import top.madkarma.patches.shared.gmscore.signInThroughGmsCore
 import top.madkarma.patches.shared.originalSignerSha1
 import top.madkarma.shared.gmscore.bindings.GmsCore
 
-val gmsCoreSupport = patch("GmsCore support") {
-    description("Uses separately installed Reseam GmsCore for Google sign-in and Drive authorization.")
-    compatibleWith("ginlemon.iconpackstudio")
+val gmsCoreSupport =
+    patch(IconPackStudioPatchStrings.gmsCoreSupportName) {
+        description(
+            IconPackStudioPatchStrings.gmsCoreSupportDescription,
+        )
+        compatibleWith("ginlemon.iconpackstudio")
 
-    val vendorGroupId = stringOption(
-        "gmsCoreVendorGroupId",
-        title = "GmsCore vendor group ID",
-        default = "app.reseam",
-        required = true,
-    )
-
-    execute {
-        val vendor = options[vendorGroupId]
-        require(
-            Regex("[A-Za-z][A-Za-z0-9_]*(?:\\.[A-Za-z][A-Za-z0-9_]*)+").matches(vendor) && !vendor.endsWith(
-                ".android.gms"
+        val vendorGroupId =
+            stringOption(
+                "gmsCoreVendorGroupId",
+                title = IconPackStudioPatchStrings.gmsCoreSupportGmsCoreVendorGroupIdTitle,
+                default = "app.reseam",
+                required = true,
             )
-        ) { "gmsCoreVendorGroupId must be a vendor group such as app.reseam" }
-        val gmsPackage = "$vendor.android.gms"
 
-        signInThroughGmsCore(vendor)
-
-        serviceConfigurationConstructor.before {
-            // The constructor takes the destination package, service action, and dynamic-lookup flag.
-            val packageOverride = call(GmsCore.servicePackageOverride, param(1))
-
-            whenNotNull(packageOverride) {
-                param(0).assign(packageOverride)
-                param(1).assign(call(GmsCore.serviceAction, param(1)))
-                paramOfType(Type.Boolean).assign(bool(false))
-            }
-        }
-        log.info("GmsCore: ${serviceConfigurationConstructor.descriptor} binds authentication services directly to $gmsPackage.")
-
-        requiresPlayServices.before {
-            whenNotNull(
-                call(GmsCore.servicePackageOverride, thisObject.call(serviceAction))
+        execute {
+            val vendor = options[vendorGroupId]
+            require(
+                Regex("[A-Za-z][A-Za-z0-9_]*(?:\\.[A-Za-z][A-Za-z0-9_]*)+").matches(vendor) &&
+                    !vendor.endsWith(
+                        ".android.gms",
+                    ),
             ) {
-                returnFalse()
+                "gmsCoreVendorGroupId must be a vendor group such as app.reseam"
             }
-        }
-        log.info("GmsCore: ${requiresPlayServices.descriptor} accepts GmsCore for authentication clients.")
+            val gmsPackage = "$vendor.android.gms"
 
-        // Android 14+ otherwise selects the platform provider, outside the redirected GMS client.
-        selectCredentialProvider.replace {
-            returnValue(
-                paramOfType(credentialProviderFromManifest.owner).call(
-                    credentialProviderFromManifest
-                )
+            signInThroughGmsCore(vendor)
+
+            serviceConfigurationConstructor.before {
+                // The constructor takes the destination package, service action, and dynamic-lookup
+                // flag.
+                val packageOverride = call(GmsCore.servicePackageOverride, param(1))
+
+                whenNotNull(packageOverride) {
+                    param(0).assign(packageOverride)
+                    param(1).assign(call(GmsCore.serviceAction, param(1)))
+                    paramOfType(Type.Boolean).assign(bool(false))
+                }
+            }
+            log.info(
+                "GmsCore: ${serviceConfigurationConstructor.descriptor} binds authentication services directly to $gmsPackage.",
             )
-        }
-        log.info("GmsCore: ${selectCredentialProvider.descriptor} selects the bundled AndroidX credential provider.")
 
-        credentialsAvailable.alwaysReturn(true)
-        log.info("GmsCore: ${credentialsAvailable.descriptor} enables credentials through GmsCore.")
+            requiresPlayServices.before {
+                whenNotNull(
+                    call(GmsCore.servicePackageOverride, thisObject.call(serviceAction)),
+                ) {
+                    returnFalse()
+                }
+            }
+            log.info(
+                "GmsCore: ${requiresPlayServices.descriptor} accepts GmsCore for authentication clients.",
+            )
 
-        val accountTypes = googleAccountTypes.all
-        check(accountTypes.isNotEmpty()) { "Google account types not found" }
+            // Android 14+ otherwise selects the platform provider, outside the redirected GMS
+            // client.
+            selectCredentialProvider.replace {
+                returnValue(
+                    paramOfType(credentialProviderFromManifest.owner)
+                        .call(
+                            credentialProviderFromManifest,
+                        ),
+                )
+            }
+            log.info(
+                "GmsCore: ${selectCredentialProvider.descriptor} selects the bundled AndroidX credential provider.",
+            )
 
-        for (target in accountTypes) {
-            check(target.method.replaceAllStrings("com.google", vendor) > 0)
-            log.info("GmsCore: ${target.descriptor} uses the GmsCore account type.")
-        }
+            credentialsAvailable.alwaysReturn(true)
+            log.info(
+                "GmsCore: ${credentialsAvailable.descriptor} enables credentials through GmsCore.",
+            )
 
-        // Authenticate with the original app identity instead of the bundle signer.
-        val originalSignature = originalSignerSha1()
-        log.info("GmsCore: presents the original signing certificate $originalSignature.")
+            val accountTypes = googleAccountTypes.all
+            check(accountTypes.isNotEmpty()) { "Google account types not found" }
 
-        manifest.addPermission("org.microg.gms.permission.FAKE_PACKAGE_SIGNATURE")
-        manifest.addPermission("$vendor.org.microg.gms.EXTENDED_ACCESS")
+            for (target in accountTypes) {
+                check(target.method.replaceAllStrings("com.google", vendor) > 0)
+                log.info("GmsCore: ${target.descriptor} uses the GmsCore account type.")
+            }
 
-        manifest.edit {
-            val queries = findByTag("queries").singleOrNull()
-                ?: createElement("queries").also { root.appendChild(it) }
+            // Authenticate with the original app identity instead of the bundle signer.
+            val originalSignature = originalSignerSha1()
+            log.info("GmsCore: presents the original signing certificate $originalSignature.")
 
-            queries.appendChild(createElement("package").apply {
-                this["android:name"] = gmsPackage
-            })
+            manifest.addPermission("org.microg.gms.permission.FAKE_PACKAGE_SIGNATURE")
+            manifest.addPermission("$vendor.org.microg.gms.EXTENDED_ACCESS")
 
-            val application = findByTag("application").singleOrNull()
-                ?: error("Icon Pack Studio Application is missing")
-            for ((name, value) in mapOf(
-                "$gmsPackage.SPOOFED_PACKAGE_NAME" to "ginlemon.iconpackstudio",
-                "$gmsPackage.SPOOFED_PACKAGE_SIGNATURE" to originalSignature,
-                "$vendor.MICROG_PACKAGE_NAME" to gmsPackage,
-            )) application.appendChild(createElement("meta-data").apply {
-                this["android:name"] = name
-                this["android:value"] = value
-            })
+            manifest.edit {
+                val queries =
+                    findByTag("queries").singleOrNull()
+                        ?: createElement("queries").also { root.appendChild(it) }
+
+                queries.appendChild(
+                    createElement("package").apply {
+                        this["android:name"] = gmsPackage
+                    },
+                )
+
+                val application =
+                    findByTag("application").singleOrNull()
+                        ?: error("Icon Pack Studio Application is missing")
+                for ((name, value) in
+                    mapOf(
+                        "$gmsPackage.SPOOFED_PACKAGE_NAME" to "ginlemon.iconpackstudio",
+                        "$gmsPackage.SPOOFED_PACKAGE_SIGNATURE" to originalSignature,
+                        "$vendor.MICROG_PACKAGE_NAME" to gmsPackage,
+                    )) application.appendChild(
+                    createElement("meta-data").apply {
+                        this["android:name"] = name
+                        this["android:value"] = value
+                    },
+                )
+            }
         }
     }
-}

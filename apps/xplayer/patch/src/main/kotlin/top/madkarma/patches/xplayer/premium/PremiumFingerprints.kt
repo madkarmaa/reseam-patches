@@ -7,40 +7,47 @@ import app.reseam.patch.Type
 import app.reseam.patch.klass
 import app.reseam.patch.method
 
-private val billingStartup = method("billingStartup") {
-    strings("Pro_UpgPre251")
-}
-
-internal val booleanPreference = method("booleanPreference") {
-    calledBy(billingStartup)
-    calls {
-        owner("android.content.SharedPreferences")
-        name("getBoolean")
+private val billingStartup =
+    method("billingStartup") {
+        strings("Pro_UpgPre251")
     }
-}
 
-private val purchaseScreen = klass("purchaseScreen") {
-    strings("clLifetime")
-}
+internal val booleanPreference =
+    method("booleanPreference") {
+        calledBy(billingStartup)
+        calls {
+            owner("android.content.SharedPreferences")
+            name("getBoolean")
+        }
+    }
 
-private val purchaseStateChanged = method("purchaseStateChanged") {
-    inClass(purchaseScreen)
-    strings("state")
-}
+private val purchaseScreen =
+    klass("purchaseScreen") {
+        strings("clLifetime")
+    }
 
-private val cachedPremium = method("cachedPremium") {
-    calledBy(purchaseStateChanged)
-    returns(Type.Boolean)
-}
+private val purchaseStateChanged =
+    method("purchaseStateChanged") {
+        inClass(purchaseScreen)
+        strings("state")
+    }
 
-internal val updateCachedPremium = method("updateCachedPremium") {
-    inClass(klass(cachedPremium.owner))
-    calledBy(billingStartup)
-    hasParam(Type.Boolean)
-}
+private val cachedPremium =
+    method("cachedPremium") {
+        calledBy(purchaseStateChanged)
+        returns(Type.Boolean)
+    }
 
-internal val purchaseStateConstructor = method("purchaseStateConstructor") {
-    inClass(klass(cachedPremium.owner))
-    name("<init>")
-    params()
-}
+internal val updateCachedPremium =
+    method("updateCachedPremium") {
+        inClass(klass(cachedPremium.owner))
+        calledBy(billingStartup)
+        hasParam(Type.Boolean)
+    }
+
+internal val purchaseStateConstructor =
+    method("purchaseStateConstructor") {
+        inClass(klass(cachedPremium.owner))
+        name("<init>")
+        params()
+    }

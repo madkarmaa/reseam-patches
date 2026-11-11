@@ -16,14 +16,16 @@ internal val settingsMenuItems = settingsMenu.fieldOfType("Ljava/util/List;")
 
 // Nested screens show bare menus; only the main page wraps its menu in a page state.
 internal val settingsPageConstructor =
-    klass("settingsPage") { strings("SettingsPageUiState(menuData=") }.method("<init>") {
-        hasParam(settingsMenu.descriptor)
-    }
+    klass("settingsPage") { strings("SettingsPageUiState(menuData=") }
+        .method("<init>") {
+            hasParam(settingsMenu.descriptor)
+        }
 
 // Nested screens such as Preferences route their rows through their own destination enum.
-internal val nestedSettingsDestination = klass("nestedSettingsDestination") {
-    enumConstants("GridControls", "NearDupes", "Memories")
-}
+internal val nestedSettingsDestination =
+    klass("nestedSettingsDestination") {
+        enumConstants("GridControls", "NearDupes", "Memories")
+    }
 
 // The main screen's navigation, which only ever receives its own destination enum.
 internal val settingsNavigation = method("settingsNavigation") { strings("Unknown activity class") }

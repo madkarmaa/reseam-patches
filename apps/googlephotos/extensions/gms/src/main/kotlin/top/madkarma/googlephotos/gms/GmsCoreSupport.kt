@@ -3,7 +3,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Reseam-derived material: see NOTICE for applicable section 7 terms.
 
-@file:JvmName("GmsCoreSupport") @file:Suppress("unused")
+@file:JvmName("GmsCoreSupport")
+@file:Suppress("unused")
 
 package top.madkarma.googlephotos.gms
 
@@ -41,14 +42,11 @@ private const val MEDIA_PERMISSION_HANDLED = "media_permission_handled"
 private val accountRefreshExecutor = Executors.newSingleThreadExecutor()
 private val accountsListeners = CopyOnWriteArrayList<WeakReference<OnAccountsUpdateListener>>()
 
-@Volatile
-private var accountAccessRequest: Callable<*>? = null
+@Volatile private var accountAccessRequest: Callable<*>? = null
 
-@Volatile
-private var accountAccessRejected = false
+@Volatile private var accountAccessRejected = false
 
-@Volatile
-private var foregroundActivity = WeakReference<Activity>(null)
+@Volatile private var foregroundActivity = WeakReference<Activity>(null)
 private var permissionRequestActivity = WeakReference<Activity>(null)
 private var activePrompt = WeakReference<AlertDialog>(null)
 
@@ -57,8 +55,7 @@ fun initialize(request: Callable<*>?) {
     accountAccessRequest = request
 }
 
-@Export
-fun getAccountRefreshExecutor(): ExecutorService = accountRefreshExecutor
+@Export fun getAccountRefreshExecutor(): ExecutorService = accountRefreshExecutor
 
 @Export
 fun withPackageName(context: Context, packageName: String): Context =
@@ -77,7 +74,8 @@ fun check(activity: Activity, packageName: String, vendor: String) {
                 activity,
                 "GmsCore is not installed",
                 "Google Photos needs GmsCore ($packageName) to sign in. Install it, open it once and grant its permissions.",
-                // Reseam publishes only its own GmsCore; other vendor groups come from their own publishers.
+                // Reseam publishes only its own GmsCore; other vendor groups come from their own
+                // publishers.
                 "Get GmsCore".takeIf { vendor == RESEAM_VENDOR },
             ) {
                 open(
@@ -110,8 +108,8 @@ fun check(activity: Activity, packageName: String, vendor: String) {
                 "Open settings",
             ) {
                 var intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
-                if (intent.resolveActivity(activity.packageManager) == null) intent =
-                    Intent(Settings.ACTION_SETTINGS)
+                if (intent.resolveActivity(activity.packageManager) == null)
+                    intent = Intent(Settings.ACTION_SETTINGS)
                 open(activity, intent)
             }
             return
@@ -141,7 +139,8 @@ fun check(activity: Activity, packageName: String, vendor: String) {
 }
 
 private fun hasExtendedAccess(context: Context, vendor: String): Boolean =
-    context.checkSelfPermission("$vendor.org.microg.gms.EXTENDED_ACCESS") == PackageManager.PERMISSION_GRANTED
+    context.checkSelfPermission("$vendor.org.microg.gms.EXTENDED_ACCESS") ==
+        PackageManager.PERMISSION_GRANTED
 
 @Export
 @Throws(RemoteException::class)
@@ -168,10 +167,15 @@ private fun isAccountPermissionRejection(exception: Exception): Boolean {
     while (cause != null) {
         val message = cause.message
 
-        if (message != null && (message.contains("missing google package permission for ACCOUNT") || message.contains(
-                "missing google package permission or GET_ACCOUNTS"
-            ) || message.contains("missing EXTENDED_ACCESS permission"))
-        ) return true
+        if (
+            message != null &&
+                (message.contains("missing google package permission for ACCOUNT") ||
+                    message.contains(
+                        "missing google package permission or GET_ACCOUNTS",
+                    ) ||
+                    message.contains("missing EXTENDED_ACCESS permission"))
+        )
+            return true
 
         cause = cause.cause
     }
@@ -192,16 +196,20 @@ private fun queryAccounts(context: Context, vendor: String): Array<Account> {
                 if (context is Activity) context.componentName.className else "",
             )
 
-            val response = client.call("get_accounts", vendor, extras)
-                ?: throw RemoteException("Null result from the accounts provider")
+            val response =
+                client.call("get_accounts", vendor, extras)
+                    ?: throw RemoteException("Null result from the accounts provider")
 
-            val accounts = if (Build.VERSION.SDK_INT >= 33) response.getParcelableArray(
-                "accounts",
-                Account::class.java,
-            )
-            else response.getParcelableArray("accounts")
+            val accounts =
+                if (Build.VERSION.SDK_INT >= 33)
+                    response.getParcelableArray(
+                        "accounts",
+                        Account::class.java,
+                    )
+                else response.getParcelableArray("accounts")
 
-            if (accounts == null) throw RemoteException("The accounts provider returned no accounts array")
+            if (accounts == null)
+                throw RemoteException("The accounts provider returned no accounts array")
 
             return Arrays.copyOf(accounts, accounts.size, Array<Account>::class.java)
         }
@@ -227,7 +235,8 @@ private fun refreshAccounts(activity: Activity, vendor: String) {
     accountRefreshExecutor.execute {
         try {
             val context = activity.applicationContext
-            checkNotNull(accountAccessRequest) { "Account access request is not initialized" }.call()
+            checkNotNull(accountAccessRequest) { "Account access request is not initialized" }
+                .call()
 
             val accounts = readAccounts(context, vendor)
             activity.runOnUiThread {
@@ -267,7 +276,10 @@ private fun refreshAccounts(activity: Activity, vendor: String) {
 }
 
 private fun requestAccountPermission(activity: Activity, vendor: String) {
-    if (activity.isFinishing || activity.isDestroyed || permissionRequestActivity.get() === activity) return
+    if (
+        activity.isFinishing || activity.isDestroyed || permissionRequestActivity.get() === activity
+    )
+        return
 
     Log.i(TAG, "Requesting GmsCore account access")
 
@@ -287,12 +299,19 @@ fun onAccountPermissionResult(
     results: IntArray,
     vendor: String,
 ): Boolean {
-    if (requestCode != ACCOUNT_PERMISSION_REQUEST || permissions.size != 1 || "$vendor.org.microg.gms.EXTENDED_ACCESS" != permissions[0]) {
+    if (
+        requestCode != ACCOUNT_PERMISSION_REQUEST ||
+            permissions.size != 1 ||
+            "$vendor.org.microg.gms.EXTENDED_ACCESS" != permissions[0]
+    ) {
         for (permission in permissions) {
             if (!isMediaPermission(permission)) continue
 
-            activity.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE).edit()
-                .putBoolean(MEDIA_PERMISSION_HANDLED, true).apply()
+            activity
+                .getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE)
+                .edit()
+                .putBoolean(MEDIA_PERMISSION_HANDLED, true)
+                .apply()
 
             activity.window.decorView.post { check(activity, "$vendor.android.gms", vendor) }
             break
@@ -313,19 +332,31 @@ fun onAccountPermissionResult(
 }
 
 private fun isMediaPermissionHandled(context: Context): Boolean {
-    if (context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE)
+    if (
+        context
+            .getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE)
             .getBoolean(MEDIA_PERMISSION_HANDLED, false)
-    ) return true
+    )
+        return true
 
-    if (Build.VERSION.SDK_INT < 33) return context.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+    if (Build.VERSION.SDK_INT < 33)
+        return context.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) ==
+            PackageManager.PERMISSION_GRANTED
 
-    return context.checkSelfPermission(Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED || context.checkSelfPermission(
-        Manifest.permission.READ_MEDIA_VIDEO
-    ) == PackageManager.PERMISSION_GRANTED || context.checkSelfPermission(Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED) == PackageManager.PERMISSION_GRANTED
+    return context.checkSelfPermission(Manifest.permission.READ_MEDIA_IMAGES) ==
+        PackageManager.PERMISSION_GRANTED ||
+        context.checkSelfPermission(
+            Manifest.permission.READ_MEDIA_VIDEO,
+        ) == PackageManager.PERMISSION_GRANTED ||
+        context.checkSelfPermission(Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED) ==
+            PackageManager.PERMISSION_GRANTED
 }
 
 private fun isMediaPermission(permission: String?): Boolean =
-    permission == Manifest.permission.READ_EXTERNAL_STORAGE || permission == Manifest.permission.READ_MEDIA_IMAGES || permission == Manifest.permission.READ_MEDIA_VIDEO || permission == Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
+    permission == Manifest.permission.READ_EXTERNAL_STORAGE ||
+        permission == Manifest.permission.READ_MEDIA_IMAGES ||
+        permission == Manifest.permission.READ_MEDIA_VIDEO ||
+        permission == Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
 
 private fun isInstalled(context: Context, packageName: String): Boolean {
     try {
@@ -349,7 +380,10 @@ private fun prompt(
     if (previous != null && previous.isShowing) return
 
     val builder =
-        AlertDialog.Builder(activity).setTitle(title).setMessage(message).setCancelable(false)
+        AlertDialog.Builder(activity)
+            .setTitle(title)
+            .setMessage(message)
+            .setCancelable(false)
             .setNegativeButton("Ignore") { prompt, _ -> prompt.dismiss() }
     if (action != null) builder.setPositiveButton(action) { _, _ -> onAction() }
     val dialog = builder.create()

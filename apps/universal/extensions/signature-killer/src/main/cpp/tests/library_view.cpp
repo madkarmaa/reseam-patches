@@ -58,7 +58,7 @@ namespace {
 int main(const int count, const char *const *arguments) {
     assert(count == 1);
     assert(dlopen("libSignatureKiller.so", RTLD_NOW | RTLD_LOCAL) != nullptr);
-    assert(signature_count_support_modules() >= 2);
+    assert(signature_count_support_modules() == 1);
     FILE *status = fopen("/proc/self/status", "re");
     assert(status != nullptr);
     const int status_descriptor = dup(fileno(status));
@@ -75,7 +75,7 @@ int main(const int count, const char *const *arguments) {
         return 0;
     }, &visible_support_modules);
     assert(visible_support_modules == 0);
-    assert(signature_count_support_modules() >= 2);
+    assert(signature_count_support_modules() == 1);
     int calls = 0;
     assert(dl_iterate_phdr([](dl_phdr_info *, size_t, void *data) {
         ++*static_cast<int *>(data);

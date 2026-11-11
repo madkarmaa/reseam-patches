@@ -8,16 +8,18 @@ package top.madkarma.patches.niagara.analytics
 import app.reseam.patch.appEntry
 import app.reseam.patch.patch
 import top.madkarma.extensions.bindings.NiagaraSetup
+import top.madkarma.patches.niagara.NiagaraPatchStrings
 
-val disableAnalytics = patch("Disable analytics") {
-    description("Refuses and blocks analytics collection.")
-    compatibleWith("bitpit.launcher")
+val disableAnalytics =
+    patch(NiagaraPatchStrings.disableAnalyticsName) {
+        description(NiagaraPatchStrings.disableAnalyticsDescription)
+        compatibleWith("bitpit.launcher")
 
-    execute {
-        appEntry {
-            call(NiagaraSetup.refuseAnalytics, application)
-            call(NiagaraSetup.disableAnalyticsFlags, application)
+        execute {
+            appEntry {
+                call(NiagaraSetup.refuseAnalytics, application)
+                call(NiagaraSetup.disableAnalyticsFlags, application)
+            }
+            log.info("Analytics: collection refused and blocked at startup.")
         }
-        log.info("Analytics: collection refused and blocked at startup.")
     }
-}

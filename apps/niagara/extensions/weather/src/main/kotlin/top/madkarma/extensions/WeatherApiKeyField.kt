@@ -1,7 +1,8 @@
 // SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-@file:JvmName("WeatherApiKeyField") @file:Suppress("unused")
+@file:JvmName("WeatherApiKeyField")
+@file:Suppress("unused")
 
 package top.madkarma.extensions
 
@@ -142,23 +143,26 @@ private fun buildInput(context: Context, api: WeatherApi): EditText {
     input.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
     input.hint = HINT_TEXT
     input.setText(api.currentApiKey())
-    input.addTextChangedListener(object : KeySaver() {
-        override fun afterTextChanged(text: Editable?) {
-            api.saveApiKey(checkNotNull(text) { "Weather key text is unavailable" }.toString())
-        }
-    })
+    input.addTextChangedListener(
+        object : KeySaver() {
+            override fun afterTextChanged(text: Editable?) {
+                api.saveApiKey(checkNotNull(text) { "Weather key text is unavailable" }.toString())
+            }
+        },
+    )
     return input
 }
 
 private fun rowParams(context: Context, metricButton: View): LinearLayout.LayoutParams {
     val source = metricButton.layoutParams
     val parameters = LinearLayout.LayoutParams(source.width, source.height)
-    if (source is ViewGroup.MarginLayoutParams) parameters.setMargins(
-        source.leftMargin,
-        gapPx(context),
-        source.rightMargin,
-        source.bottomMargin,
-    )
+    if (source is ViewGroup.MarginLayoutParams)
+        parameters.setMargins(
+            source.leftMargin,
+            gapPx(context),
+            source.rightMargin,
+            source.bottomMargin,
+        )
     return parameters
 }
 
@@ -174,10 +178,11 @@ private fun dimenPx(context: Context, name: String, fallbackDp: Int): Int {
         }
     }
     return TypedValue.applyDimension(
-        TypedValue.COMPLEX_UNIT_DIP,
-        fallbackDp.toFloat(),
-        context.resources.displayMetrics,
-    ).toInt()
+            TypedValue.COMPLEX_UNIT_DIP,
+            fallbackDp.toFloat(),
+            context.resources.displayMetrics,
+        )
+        .toInt()
 }
 
 private fun iconColor(context: Context, metricButton: View): Int {
@@ -198,7 +203,8 @@ private fun themeColor(context: Context, attribute: Int, fallback: Int): Int {
     if (!context.theme.resolveAttribute(attribute, value, true)) return fallback
 
     try {
-        if (value.type in TypedValue.TYPE_FIRST_COLOR_INT..TypedValue.TYPE_LAST_COLOR_INT) return value.data
+        if (value.type in TypedValue.TYPE_FIRST_COLOR_INT..TypedValue.TYPE_LAST_COLOR_INT)
+            return value.data
         return context.getColor(value.resourceId)
     } catch (exception: Exception) {
         return fallback

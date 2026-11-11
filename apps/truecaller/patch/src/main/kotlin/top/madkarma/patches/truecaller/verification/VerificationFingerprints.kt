@@ -7,14 +7,16 @@ import app.reseam.patch.Type
 import app.reseam.patch.klass
 import app.reseam.patch.method
 
-private val smsApiConfiguration = method("smsApiConfiguration") {
-    strings("verificationOtpSmsApi_19731")
-    name("invoke")
-}
+private val smsApiConfiguration =
+    method("smsApiConfiguration") {
+        strings("verificationOtpSmsApi_19731")
+        name("invoke")
+    }
 
 internal val verificationSetup = klass("com.truecaller.wizard.WizardActivity").method("onCreate")
 
-internal val readIntegerSetting = method("readIntegerSetting") {
-    calledBy(smsApiConfiguration)
-    params(Type.Int, Type.String)
-}
+internal val readIntegerSetting =
+    method("readIntegerSetting") {
+        calledBy(smsApiConfiguration)
+        params(Type.Int, Type.String)
+    }

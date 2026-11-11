@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top> -->
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<resources>
+    <string name="bug_fixes_description">Fixes app bugs.</string>
+    <string name="bug_fixes_name">Bug fixes</string>
+    <string name="disable_analytics_description">Refuses and blocks analytics collection.</string>
+    <string name="disable_analytics_name">Disable analytics</string>
+    <string name="skip_intro_accept_terms_description">Marks the terms as accepted, skipping the terms screen.</string>
+    <string name="skip_intro_accept_terms_title">Accept terms</string>
+    <string name="skip_intro_description">Skips the promo and terms screens and opens favorites setup.</string>
+    <string name="skip_intro_name">Skip intro</string>
+    <string name="skip_intro_skip_to_favorites_description">Jumps the onboarding flow straight to the favorites setup step.</string>
+    <string name="skip_intro_skip_to_favorites_title">Skip to favorites</string>
+    <string name="unlock_pro_description">Unlocks Pro-only features.</string>
+    <string name="unlock_pro_name">Unlock Pro</string>
+    <string name="weather_widget_fix_description">Replaces the Niagara weather service with WeatherAPI.com. Enter your API key in the weather settings.</string>
+    <string name="weather_widget_fix_name">Weather widget fix</string>
+</resources>

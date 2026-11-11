@@ -2,7 +2,8 @@
 // SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-@file:JvmName("HiddenPackages") @file:Suppress("unused")
+@file:JvmName("HiddenPackages")
+@file:Suppress("unused")
 
 package dev.secp192k1.universal.hidepackages
 
@@ -21,8 +22,7 @@ internal val APPLICATION_INFO = PackageNameReader<ApplicationInfo> { it.packageN
 internal val PROVIDER_INFO = PackageNameReader<ProviderInfo> { it.packageName }
 internal val RESOLVE_INFO = PackageNameReader<ResolveInfo> { packageNameOf(it) }
 
-@Volatile
-private var hiddenPackageNames: Set<String> = emptySet()
+@Volatile private var hiddenPackageNames: Set<String> = emptySet()
 
 @Export
 fun initialize(joinedPackageNames: String) {
@@ -45,7 +45,8 @@ internal fun requireVisible(packageName: String?) {
 }
 
 internal fun requireVisible(component: ComponentName?) {
-    if (component != null && isHidden(component.packageName)) throw NameNotFoundException(component.toString())
+    if (component != null && isHidden(component.packageName))
+        throw NameNotFoundException(component.toString())
 }
 
 internal fun requireKnownPackage(packageName: String?) {
@@ -76,7 +77,9 @@ internal fun <T> visible(items: List<T>?, reader: PackageNameReader<T>): List<T>
     if (items == null) return null
     val size = items.size
     var firstHiddenIndex = 0
-    while (firstHiddenIndex < size && !isHidden(reader.packageNameOf(items[firstHiddenIndex]))) firstHiddenIndex++
+    while (
+        firstHiddenIndex < size && !isHidden(reader.packageNameOf(items[firstHiddenIndex]))
+    ) firstHiddenIndex++
     if (firstHiddenIndex == size) return items
     val visibleItems = ArrayList<T>(size - 1)
     visibleItems.addAll(items.subList(0, firstHiddenIndex))
@@ -222,7 +225,8 @@ fun checkSignatures(
     firstPackageName: String,
     secondPackageName: String,
 ): Int {
-    if (isHidden(firstPackageName) || isHidden(secondPackageName)) return PackageManager.SIGNATURE_UNKNOWN_PACKAGE
+    if (isHidden(firstPackageName) || isHidden(secondPackageName))
+        return PackageManager.SIGNATURE_UNKNOWN_PACKAGE
     return packageManager.checkSignatures(firstPackageName, secondPackageName)
 }
 
@@ -245,8 +249,8 @@ fun getPackagesForUid(packageManager: PackageManager, packageUid: Int): Array<St
     if (visibleCount == 0) return null
     val visiblePackageNames = arrayOfNulls<String>(visibleCount)
     var index = 0
-    for (packageName in packageNames) if (!isHidden(packageName)) visiblePackageNames[index++] =
-        packageName
+    for (packageName in packageNames) if (!isHidden(packageName))
+        visiblePackageNames[index++] = packageName
     return visiblePackageNames
 }
 
@@ -410,7 +414,8 @@ fun getProviderInfo(
 fun getComponentEnabledSetting(packageManager: PackageManager, component: ComponentName): Int {
     Objects.requireNonNull(component, "component")
 
-    if (isHidden(component.packageName)) throw IllegalArgumentException("Unknown component: $component")
+    if (isHidden(component.packageName))
+        throw IllegalArgumentException("Unknown component: $component")
 
     return packageManager.getComponentEnabledSetting(component)
 }

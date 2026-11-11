@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top> -->
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<resources>
+    <string name="disable_ads_description">Disables in-app ads and their consent prompt.</string>
+    <string name="disable_ads_name">Disable ads</string>
+    <string name="skip_onboarding_description">Skips the setup screens and opens the home screen.</string>
+    <string name="skip_onboarding_name">Skip onboarding</string>
+    <string name="unlock_premium_description">Unlocks Premium-only features.</string>
+    <string name="unlock_premium_name">Unlock Lifetime Premium</string>
+</resources>

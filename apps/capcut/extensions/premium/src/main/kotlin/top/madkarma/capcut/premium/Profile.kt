@@ -1,7 +1,8 @@
 // SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-@file:JvmName("Profile") @file:Suppress("unused")
+@file:JvmName("Profile")
+@file:Suppress("unused")
 
 package top.madkarma.capcut.premium
 
@@ -22,12 +23,13 @@ fun hideSubscriptionEntrance(configuration: JSONObject?) {
 fun subscriptionTouchConfiguration(name: String?, configuration: String?): String? {
     if (name != "cc_subscription_entry_press_opt") return configuration
 
-    val settings = try {
-        JSONObject(configuration ?: "{}")
-    } catch (exception: JSONException) {
-        Log.w("CapCutPremium", "Could not read subscription touch configuration", exception)
-        JSONObject()
-    }
+    val settings =
+        try {
+            JSONObject(configuration ?: "{}")
+        } catch (exception: JSONException) {
+            Log.w("CapCutPremium", "Could not read subscription touch configuration", exception)
+            JSONObject()
+        }
 
     settings.put("enable_press_activation", false)
     settings.put("enable_hit_slop_expansion", false)

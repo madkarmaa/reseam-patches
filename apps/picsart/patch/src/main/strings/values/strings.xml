@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top> -->
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<resources>
+    <string name="gms_core_support_description">Signs in with Google through separately installed Reseam GmsCore.</string>
+    <string name="gms_core_support_gms_core_vendor_group_id_title">GmsCore vendor group ID</string>
+    <string name="gms_core_support_name">GmsCore support</string>
+    <string name="remove_annoyances_description">Removes promotional popups from the app.</string>
+    <string name="remove_annoyances_name">Remove annoyances</string>
+    <string name="skip_onboarding_description">Skips the onboarding questionnaires shown at startup.</string>
+    <string name="skip_onboarding_name">Skip onboarding</string>
+    <string name="unlock_ultra_description">Unlocks Ultra-only features. Server credit balances remain unchanged.</string>
+    <string name="unlock_ultra_name">Unlock Ultra</string>
+</resources>

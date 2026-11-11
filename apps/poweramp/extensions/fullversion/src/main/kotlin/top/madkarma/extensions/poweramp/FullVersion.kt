@@ -1,7 +1,8 @@
 // SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-@file:JvmName("FullVersion") @file:Suppress("unused")
+@file:JvmName("FullVersion")
+@file:Suppress("unused")
 
 package top.madkarma.extensions.poweramp
 
@@ -21,11 +22,12 @@ fun initialize(status: Any?, expiry: Any?) {
 }
 
 @Export
-fun licenseInteger(preference: Any?, value: Int): Int = when {
-    preference === fullVersionState -> 229
-    preference === pendingExpiry -> 0
-    else -> value
-}
+fun licenseInteger(preference: Any?, value: Int): Int =
+    when {
+        preference === fullVersionState -> 229
+        preference === pendingExpiry -> 0
+        else -> value
+    }
 
 @Export
 fun acquire(tag: String?) {

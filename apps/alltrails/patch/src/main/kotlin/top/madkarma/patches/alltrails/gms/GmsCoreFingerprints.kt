@@ -8,18 +8,21 @@ import app.reseam.patch.klass
 import app.reseam.patch.method
 import app.reseam.patch.methods
 
-private val serviceClient = klass("serviceClient") {
-    strings("Calling connect() while still connected, missing disconnect() for ")
-}
+private val serviceClient =
+    klass("serviceClient") {
+        strings("Calling connect() while still connected, missing disconnect() for ")
+    }
 
-private val serviceConfiguration = serviceClient.method("getEndpointPackageName").field {
-    owner(serviceClient.descriptor)
-}
+private val serviceConfiguration =
+    serviceClient.method("getEndpointPackageName").field {
+        owner(serviceClient.descriptor)
+    }
 
-internal val serviceConfigurationConstructor = method("serviceConfigurationConstructor") {
-    inClass(klass(serviceConfiguration.type))
-    name("<init>")
-}
+internal val serviceConfigurationConstructor =
+    method("serviceConfigurationConstructor") {
+        inClass(klass(serviceConfiguration.type))
+        name("<init>")
+    }
 
 internal val serviceAction = serviceClient.method("getStartServiceAction")
 internal val requiresPlayServices = serviceClient.method("requiresGooglePlayServices")

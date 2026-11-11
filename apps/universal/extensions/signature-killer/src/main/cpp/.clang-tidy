@@ -20,47 +20,47 @@
 #   uninitialized, because the kernel fills only the prefix that is later read, and zeroing them
 #   would cost a full PATH_MAX write on the signal stack.
 Checks: >
-  -*,
-  bugprone-*,
-  -bugprone-easily-swappable-parameters,
-  cert-*,
-  -cert-dcl50-cpp,
-  clang-analyzer-*,
-  concurrency-*,
-  cppcoreguidelines-*,
-  -cppcoreguidelines-avoid-magic-numbers,
-  -cppcoreguidelines-avoid-non-const-global-variables,
-  -cppcoreguidelines-macro-usage,
-  -cppcoreguidelines-owning-memory,
-  -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
-  -cppcoreguidelines-pro-bounds-pointer-arithmetic,
-  -cppcoreguidelines-pro-type-reinterpret-cast,
-  -cppcoreguidelines-pro-type-static-cast-downcast,
-  -cppcoreguidelines-pro-type-union-access,
-  -cppcoreguidelines-pro-type-vararg,
-  google-*,
-  -google-readability-*,
-  -google-runtime-int,
-  misc-*,
-  -misc-include-cleaner,
-  -misc-misplaced-const,
-  -misc-unused-parameters,
-  modernize-*,
-  -modernize-avoid-variadic-functions,
-  -modernize-use-trailing-return-type,
-  performance-*,
-  -performance-no-int-to-ptr,
-  portability-*,
-  -portability-avoid-pragma-once,
-  readability-*,
-  -readability-braces-around-statements,
-  -readability-identifier-length,
-  -readability-magic-numbers
+    -*,
+    bugprone-*,
+    -bugprone-easily-swappable-parameters,
+    cert-*,
+    -cert-dcl50-cpp,
+    clang-analyzer-*,
+    concurrency-*,
+    cppcoreguidelines-*,
+    -cppcoreguidelines-avoid-magic-numbers,
+    -cppcoreguidelines-avoid-non-const-global-variables,
+    -cppcoreguidelines-macro-usage,
+    -cppcoreguidelines-owning-memory,
+    -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+    -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+    -cppcoreguidelines-pro-type-reinterpret-cast,
+    -cppcoreguidelines-pro-type-static-cast-downcast,
+    -cppcoreguidelines-pro-type-union-access,
+    -cppcoreguidelines-pro-type-vararg,
+    google-*,
+    -google-readability-*,
+    -google-runtime-int,
+    misc-*,
+    -misc-include-cleaner,
+    -misc-misplaced-const,
+    -misc-unused-parameters,
+    modernize-*,
+    -modernize-avoid-variadic-functions,
+    -modernize-use-trailing-return-type,
+    performance-*,
+    -performance-no-int-to-ptr,
+    portability-*,
+    -portability-avoid-pragma-once,
+    readability-*,
+    -readability-braces-around-statements,
+    -readability-identifier-length,
+    -readability-magic-numbers
 CheckOptions:
-  # Pointers that are never reassigned are const too, as the IDE suggests.
-  misc-const-correctness.WarnPointersAsValues: true
-  # The logging macros use the standard do-while(false) statement wrapper.
-  cppcoreguidelines-avoid-do-while.IgnoreMacros: true
-  readability-function-cognitive-complexity.IgnoreMacros: true
-  # Signal-safe scratch buffers stay uninitialized; see the header comment.
-  cppcoreguidelines-pro-type-member-init.IgnoreArrays: true
+    # Pointers that are never reassigned are const too, as the IDE suggests.
+    misc-const-correctness.WarnPointersAsValues: true
+    # The logging macros use the standard do-while(false) statement wrapper.
+    cppcoreguidelines-avoid-do-while.IgnoreMacros: true
+    readability-function-cognitive-complexity.IgnoreMacros: true
+    # Signal-safe scratch buffers stay uninitialized; see the header comment.
+    cppcoreguidelines-pro-type-member-init.IgnoreArrays: true

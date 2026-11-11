@@ -4,5 +4,9 @@
 package com.truecaller.bottombar;
 
 public enum BottomBarButtonType {
-    CALLS, MESSAGES, BLOCKING, PREMIUM, FAMILY_PROTECTION_CONFIG
+    CALLS,
+    MESSAGES,
+    BLOCKING,
+    PREMIUM,
+    FAMILY_PROTECTION_CONFIG
 }

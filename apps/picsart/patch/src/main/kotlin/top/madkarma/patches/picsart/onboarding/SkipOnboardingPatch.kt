@@ -7,13 +7,17 @@ package top.madkarma.patches.picsart.onboarding
 
 import app.reseam.patch.alwaysReturnNull
 import app.reseam.patch.patch
+import top.madkarma.patches.picsart.PicsartPatchStrings
 
-val skipOnboarding = patch("Skip onboarding") {
-    description("Skips the onboarding questionnaires shown at startup.")
-    compatibleWith("com.picsart.studio")
+val skipOnboarding =
+    patch(PicsartPatchStrings.skipOnboardingName) {
+        description(PicsartPatchStrings.skipOnboardingDescription)
+        compatibleWith("com.picsart.studio")
 
-    execute {
-        onboardingLaunchOrder.alwaysReturnNull()
-        log.info("Onboarding: ${onboardingLaunchOrder.descriptor} adds no onboarding steps to the launch order.")
+        execute {
+            onboardingLaunchOrder.alwaysReturnNull()
+            log.info(
+                "Onboarding: ${onboardingLaunchOrder.descriptor} adds no onboarding steps to the launch order.",
+            )
+        }
     }
-}

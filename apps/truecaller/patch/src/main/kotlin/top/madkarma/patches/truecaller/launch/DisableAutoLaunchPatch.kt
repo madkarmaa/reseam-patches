@@ -8,25 +8,29 @@ package top.madkarma.patches.truecaller.launch
 import app.reseam.patch.patch
 import app.reseam.patch.settings.gate
 import app.reseam.patch.settings.section
+import top.madkarma.patches.truecaller.TruecallerPatchStrings
 import top.madkarma.patches.truecaller.settings.truecallerSettings
 import top.madkarma.patches.truecaller.shared.disableFeatureFlag
 import top.madkarma.truecaller.settings.TruecallerSettings
 import top.madkarma.truecaller.settings.TruecallerStrings
 
-val disableAutoLaunch = patch("Disable auto-launch") {
-    description("Disables automatic after-call screens.")
-    compatibleWith("com.truecaller")
+val disableAutoLaunch =
+    patch(TruecallerPatchStrings.disableAutoLaunchName) {
+        description(TruecallerPatchStrings.disableAutoLaunchDescription)
+        compatibleWith("com.truecaller")
 
-    settings(
-        truecallerSettings,
-        section(TruecallerStrings.sectionBehavior, TruecallerSettings.disableAutoLaunch)
-    )
+        settings(
+            truecallerSettings,
+            section(TruecallerStrings.sectionBehavior, TruecallerSettings.disableAutoLaunch),
+        )
 
-    execute {
-        gate(TruecallerSettings.disableAutoLaunch) {
-            afterCallScreenEnabled.alwaysReturn(false)
+        execute {
+            gate(TruecallerSettings.disableAutoLaunch) {
+                afterCallScreenEnabled.alwaysReturn(false)
+            }
+            log.info(
+                "Auto-launch: ${afterCallScreenEnabled.descriptor} disables automatic after-call screens.",
+            )
+            disableFeatureFlag("featureAutoAppLaunchPassive")
         }
-        log.info("Auto-launch: ${afterCallScreenEnabled.descriptor} disables automatic after-call screens.")
-        disableFeatureFlag("featureAutoAppLaunchPassive")
     }
-}

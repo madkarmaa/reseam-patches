@@ -8,17 +8,21 @@ package top.madkarma.patches.kleinanzeigen.pur
 import app.reseam.patch.before
 import app.reseam.patch.patch
 import top.madkarma.kleinanzeigen.pur.bindings.ConsentBanner
+import top.madkarma.patches.kleinanzeigen.KleinanzeigenPatchStrings
 
-val removePurPopups = patch("Remove Pur popups") {
-    description("Skips the consent screen that advertises Kleinanzeigen Pur, without giving tracking consent.")
-    compatibleWith("com.ebay.kleinanzeigen")
+val removePurPopups =
+    patch(KleinanzeigenPatchStrings.removePurPopupsName) {
+        description(
+            KleinanzeigenPatchStrings.removePurPopupsDescription,
+        )
+        compatibleWith("com.ebay.kleinanzeigen")
 
-    execute {
-        // Same result as the app's own path when consent is already settled.
-        shouldShowConsentBanner.before {
-            thisObject.call(hideConsentBanner)
-            returnValue(ConsentBanner.notNeeded())
+        execute {
+            // Same result as the app's own path when consent is already settled.
+            shouldShowConsentBanner.before {
+                thisObject.call(hideConsentBanner)
+                returnValue(ConsentBanner.notNeeded())
+            }
+            log.info("Pur: ${shouldShowConsentBanner.descriptor} never shows the consent banner.")
         }
-        log.info("Pur: ${shouldShowConsentBanner.descriptor} never shows the consent banner.")
     }
-}

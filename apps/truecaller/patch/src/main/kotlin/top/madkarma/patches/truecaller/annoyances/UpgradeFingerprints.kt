@@ -12,13 +12,16 @@ private val interstitialConfiguration =
 
 private val interstitialEnabled = interstitialConfiguration.method("enabled")
 
-internal val automaticUpgradeEligibility = method("automaticUpgradeEligibility") {
-    calls(interstitialEnabled)
-    // The other caller is a generated coroutine state machine, rather than the eligibility function.
-    custom { name != "invokeSuspend" }
-}
+internal val automaticUpgradeEligibility =
+    method("automaticUpgradeEligibility") {
+        calls(interstitialEnabled)
+        // The other caller is a generated coroutine state machine, rather than the eligibility
+        // function.
+        custom { name != "invokeSuspend" }
+    }
 
-internal val automaticUpgradeDecision = method("automaticUpgradeDecision") {
-    calls(automaticUpgradeEligibility)
-    hasParam(Type.String)
-}
+internal val automaticUpgradeDecision =
+    method("automaticUpgradeDecision") {
+        calls(automaticUpgradeEligibility)
+        hasParam(Type.String)
+    }

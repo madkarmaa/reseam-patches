@@ -1,7 +1,8 @@
 // SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-@file:JvmName("GmsCore") @file:Suppress("unused")
+@file:JvmName("GmsCore")
+@file:Suppress("unused")
 
 package top.madkarma.shared.gmscore
 
@@ -24,8 +25,7 @@ private const val TOKEN_SUBTYPE = "$GOOGLE_ID.BUNDLE_KEY_GOOGLE_ID_TOKEN_SUBTYPE
 private const val SIGN_IN_WITH_GOOGLE = "$GOOGLE_ID.TYPE_GOOGLE_ID_TOKEN_SIWG_CREDENTIAL"
 
 /** The GmsCore vendor group selected at patch time. */
-@Export
-external fun vendorGroupId(): String
+@Export external fun vendorGroupId(): String
 
 internal fun gmsCorePackageName() = "${vendorGroupId()}.android.gms"
 
@@ -38,9 +38,13 @@ fun start(context: Context?) {
 
 // Credential Manager requests Google ID tokens through the identity credentials service.
 private fun isAuthentication(action: String): Boolean =
-    action.startsWith("$PLAY_SERVICES_NAMESPACE.auth.") || action == SIGN_IN_SERVICE || action == CREDENTIALS_SERVICE
+    action.startsWith("$PLAY_SERVICES_NAMESPACE.auth.") ||
+        action == SIGN_IN_SERVICE ||
+        action == CREDENTIALS_SERVICE
 
-/** The GmsCore package for authentication services, or null to leave the service on Play Services. */
+/**
+ * The GmsCore package for authentication services, or null to leave the service on Play Services.
+ */
 @Export
 fun servicePackageOverride(action: String?): String? {
     if (action == null || !isAuthentication(action)) return null
@@ -57,8 +61,8 @@ fun serviceAction(action: String): String {
 }
 
 /**
- * Whether credential requests can use the identity credential service. MicroG-RE registers it under its
- * vendor group, where it rejects Google's credential type, so requests use the legacy flows.
+ * Whether credential requests can use the identity credential service. MicroG-RE registers it under
+ * its vendor group, where it rejects Google's credential type, so requests use the legacy flows.
  */
 @Export
 fun identityCredentialsAvailable(): Boolean {
@@ -68,7 +72,10 @@ fun identityCredentialsAvailable(): Boolean {
     return false
 }
 
-/** Points the GmsCore sign-in screen intent at its registered action, after asking for GmsCore when it is missing. */
+/**
+ * Points the GmsCore sign-in screen intent at its registered action, after asking for GmsCore when
+ * it is missing.
+ */
 @Export
 fun prepareSignIn(activity: Activity, intent: Intent) {
     if (intent.`package` != gmsCorePackageName()) return
@@ -90,13 +97,16 @@ fun checkGoogleIdRequest(request: Bundle?) {
     if (request == null) return
 
     val signInButton = request.getString(TOKEN_SUBTYPE) == SIGN_IN_WITH_GOOGLE
-    val accountPicker = request.containsKey(FILTER_BY_AUTHORIZED_ACCOUNTS) && !request.getBoolean(
-        FILTER_BY_AUTHORIZED_ACCOUNTS
-    )
+    val accountPicker =
+        request.containsKey(FILTER_BY_AUTHORIZED_ACCOUNTS) &&
+            !request.getBoolean(
+                FILTER_BY_AUTHORIZED_ACCOUNTS,
+            )
     if (signInButton || accountPicker) requireInstalled(context)
 }
 
-// Reseam and ReVanced GmsCore register Play Services actions, while MicroG-RE registers them under its vendor group.
+// Reseam and ReVanced GmsCore register Play Services actions, while MicroG-RE registers them under
+// its vendor group.
 private fun registeredAction(action: String, resolve: (Intent) -> List<*>): String {
     if (!action.startsWith("$PLAY_SERVICES_NAMESPACE.")) return action
 

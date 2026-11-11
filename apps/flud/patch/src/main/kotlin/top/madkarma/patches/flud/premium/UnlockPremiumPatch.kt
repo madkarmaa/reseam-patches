@@ -6,17 +6,21 @@
 package top.madkarma.patches.flud.premium
 
 import app.reseam.patch.*
+import top.madkarma.patches.flud.FludPatchStrings
 
-val unlockPremium = patch("Unlock Premium") {
-    description("Unlocks Premium-only features.")
-    compatibleWith("com.delphicoder.flud")
-    dependsOn(ExternalPatch("reseam-patches", "app.reseam.patches.universal.removePairip"))
+val unlockPremium =
+    patch(FludPatchStrings.unlockPremiumName) {
+        description(FludPatchStrings.unlockPremiumDescription)
+        compatibleWith("com.delphicoder.flud")
+        dependsOn(ExternalPatch("reseam-patches", "app.reseam.patches.universal.removePairip"))
 
-    execute {
-        isPremium.alwaysReturn(true)
-        log.info("Premium: ${isPremium.descriptor} returns an unlocked entitlement.")
+        execute {
+            isPremium.alwaysReturn(true)
+            log.info("Premium: ${isPremium.descriptor} returns an unlocked entitlement.")
 
-        publishPremium.before { paramOfType(Type.Boolean).assign(bool(true)) }
-        log.info("Premium: ${publishPremium.descriptor} publishes unlocked state to all observers.")
+            publishPremium.before { paramOfType(Type.Boolean).assign(bool(true)) }
+            log.info(
+                "Premium: ${publishPremium.descriptor} publishes unlocked state to all observers.",
+            )
+        }
     }
-}

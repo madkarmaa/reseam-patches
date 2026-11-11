@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top> -->
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<resources>
+    <string name="disable_startup_checks_description">Prevents local integrity and emulator checks from crashing the app at startup.</string>
+    <string name="disable_startup_checks_name">Disable startup checks</string>
+</resources>
