@@ -209,15 +209,11 @@ val spoofApkFileAccess =
             )
 
             for (abi in nativeAbis) {
-                val libraries =
-                    listOf("libSignatureKiller.so", "libshadowhook.so", "libshadowhook_nothing.so")
-                for (name in libraries) {
-                    val path = "lib/$abi/$name"
-                    val library =
-                        SignatureResources.javaClass.classLoader.getResourceAsStream(path)
-                            ?: error("SignatureKiller: bundled native lib missing: $path")
-                    library.use { files.write(path, it) }
-                }
+                val path = "lib/$abi/libSignatureKiller.so"
+                val library =
+                    SignatureResources.javaClass.classLoader.getResourceAsStream(path)
+                        ?: error("SignatureKiller: bundled native lib missing: $path")
+                library.use { files.write(path, it) }
             }
 
             log.info(
