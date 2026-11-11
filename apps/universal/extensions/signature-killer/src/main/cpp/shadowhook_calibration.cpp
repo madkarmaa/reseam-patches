@@ -19,11 +19,11 @@
 #include <cstdio>
 #include <cstring>
 #include <string>
-// ReSharper restore CppUnusedIncludeDirective
 
 extern "C" {
     #include "sh_util.h"
     #include "xdl.h"
+// ReSharper restore CppUnusedIncludeDirective
     extern const unsigned char signature_shadowhook_calibration_start[];
     extern const unsigned char signature_shadowhook_calibration_end[];
 }

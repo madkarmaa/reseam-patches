@@ -28,17 +28,47 @@ target_include_directories(bytehook SYSTEM PUBLIC
         bytehook/third_party/lss)
 target_include_directories(bytehook PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
+# Shared by the library and the standalone device tests.
+set(NATIVE_HOOK_SOURCES
+        hooks/native_file_hooks.cpp
+        hooks/native_file_io.cpp
+        hooks/native_file_metadata.cpp
+        hooks/native_memory_hooks.cpp
+        hooks/native_stdio.cpp
+        hooks/native_libc_forwarders.cpp
+        hooks/native_branch.cpp)
+
+set(LIBRARY_VIEW_SOURCES
+        view/library_view.cpp
+        view/library_modules.cpp
+        view/process_status.cpp
+        view/process_snapshot.cpp
+        view/snapshot_channel.cpp)
+
+set(RAW_REDIRECT_SOURCES
+        redirect/seccomp_open.cpp
+        redirect/raw_redirect_identity.cpp
+        redirect/raw_redirect_dispatch.cpp
+        redirect/seccomp_filter.cpp
+        redirect/raw_redirect_paths.cpp
+        redirect/raw_redirect_metadata.cpp
+        redirect/raw_redirect_content.cpp
+        redirect/raw_redirect_open.cpp
+        redirect/raw_redirect_signal.cpp
+        redirect/raw_redirect_diagnostics.cpp)
+
 add_library(SignatureKiller SHARED
         code_memory.cpp
         creator_view.cpp
         file_hooks.cpp
         jni.cpp
         library_file_redirect.cpp
-        library_view.cpp
-        native_file_hooks.cpp
-        seccomp_open.cpp
+        ${LIBRARY_VIEW_SOURCES}
+        ${NATIVE_HOOK_SOURCES}
+        ${RAW_REDIRECT_SOURCES}
         raw_syscall.S)
 
+target_include_directories(SignatureKiller PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_features(SignatureKiller PRIVATE cxx_std_23)
 # Nothing may unwind through hooked libc calls or across JNI, and nothing needs type information.
 target_compile_options(SignatureKiller PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
@@ -62,7 +92,15 @@ install(TARGETS SignatureKiller LIBRARY DESTINATION ${ANDROID_ABI})
 
 option(SIGNATURE_KILLER_BUILD_TESTS "Build standalone native file-redirection tests" OFF)
 if (SIGNATURE_KILLER_BUILD_TESTS)
-    add_executable(signature_file_tests tests/file_redirect.cpp seccomp_open.cpp raw_syscall.S)
+    add_executable(signature_file_tests
+            tests/files/file_redirect.cpp
+            tests/files/file_platform.cpp
+            tests/files/file_fixture.cpp
+            tests/files/file_scenarios.cpp
+            tests/files/file_metadata.cpp
+            tests/files/file_contents.cpp
+            ${RAW_REDIRECT_SOURCES}
+            raw_syscall.S)
     target_include_directories(signature_file_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
     target_compile_features(signature_file_tests PRIVATE cxx_std_23)
     target_compile_options(signature_file_tests PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
@@ -72,7 +110,7 @@ if (SIGNATURE_KILLER_BUILD_TESTS)
 
     add_library(signature_view_probe SHARED tests/library_probe.cpp)
     target_link_libraries(signature_view_probe PRIVATE dl)
-    add_executable(signature_view_tests tests/library_view.cpp library_view.cpp raw_syscall.S)
+    add_executable(signature_view_tests tests/library_view.cpp ${LIBRARY_VIEW_SOURCES} raw_syscall.S)
     target_include_directories(signature_view_tests PRIVATE . shadowhook/include)
     target_compile_features(signature_view_tests PRIVATE cxx_std_23)
     target_compile_options(signature_view_tests PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
@@ -86,9 +124,9 @@ if (SIGNATURE_KILLER_BUILD_TESTS)
     add_executable(signature_unpacked_tests
             tests/unpacked_redirect.cpp
             library_file_redirect.cpp
-            native_file_hooks.cpp
-            library_view.cpp
-            seccomp_open.cpp
+            ${NATIVE_HOOK_SOURCES}
+            ${LIBRARY_VIEW_SOURCES}
+            ${RAW_REDIRECT_SOURCES}
             raw_syscall.S)
     target_include_directories(signature_unpacked_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
     target_include_directories(signature_unpacked_tests SYSTEM PRIVATE shadowhook/include)

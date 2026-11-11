@@ -3,8 +3,10 @@
 
 #pragma once
 
+// ReSharper disable CppUnusedIncludeDirective
 #include <android/log.h>
 #include <atomic>
+// ReSharper restore CppUnusedIncludeDirective
 
 inline constinit std::atomic<bool> diagnostics{false};
 

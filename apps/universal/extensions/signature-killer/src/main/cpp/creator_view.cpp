@@ -6,7 +6,7 @@
 #include <mutex>
 
 #include "logging.h"
-#include "seccomp_open.h"
+#include "redirect/seccomp_open.h"
 #include "shadowhook.h"
 // ReSharper restore CppUnusedIncludeDirective
 

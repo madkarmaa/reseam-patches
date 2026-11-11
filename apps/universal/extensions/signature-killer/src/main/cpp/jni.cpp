@@ -15,9 +15,9 @@
 #include "bytehook.h"
 #include "file_hooks.h"
 #include "logging.h"
-#include "seccomp_open.h"
-#include "library_view.h"
-#include "native_file_hooks.h"
+#include "redirect/seccomp_open.h"
+#include "view/library_view.h"
+#include "hooks/native_file_hooks.h"
 // ReSharper restore CppUnusedIncludeDirective
 
 #ifdef __aarch64__

@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+// ReSharper disable CppUnusedIncludeDirective
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
@@ -12,6 +13,7 @@
 #endif
 
 #include <array>
+#include <utility>
 #include <cassert>
 #include <cerrno>
 #include <cstdint>
@@ -19,6 +21,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <string>
+// ReSharper restore CppUnusedIncludeDirective
 
 extern "C" long signature_raw_syscall(long, long, long, long, long, long, long);
 extern "C" long signature_test_bridge(void *, long, long, long, long, long, long);
@@ -27,38 +30,45 @@ extern "C" char signature_test_bridge_end;
 namespace {
     using raw_call = decltype(&signature_raw_syscall);
     using libc_call = decltype(&signature_test_bridge);
-    struct unpacked_code { raw_call raw; libc_call libc; };
+
+    struct unpacked_code {
+        raw_call raw;
+        libc_call libc;
+    };
+
     std::array<unpacked_code, 2> copies{};
     using open_function = int (*)(const char *, int, ...);
 
-    void expect_read(const unpacked_code &code, const char *path, const bool libc,
-                     const char *expected = "original contents") {
-        const long descriptor = libc
-                ? code.libc(reinterpret_cast<void *>(static_cast<open_function>(open)),
-                            reinterpret_cast<long>(path), O_RDONLY, 0, 0, 0, 0)
-                : code.raw(__NR_openat, AT_FDCWD, reinterpret_cast<long>(path), O_RDONLY, 0, 0, 0);
+    void expect_read(const unpacked_code &code, const char *const path, const bool libc,
+                     const char *const expected = "original contents") {
+        const long descriptor =
+            libc ? code.libc(reinterpret_cast<void *>(static_cast<open_function>(open)),
+                             reinterpret_cast<long>(path), O_RDONLY, 0, 0, 0, 0)
+                 : code.raw(__NR_openat, AT_FDCWD, reinterpret_cast<long>(path), O_RDONLY, 0, 0, 0);
         assert(descriptor >= 0);
         std::array<char, 32> bytes{};
-        const long length = libc
-                ? code.libc(reinterpret_cast<void *>(read), descriptor,
-                            reinterpret_cast<long>(bytes.data()), bytes.size(), 0, 0, 0)
-                : code.raw(__NR_read, descriptor, reinterpret_cast<long>(bytes.data()), bytes.size(), 0, 0, 0);
-        assert(length == static_cast<long>(strlen(expected)) && strcmp(bytes.data(), expected) == 0);
+        const long length = libc ? code.libc(reinterpret_cast<void *>(read), descriptor,
+                                             reinterpret_cast<long>(bytes.data()), bytes.size(), 0, 0, 0)
+                                 : code.raw(__NR_read, descriptor, reinterpret_cast<long>(bytes.data()),
+                                            bytes.size(), 0, 0, 0);
+        assert(std::cmp_equal(length, strlen(expected)) && strcmp(bytes.data(), expected) == 0);
         assert(code.libc(reinterpret_cast<void *>(close), descriptor, 0, 0, 0, 0, 0) == 0);
     }
 
     void initialize_unpacked_code() __attribute__((constructor));
+
     void initialize_unpacked_code() {
         const auto page = static_cast<size_t>(sysconf(_SC_PAGESIZE));
         const auto bridge_size = static_cast<size_t>(&signature_test_bridge_end -
-                reinterpret_cast<const char *>(&signature_test_bridge));
+                                                     reinterpret_cast<const char *>(&signature_test_bridge));
         assert(bridge_size < 128);
-        const char *path = getenv("SIGNATURE_UNPACKED_APK");
+        // NOLINTNEXTLINE(concurrency-mt-unsafe): setup is single-threaded; the environment stays read-only.
+        const char *const path = getenv("SIGNATURE_UNPACKED_APK");
         assert(path != nullptr);
 
         for (auto &code : copies) {
-            void *const allocation = mmap(nullptr, page * 3, PROT_READ | PROT_WRITE,
-                                           MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+            void *const allocation =
+                mmap(nullptr, page * 3, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
             assert(allocation != MAP_FAILED);
             auto *const memory = static_cast<char *>(allocation) + page;
             memcpy(memory, reinterpret_cast<void *>(&signature_raw_syscall), 64);
@@ -67,8 +77,10 @@ namespace {
             assert(mprotect(memory + 1, page - 1, PROT_READ | PROT_EXEC) == -1 && errno == EINVAL);
             assert(mprotect(memory, page, PROT_READ | PROT_EXEC) == 0);
             assert(mprotect(memory, page, PROT_READ | PROT_WRITE | PROT_EXEC) == 0);
-            code = {.raw = reinterpret_cast<raw_call>(memory),
-                    .libc = reinterpret_cast<libc_call>(memory + 128)};
+            code = {
+                .raw = reinterpret_cast<raw_call>(memory),
+                .libc = reinterpret_cast<libc_call>(memory + 128),
+            };
             expect_read(code, path, false);
             expect_read(code, path, true);
         }
@@ -76,15 +88,17 @@ namespace {
         // Changing a foreign code page's permissions must not make libc a target.
         const auto libc_page = reinterpret_cast<uintptr_t>(read) & ~(page - 1);
         assert(mprotect(reinterpret_cast<void *>(libc_page), page, PROT_READ | PROT_EXEC) == 0);
-        const char *foreign = getenv("SIGNATURE_FOREIGN_MAPPING");
+        // NOLINTNEXTLINE(concurrency-mt-unsafe): setup is single-threaded; the environment stays read-only.
+        const char *const foreign = getenv("SIGNATURE_FOREIGN_MAPPING");
         assert(foreign != nullptr);
         const auto foreign_page = static_cast<uintptr_t>(strtoull(foreign, nullptr, 10));
         assert(mprotect(reinterpret_cast<void *>(foreign_page), page, PROT_READ | PROT_EXEC) == 0);
     }
-}
+} // namespace
 
 extern "C" __attribute__((visibility("default"))) void signature_verify_unpacked_reads() {
-    const char *path = getenv("SIGNATURE_UNPACKED_APK");
+    // NOLINTNEXTLINE(concurrency-mt-unsafe): setup is single-threaded; the environment stays read-only.
+    const char *const path = getenv("SIGNATURE_UNPACKED_APK");
     for (const auto &code : copies) {
         expect_read(code, path, false);
         expect_read(code, path, true);
@@ -102,16 +116,17 @@ extern "C" __attribute__((visibility("default"))) void signature_verify_unpacked
     assert(fclose(file) == 0);
 }
 
-extern "C" __attribute__((visibility("default"))) const char *signature_unpacked_status(const char *path) {
+extern "C" __attribute__((visibility("default"))) const char *
+signature_unpacked_status(const char *const path) {
     static std::string status;
     status.clear();
     const long descriptor = copies.front().libc(reinterpret_cast<void *>(static_cast<open_function>(open)),
-            reinterpret_cast<long>(path), O_RDONLY, 0, 0, 0, 0);
+                                                reinterpret_cast<long>(path), O_RDONLY, 0, 0, 0, 0);
     assert(descriptor >= 0);
     std::array<char, 1024> bytes{};
     while (true) {
         const long length = copies.front().libc(reinterpret_cast<void *>(read), descriptor,
-                reinterpret_cast<long>(bytes.data()), bytes.size(), 0, 0, 0);
+                                                reinterpret_cast<long>(bytes.data()), bytes.size(), 0, 0, 0);
         assert(length >= 0);
         if (length == 0) break;
         status.append(bytes.data(), static_cast<size_t>(length));
@@ -121,7 +136,8 @@ extern "C" __attribute__((visibility("default"))) const char *signature_unpacked
 }
 
 extern "C" __attribute__((visibility("default"))) void signature_verify_internal_reads() {
-    const char *path = getenv("SIGNATURE_UNPACKED_APK");
+    // NOLINTNEXTLINE(concurrency-mt-unsafe): setup is single-threaded; the environment stays read-only.
+    const char *const path = getenv("SIGNATURE_UNPACKED_APK");
     expect_read(copies.front(), path, false, "installed");
     expect_read(copies.front(), path, true, "installed");
 }
@@ -131,12 +147,12 @@ namespace {
     ssize_t (*forwarded_read)(int, void *, size_t) = nullptr;
 }
 
-extern "C" __attribute__((visibility("default"))) void signature_set_read_forwarder(void *entry) {
+extern "C" __attribute__((visibility("default"))) void signature_set_read_forwarder(void *const entry) {
     forwarded_read = reinterpret_cast<decltype(forwarded_read)>(entry);
 }
 
-extern "C" __attribute__((visibility("default"), noinline)) ssize_t signature_forward_read(
-        const int descriptor, void *buffer, const size_t count) {
+extern "C" __attribute__((visibility("default"), noinline)) ssize_t
+signature_forward_read(const int descriptor, void *const buffer, const size_t count) {
     // Keep a real forwarding frame so the old caller-only classifier sees this target image.
     const volatile ssize_t length = forwarded_read(descriptor, buffer, count);
     return length;
