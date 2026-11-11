@@ -75,13 +75,3 @@ internal val weatherSheet =
     method("weatherSheet") {
         strings(WEATHER_WIDGET_ARTICLE_URL)
     }
-
-// The other location-name readers only touch preferences; this one binds the settings views.
-internal val weatherContentBind =
-    method("weatherContentBind") {
-        strings("bitpit.launcher.key.WEATHER_LOCATION_NAME")
-        calls {
-            owner("android.view.View")
-            name("findViewById")
-        }
-    }
