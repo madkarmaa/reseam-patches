@@ -15,7 +15,7 @@ namespace signature::hooks {
 
     namespace {
         constinit std::once_flag thread_context_once;
-        std::atomic<bool> thread_context_ready{false};
+        std::atomic thread_context_ready{false};
 
     } // namespace
 

@@ -59,8 +59,9 @@ namespace {
 
     void initialize_unpacked_code() {
         const auto page = static_cast<size_t>(sysconf(_SC_PAGESIZE));
-        const auto bridge_size = static_cast<size_t>(&signature_test_bridge_end -
-                                                     reinterpret_cast<const char *>(&signature_test_bridge));
+        // The bridge's start and end are separate assembly symbols, so compare their addresses.
+        const auto bridge_size = reinterpret_cast<uintptr_t>(&signature_test_bridge_end) -
+                                 reinterpret_cast<uintptr_t>(&signature_test_bridge);
         assert(bridge_size < 128);
         // NOLINTNEXTLINE(concurrency-mt-unsafe): setup is single-threaded; the environment stays read-only.
         const char *const path = getenv("SIGNATURE_UNPACKED_APK");
@@ -76,6 +77,8 @@ namespace {
             __builtin___clear_cache(memory, memory + 128 + bridge_size);
             assert(mprotect(memory + 1, page - 1, PROT_READ | PROT_EXEC) == -1 && errno == EINVAL);
             assert(mprotect(memory, page, PROT_READ | PROT_EXEC) == 0);
+            // Unpackers keep their code writable while it runs; the hooks must still treat it as code.
+            // NOLINTNEXTLINE(clang-analyzer-security.MmapWriteExec)
             assert(mprotect(memory, page, PROT_READ | PROT_WRITE | PROT_EXEC) == 0);
             code = {
                 .raw = reinterpret_cast<raw_call>(memory),
@@ -99,6 +102,7 @@ namespace {
 extern "C" __attribute__((visibility("default"))) void signature_verify_unpacked_reads() {
     // NOLINTNEXTLINE(concurrency-mt-unsafe): setup is single-threaded; the environment stays read-only.
     const char *const path = getenv("SIGNATURE_UNPACKED_APK");
+    assert(path != nullptr);
     for (const auto &code : copies) {
         expect_read(code, path, false);
         expect_read(code, path, true);

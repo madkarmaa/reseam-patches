@@ -94,6 +94,8 @@ namespace signature::tests {
             assert(stat_at(directory, path, flags, &observed.value) == 0);
             for (const auto value : observed.before) assert(value == 0x5a);
             for (const auto value : observed.after) assert(value == 0xa5);
+            // The kernel writes every byte, padding included, and the redirect must return the same bytes.
+            // NOLINTNEXTLINE(bugprone-suspicious-memory-comparison,cert-exp42-c,cert-flp37-c)
             if (memcmp(&observed.value, &expected, sizeof(expected)) != 0) {
                 std::println(stderr, "stat-at metadata mismatch: {}", label);
                 abort();
@@ -107,6 +109,8 @@ namespace signature::tests {
         assert(fstat(redirected, &reported) == 0);
         if (redirect_contents) {
             // Outside the protected range, the descriptor and its mmap retain the installed file.
+            // The kernel writes every byte, padding included, and the redirect must return the same bytes.
+            // NOLINTNEXTLINE(bugprone-suspicious-memory-comparison,cert-exp42-c,cert-flp37-c)
             assert(memcmp(&reported, &installed, sizeof(installed)) == 0);
             void *const mapping = mmap(nullptr, page_size, PROT_READ, MAP_PRIVATE, redirected, 0);
             assert(mapping != MAP_FAILED);

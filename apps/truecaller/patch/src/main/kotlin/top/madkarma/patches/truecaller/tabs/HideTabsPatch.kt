@@ -36,7 +36,9 @@ val hideTabs =
         execute {
             // Badge updates still need every item. Filter only after the builder finishes.
             buildBottomBar.after { Navigation.hideTabs(thisObject.field(bottomBarView)) }
-            log.info("Tabs: ${buildBottomBar.descriptor} removes hidden tabs from the menu.")
+            log.info(
+                "Tabs: ${buildBottomBar.descriptor} removes hidden tabs and hides a Calls-only bottom bar.",
+            )
 
             currentTab.after { returnValue(Navigation.visibleTab(result)) }
             log.info("Tabs: ${currentTab.descriptor} returns Calls if the current tab is hidden.")

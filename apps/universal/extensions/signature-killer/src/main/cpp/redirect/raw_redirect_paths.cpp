@@ -70,7 +70,9 @@ namespace signature::redirect {
             return copied_path_equals(copied, copied_length, candidate.installed);
         });
 
+        // ptrdiff_t is wider than int on 64-bit ABIs.
         return mapping == state.paths.end() ? -1
+                                            // ReSharper disable once CppRedundantCastExpression
                                             : static_cast<int>(std::distance(state.paths.begin(), mapping));
     }
 
@@ -89,8 +91,10 @@ namespace signature::redirect {
                 return copied_path_equals(path, length, candidate.resolved_replacement.c_str());
             });
 
+        // ptrdiff_t is wider than int on 64-bit ABIs.
         return identity == state.identities.end()
                    ? -1
+                   // ReSharper disable once CppRedundantCastExpression
                    : static_cast<int>(std::distance(state.identities.begin(), identity));
     }
 

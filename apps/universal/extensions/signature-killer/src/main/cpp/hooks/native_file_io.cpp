@@ -35,7 +35,7 @@ namespace signature::hooks {
 #endif
         }
 
-        template <open_function &Original> int open_proxy(const char *const path, const int flags, ...) {
+        int open_proxy(const char *const path, const int flags, ...) {
             mode_t mode = 0;
             if (needs_mode(flags)) {
                 va_list arguments{};
@@ -49,7 +49,6 @@ namespace signature::hooks {
             return libc_result<int>(result, previous_errno);
         }
 
-        template <openat_function &Original>
         int openat_proxy(const int directory, const char *const path, const int flags, ...) {
             mode_t mode = 0;
             if (needs_mode(flags)) {
@@ -123,7 +122,7 @@ namespace signature::hooks {
         pread_function original_pread = nullptr;
         pread64_function original_pread64 = nullptr;
 
-        template <typename Offset, auto &Original>
+        template <typename Offset>
         ssize_t pread_proxy(const int descriptor, void *const buffer, const size_t count,
                             const Offset offset) {
             const int previous_errno = errno;
@@ -147,7 +146,7 @@ namespace signature::hooks {
         off_t lseek_proxy(const int descriptor, const off_t offset, const int whence) {
             const int previous_errno = errno;
             const auto result =
-                redirect(NATIVE_CALLER, __NR_lseek, descriptor, static_cast<long>(offset), whence);
+                redirect(NATIVE_CALLER, __NR_lseek, descriptor, offset, whence);
             return libc_result<off_t>(result, previous_errno);
         }
 
@@ -163,7 +162,7 @@ namespace signature::hooks {
             return libc_result<int>(result, previous_errno) == 0 ? adjusted : static_cast<off64_t>(-1);
 #else
             const auto result =
-                redirect(NATIVE_CALLER, __NR_lseek, descriptor, static_cast<long>(offset), whence);
+                redirect(NATIVE_CALLER, __NR_lseek, descriptor, offset, whence);
             return libc_result<off64_t>(result, previous_errno);
 #endif
         }
@@ -172,15 +171,15 @@ namespace signature::hooks {
 
     std::span<const libc_hook> file_io_hooks() {
         static const auto hooks = std::to_array({
-            hook("open", open_proxy<original_open>, original_open),
-            hook("open64", open_proxy<original_open64>, original_open64),
-            hook("openat", openat_proxy<original_openat>, original_openat),
-            hook("openat64", openat_proxy<original_openat64>, original_openat64),
+            hook("open", open_proxy, original_open),
+            hook("open64", open_proxy, original_open64),
+            hook("openat", openat_proxy, original_openat),
+            hook("openat64", openat_proxy, original_openat64),
             hook("__open_2", open_2_proxy, original_open_2),
             hook("__openat_2", openat_2_proxy, original_openat_2),
             hook("read", read_proxy, original_read),
-            hook("pread", pread_proxy<off_t, original_pread>, original_pread),
-            hook("pread64", pread_proxy<off64_t, original_pread64>, original_pread64),
+            hook("pread", pread_proxy<off_t>, original_pread),
+            hook("pread64", pread_proxy<off64_t>, original_pread64),
             hook("close", close_proxy, original_close),
             hook("lseek", lseek_proxy, original_lseek),
             hook("lseek64", lseek64_proxy, original_lseek64),

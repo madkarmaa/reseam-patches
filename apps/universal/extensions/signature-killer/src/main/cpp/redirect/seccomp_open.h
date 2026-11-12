@@ -21,6 +21,10 @@ struct raw_redirect_options {
     // Optional signal-safe provider of a filtered procfs snapshot descriptor.
     int (*snapshot_proc_file)(proc_file, int) = nullptr;
     bool (*bypass_current_thread)() = nullptr;
+    // Holds the filter back until the process first forks and installs it in the parent only. A child
+    // that traces its own syscalls, like Pairip's watchdog, would otherwise inherit the trap and lose
+    // those syscalls to its tracer, which discards the resulting SIGSYS.
+    bool install_after_fork = false;
 };
 
 struct raw_open_mapping {

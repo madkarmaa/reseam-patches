@@ -3,7 +3,7 @@
     <string name="section_navigation">Navigation</string>
     <string name="section_settings">Settings</string>
     <string name="disable_auto_launch">Disable auto-launch</string>
-    <string name="disable_auto_launch_summary">Stop automatic after-call screens and launches for inactive users.</string>
+    <string name="disable_auto_launch_summary">Stop Truecaller from opening itself in the background, and stop automatic after-call screens.</string>
     <string name="hide_messages">Hide Messages tab</string>
     <string name="hide_blocking">Hide Blocking tab</string>
     <string name="hide_premium">Hide Premium tab</string>

@@ -19,7 +19,7 @@ namespace signature::view {
 
     namespace {
         void *module_hook = nullptr;
-        std::atomic<int> module_hook_status{-1};
+        std::atomic module_hook_status{-1};
         using module_callback = int (*)(dl_phdr_info *, size_t, void *);
         using module_iterator = int (*)(module_callback, void *);
 
@@ -80,14 +80,16 @@ namespace signature::view {
             uintptr_t last = 0;
 
             const auto page_size = static_cast<uintptr_t>(sysconf(_SC_PAGESIZE));
+            const uintptr_t page_mask = ~(page_size - 1);
             for (ElfW(Half) index = 0; index < image.dlpi_phnum; index++) {
                 const auto &segment = image.dlpi_phdr[index];
                 if (segment.p_type != PT_LOAD) continue;
 
                 // The kernel reports complete pages, including the ELF segment's leading padding.
-                const uintptr_t start = (image.dlpi_addr + segment.p_vaddr) & ~(page_size - 1);
-                const uintptr_t end =
-                    (image.dlpi_addr + segment.p_vaddr + segment.p_memsz + page_size - 1) & ~(page_size - 1);
+                const uintptr_t segment_start = image.dlpi_addr + segment.p_vaddr;
+                const uintptr_t padded_end = segment_start + segment.p_memsz + page_size - 1;
+                const uintptr_t start = segment_start & page_mask;
+                const uintptr_t end = padded_end & page_mask;
 
                 first = std::min(first, start);
                 last = std::max(last, end);
@@ -172,8 +174,7 @@ namespace signature::view {
             // ShadowHook leaves its patched code page writable. Restore the ELF code permissions.
             const auto page_size = static_cast<uintptr_t>(sysconf(_SC_PAGESIZE));
             if (const auto address = reinterpret_cast<uintptr_t>(dl_iterate_phdr) & ~(page_size - 1);
-                mprotect(reinterpret_cast<void *>(address), static_cast<size_t>(page_size),
-                         PROT_READ | PROT_EXEC) != 0)
+                mprotect(reinterpret_cast<void *>(address), page_size, PROT_READ | PROT_EXEC) != 0)
                 return false;
         }
 

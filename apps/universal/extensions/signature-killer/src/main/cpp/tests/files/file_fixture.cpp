@@ -28,7 +28,8 @@ namespace signature::tests {
     } // namespace
 
     void file_redirect_test::prepare_files(const char *parent, const char *mode) {
-        redirect_contents = strcmp(mode, "contents") == 0;
+        install_after_fork = strcmp(mode, "fork") == 0;
+        redirect_contents = install_after_fork || strcmp(mode, "contents") == 0;
         preserve_identity = redirect_contents || strcmp(mode, "identity") == 0;
         page_size = static_cast<size_t>(sysconf(_SC_PAGESIZE));
         // Production puts the protected library and handler in separate executable ranges. Keep

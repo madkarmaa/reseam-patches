@@ -6,17 +6,24 @@
 // ReSharper disable CppUnusedIncludeDirective
 #include "redirect/seccomp_open.h"
 #include <linux/audit.h>
+#include <linux/filter.h>
 #include <sys/stat.h>
 #include <atomic>
 #include <csignal>
 #include <expected>
 #include <memory>
+#include <span>
 #include <string>
 #include <vector>
 // ReSharper restore CppUnusedIncludeDirective
 
 // Returns a kernel result without changing errno. Safe to call on the signal stack.
 extern "C" long signature_raw_syscall(long, long, long, long, long, long, long);
+
+struct sigcontext;
+// Continues an interrupted context without rt_sigreturn, restoring the given floating-point state when
+// it is not null. On arm64 it clobbers x16 and x17.
+extern "C" [[noreturn]] void signature_resume_context(const sigcontext *registers, const void *floating_point);
 
 namespace signature::redirect {
 #ifdef __aarch64__
@@ -71,6 +78,9 @@ namespace signature::redirect {
         // Published once per unpacked mapping. Readers never allocate or take a lock.
         std::atomic<const executable_range *> unpacked_ranges{nullptr};
         std::atomic<unsigned> filters{0};
+        // The redirect filter held back until the library's first fork, while it still waits.
+        std::vector<sock_filter> deferred_filter;
+        std::atomic<bool> filter_deferred{false};
         // Loaded libraries with that basename. Exactly one is required.
         unsigned libraries_found = 0;
         // Set once the filter is in place. An installed state is never replaced.
@@ -116,6 +126,11 @@ namespace signature::redirect {
         long value;
     };
 
+    std::vector<sock_filter> build_filter(uintptr_t start, uintptr_t end, bool preserve_identity,
+                                          bool redirect_contents);
+    // Traps plain forks, so the redirect filter can be installed after the first one.
+    std::vector<sock_filter> build_fork_filter();
+    std::expected<void, filter_failure> install_program(std::span<sock_filter> instructions);
     std::expected<void, filter_failure> install_filter(uintptr_t start, uintptr_t end, bool preserve_identity,
                                                        bool redirect_contents);
     bool install_sigsys_handler();

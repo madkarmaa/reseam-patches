@@ -57,18 +57,21 @@ namespace signature::tests {
         void install_redirect();
         [[nodiscard]] int check_contents() const;
         void check_metadata(int redirected);
+        void check_forked_child_filter() const;
+        void check_traced_fork() const;
         void clean_up() const;
 
       private:
         bool redirect_contents = false;
         bool preserve_identity = false;
+        bool install_after_fork = false;
         size_t page_size = 0;
         void *gateway = nullptr;
         std::string directory, installed_path, replacement_path, unrelated_path, symlink_path;
         std::string large_installed_path, large_replacement_path;
         int installed_descriptor = -1, replacement_descriptor = -1, directory_descriptor = -1;
         struct stat installed{}, replacement{};
-        off_t replacement_size = 0;
+        decltype(stat::st_size) replacement_size = 0;
         stat_at_metadata installed_at{}, replacement_at{}, unrelated_at{}, symlink_at{}, error_output{};
         long bad_stat_output = 0, bad_stat_path = 0, missing_stat_path = 0;
         long bad_stat_directory = 0, empty_stat_path = 0, bad_stat_flags = 0;

@@ -31,7 +31,7 @@ namespace signature::hooks {
         stat_function<struct stat> original_lstat = nullptr;
         stat_function<struct stat64> original_lstat64 = nullptr;
 
-        template <typename Metadata, auto &Original>
+        template <typename Metadata>
         int fstat_proxy(const int descriptor, Metadata *const value) {
             const int previous_errno = errno;
             const auto result =
@@ -39,7 +39,7 @@ namespace signature::hooks {
             return libc_result<int>(result, previous_errno);
         }
 
-        template <typename Metadata, auto &Original>
+        template <typename Metadata>
         int fstatat_proxy(const int directory, const char *const path, Metadata *const value,
                           const int flags) {
             const int previous_errno = errno;
@@ -48,7 +48,7 @@ namespace signature::hooks {
             return libc_result<int>(result, previous_errno);
         }
 
-        template <typename Metadata, auto &Original, int Flags>
+        template <typename Metadata, int Flags>
         int stat_proxy(const char *const path, Metadata *const value) {
             const int previous_errno = errno;
             const auto result = redirect(NATIVE_CALLER, stat_at_number, AT_FDCWD,
@@ -86,15 +86,14 @@ namespace signature::hooks {
 
     std::span<const libc_hook> file_metadata_hooks() {
         static const auto hooks = std::to_array({
-            hook("fstat", fstat_proxy<struct stat, original_fstat>, original_fstat),
-            hook("fstat64", fstat_proxy<struct stat64, original_fstat64>, original_fstat64),
-            hook("fstatat", fstatat_proxy<struct stat, original_fstatat>, original_fstatat),
-            hook("fstatat64", fstatat_proxy<struct stat64, original_fstatat64>, original_fstatat64),
-            hook("stat", stat_proxy<struct stat, original_stat, 0>, original_stat),
-            hook("stat64", stat_proxy<struct stat64, original_stat64, 0>, original_stat64),
-            hook("lstat", stat_proxy<struct stat, original_lstat, AT_SYMLINK_NOFOLLOW>, original_lstat),
-            hook("lstat64", stat_proxy<struct stat64, original_lstat64, AT_SYMLINK_NOFOLLOW>,
-                 original_lstat64),
+            hook("fstat", fstat_proxy<struct stat>, original_fstat),
+            hook("fstat64", fstat_proxy<struct stat64>, original_fstat64),
+            hook("fstatat", fstatat_proxy<struct stat>, original_fstatat),
+            hook("fstatat64", fstatat_proxy<struct stat64>, original_fstatat64),
+            hook("stat", stat_proxy<struct stat, 0>, original_stat),
+            hook("stat64", stat_proxy<struct stat64, 0>, original_stat64),
+            hook("lstat", stat_proxy<struct stat, AT_SYMLINK_NOFOLLOW>, original_lstat),
+            hook("lstat64", stat_proxy<struct stat64, AT_SYMLINK_NOFOLLOW>, original_lstat64),
             hook("readlink", readlink_proxy, original_readlink),
             hook("readlinkat", readlinkat_proxy, original_readlinkat),
         });

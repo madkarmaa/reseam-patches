@@ -77,9 +77,9 @@ namespace signature::view {
             } else {
                 const size_t bytes = header->cmsg_len - CMSG_LEN(0);
                 if (bytes % sizeof(int) != 0) valid = false;
-                const std::span<const int> transferred(reinterpret_cast<const int *>(CMSG_DATA(header)),
-                                                       bytes / sizeof(int));
-                for (const int received : transferred) {
+                for (const std::span transferred(reinterpret_cast<const int *>(CMSG_DATA(header)),
+                                                 bytes / sizeof(int));
+                     const int received : transferred) {
                     if (descriptors++ == 0) descriptor = received;
                     else close_raw(received);
                 }

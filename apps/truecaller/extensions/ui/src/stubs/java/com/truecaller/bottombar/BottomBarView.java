@@ -3,9 +3,16 @@
 
 package com.truecaller.bottombar;
 
+import android.content.Context;
 import android.view.Menu;
+import android.widget.FrameLayout;
 
-public final class BottomBarView {
+public final class BottomBarView extends FrameLayout {
+    public BottomBarView(Context context) {
+        super(context);
+        throw new UnsupportedOperationException("Stub");
+    }
+
     public Menu getMenu() {
         throw new UnsupportedOperationException("Stub");
     }

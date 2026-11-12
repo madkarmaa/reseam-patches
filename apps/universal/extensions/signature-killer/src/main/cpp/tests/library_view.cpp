@@ -70,7 +70,9 @@ int main(const int count, const char *const *const arguments) {
     assert(prepare_library_view(slash == nullptr ? arguments[0] : slash + 1));
 
     int visible_support_modules = 0;
+    // The dl_iterate_phdr callback type takes a mutable info pointer.
     dl_iterate_phdr(
+        // ReSharper disable once CppParameterMayBeConstPtrOrRef
         [](dl_phdr_info *info, size_t, void *data) {
             if (strstr(info->dlpi_name, "libSignatureKiller.so") != nullptr ||
                 strstr(info->dlpi_name, "libshadowhook.so") != nullptr)

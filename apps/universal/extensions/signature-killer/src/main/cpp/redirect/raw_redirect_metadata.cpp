@@ -126,6 +126,8 @@ namespace signature::redirect {
                 const auto &replacement =
                     state.redirect_file_contents ? identity.installed : identity.replacement;
                 if (value.st_dev != replacement.st_dev || value.st_ino != replacement.st_ino) continue;
+                // ptrdiff_t is wider than int on 64-bit ABIs.
+                // ReSharper disable once CppRedundantCastExpression
                 mapping = static_cast<int>(&identity - state.identities.data());
                 break;
             }

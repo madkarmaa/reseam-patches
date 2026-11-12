@@ -17,8 +17,8 @@ namespace signature::view {
     library_view_options target_options;
 
     namespace {
-        std::atomic<int> requests{-1};
-        std::atomic<int> worker_socket{-1};
+        std::atomic requests{-1};
+        std::atomic worker_socket{-1};
         static_assert(std::atomic<int>::is_always_lock_free);
         bool fork_handler_registered = false;
 
@@ -109,9 +109,12 @@ bool prepare_library_view(const char *const library, const library_view_options 
     pthread_t worker{};
     if (pthread_create(
             &worker, nullptr,
+            // intptr_t is wider than int on 64-bit ABIs.
             [](void *const descriptor_argument) -> void * {
+                // ReSharper disable once CppRedundantCastExpression
                 return serve_snapshots(static_cast<int>(reinterpret_cast<intptr_t>(descriptor_argument)));
             },
+            // ReSharper disable once CppRedundantCastExpression
             reinterpret_cast<void *>(static_cast<intptr_t>(sockets.front()))) != 0) {
         worker_socket.store(-1, std::memory_order_relaxed);
         close(sockets.front());

@@ -6,7 +6,7 @@
     <string name="disable_ads_name">Disable ads</string>
     <string name="disable_annoyances_description">Hides permission banners, surveys, update prompts, and automatic Premium offers.</string>
     <string name="disable_annoyances_name">Disable annoyances</string>
-    <string name="disable_auto_launch_description">Disables automatic after-call screens.</string>
+    <string name="disable_auto_launch_description">Stops Truecaller from opening itself in the background and disables automatic after-call screens.</string>
     <string name="disable_auto_launch_name">Disable auto-launch</string>
     <string name="disable_telemetry_description">Disables analytics and Firebase crash reports.</string>
     <string name="disable_telemetry_name">Disable telemetry</string>

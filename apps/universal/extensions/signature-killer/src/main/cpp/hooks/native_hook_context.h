@@ -11,8 +11,8 @@
 namespace signature::hooks {
     extern pthread_key_t stdio_caller_key;
     // Real code addresses cannot be these sentinels.
-    inline void *const internal_worker = reinterpret_cast<void *>(uintptr_t{1});
-    inline void *const foreign_stdio = reinterpret_cast<void *>(uintptr_t{2});
+    inline auto *const internal_worker = reinterpret_cast<void *>(uintptr_t{1});
+    inline auto *const foreign_stdio = reinterpret_cast<void *>(uintptr_t{2});
     void prepare_thread_context();
 
     // A target's stdio operation can enter read/open/lseek from inside libc. Keep that
