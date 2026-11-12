@@ -41,6 +41,12 @@ jobs:
                   key: deps-${{ runner.os }}-${{ hashFiles('**/*.gradle.kts', 'gradle/wrapper/gradle-wrapper.properties', 'bun.lock') }}
                   restore-keys: deps-${{ runner.os }}-
 
+            # The CI image ships a Bun without the built-in formatter that README generation uses.
+            - name: Set up Bun
+              uses: oven-sh/setup-bun@v2
+              with:
+                  bun-version: latest
+
             - name: Install Node deps
               run: bun ci
 
