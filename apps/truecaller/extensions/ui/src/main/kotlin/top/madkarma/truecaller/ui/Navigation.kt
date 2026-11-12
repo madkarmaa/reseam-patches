@@ -6,6 +6,8 @@
 
 package top.madkarma.truecaller.ui
 
+import android.view.View
+import android.view.ViewGroup
 import app.reseam.runtime.Export
 import com.truecaller.bottombar.BottomBarButtonType
 import com.truecaller.bottombar.BottomBarButtonType.*
@@ -25,13 +27,37 @@ private fun isHidden(tab: BottomBarButtonType): Boolean =
 
 @Export
 fun hideTabs(view: Any?) {
-    val menu = (view as? BottomBarView)?.menu ?: return
+    val bottomBar = view as? BottomBarView ?: return
+    val menu = bottomBar.menu
 
     if (isHidden(MESSAGES)) menu.removeItem(BottomBarMenuItemId.MESSAGES.id)
     if (isHidden(BLOCKING)) menu.removeItem(BottomBarMenuItemId.BLOCKING.id)
     if (isHidden(PREMIUM)) menu.removeItem(BottomBarMenuItemId.PREMIUM.id)
     if (isHidden(FAMILY_PROTECTION_CONFIG))
         menu.removeItem(BottomBarMenuItemId.FAMILY_PROTECTION_CONFIG.id)
+
+    // A bar left with only Calls has nothing to switch to.
+    if (menu.size() > 1) return
+    collapseToInsets(bottomBar)
+    bottomBarDivider(bottomBar)?.visibility = View.GONE
+}
+
+// The bar pads itself by the navigation-bar inset; keeping that padding stops content from
+// sliding under the system navigation buttons.
+private fun collapseToInsets(bottomBar: ViewGroup) {
+    for (index in 0 until bottomBar.childCount) bottomBar.getChildAt(index).visibility = View.GONE
+    bottomBar.minimumHeight = 0
+}
+
+private fun bottomBarDivider(bottomBar: View): View? {
+    val dividerId =
+        bottomBar.resources.getIdentifier(
+            "bottom_bar_revamp_divider",
+            "id",
+            bottomBar.context.packageName,
+        )
+    if (dividerId == 0) return null
+    return (bottomBar.parent as? View)?.findViewById(dividerId)
 }
 
 @Export
