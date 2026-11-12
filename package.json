@@ -2,7 +2,7 @@
     "name": "madkarma-patches",
     "version": "0.56.0",
     "reseam": {
-        "engine": "0.40.0"
+        "engine": "0.41.0"
     },
     "private": true,
     "license": "AGPL-3.0-or-later",
