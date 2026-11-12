@@ -122,13 +122,17 @@ fun killApkPath(context: Context, packageName: String) {
 /** Traps raw file-open syscalls from a loaded library and redirects installed APK paths. */
 @Export
 @Synchronized
-fun redirectRawApkOpens(libraryName: String) {
-    check(fileRedirectionInstalled) { "Original APK file redirection is not installed" }
-    check(trapRawApkOpens(libraryName, !libcFileHooksEnabled)) {
-        "Installing raw APK open redirection failed in $libraryName"
-    }
-    logInfo { "redirectRawApkOpens: seccomp redirect installed for $libraryName" }
-}
+fun redirectRawApkOpens(libraryName: String) = trapLibraryApkFiles(libraryName, afterFork = false)
+
+/**
+ * Like [redirectRawApkOpens], but starts redirecting only after the process next forks, and only in
+ * the parent. Use it when that child traces its own syscalls with ptrace, as Pairip's watchdog
+ * does: an inherited redirect would turn them into signals that its tracer discards.
+ */
+@Export
+@Synchronized
+fun redirectRawApkOpensAfterFork(libraryName: String) =
+    trapLibraryApkFiles(libraryName, afterFork = true)
 
 /** Arms APK file redirection after a library loads and before Android calls its JNI_OnLoad. */
 @Export
@@ -146,6 +150,16 @@ fun redirectApkFilesOnLibraryLoad(libraryName: String) {
 fun checkSignatures(context: Context, packageName: String, base64Sig: String) =
     logSignatures(context, packageName, base64Sig)
 
+private fun trapLibraryApkFiles(libraryName: String, afterFork: Boolean) {
+    check(fileRedirectionInstalled) { "Original APK file redirection is not installed" }
+    check(trapRawApkOpens(libraryName, !libcFileHooksEnabled, afterFork)) {
+        "Installing raw APK open redirection failed in $libraryName"
+    }
+    logInfo {
+        "Raw APK redirect for $libraryName ${if (afterFork) "waits for its first fork" else "installed"}"
+    }
+}
+
 // Preserve the same monitor as the other synchronized exported redirection methods.
 @Synchronized
 private fun killOpen(context: Context, packageName: String) =
@@ -159,7 +173,11 @@ internal external fun hookApkPaths(
     hookLibc: Boolean,
 ): Boolean
 
-private external fun trapRawApkOpens(libraryName: String, redirectContents: Boolean): Boolean
+private external fun trapRawApkOpens(
+    libraryName: String,
+    redirectContents: Boolean,
+    installAfterFork: Boolean,
+): Boolean
 
 private external fun prepareApkFilesOnLibraryLoad(
     libraryName: String,

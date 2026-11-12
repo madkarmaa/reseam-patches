@@ -56,12 +56,15 @@ namespace signature::redirect {
 } // namespace signature::redirect
 
 using signature::redirect::active;
+using signature::redirect::build_filter;
+using signature::redirect::build_fork_filter;
 using signature::redirect::contains_address;
 using signature::redirect::executable_range;
 using signature::redirect::filter_failure;
 using signature::redirect::find_library;
 using signature::redirect::install_filter;
 using signature::redirect::install_mutex;
+using signature::redirect::install_program;
 using signature::redirect::install_sigsys_handler;
 using signature::redirect::path_copying_available;
 using signature::redirect::prepare_descriptor_identities;
@@ -92,11 +95,12 @@ bool install_raw_open_redirect(const char *const library, const std::span<const 
     candidate->snapshot_proc_file = options.snapshot_proc_file;
     candidate->bypass_current_thread = options.bypass_current_thread;
 
+    candidate->installing_process = getpid();
+
     if (candidate->snapshot_proc_file != nullptr) {
         const long limit = sysconf(_SC_OPEN_MAX);
         if (limit <= 0) return false;
 
-        candidate->installing_process = getpid();
         candidate->descriptor_count = static_cast<size_t>(limit);
         candidate->proc_descriptors.reset(candidate->descriptor_count);
 
@@ -126,25 +130,33 @@ bool install_raw_open_redirect(const char *const library, const std::span<const 
     redirect_state *const state = candidate.release();
     active.store(state, std::memory_order_release);
 
+    auto filter = build_filter(state->start, state->end, state->preserve_descriptor_identity,
+                               state->redirect_file_contents);
+    if (options.install_after_fork) {
+        // The signal handler installs the held-back filter in the parent of the library's first fork.
+        state->deferred_filter = std::move(filter);
+        state->filter_deferred.store(true, std::memory_order_release);
+        filter = build_fork_filter();
+    }
+
     if (!install_sigsys_handler()) return false;
 
-    if (const std::expected<void, filter_failure> filter = install_filter(
-            state->start, state->end, state->preserve_descriptor_identity, state->redirect_file_contents);
-        !filter) {
+    if (const std::expected<void, filter_failure> installed = install_program(filter); !installed) {
         sigaction(SIGSYS, &state->previous_handler, nullptr);
-        LOG_ERROR("Installing raw APK file seccomp filter failed: %s %ld", filter.error().cause,
-                  filter.error().value);
+        LOG_ERROR("Installing raw APK file seccomp filter failed: %s %ld", installed.error().cause,
+                  installed.error().value);
         return false;
     }
 
     // Filter installation is irreversible. State and mapping strings live until process exit;
     // forked children inherit them, the signal disposition and the filter.
     state->installed = true;
-    state->filters.store(1, std::memory_order_release);
+    state->filters.fetch_add(1, std::memory_order_release);
     if (!diagnostics_enabled()) return true;
 
     start_event_logger(*state);
-    LOG_INFO("Raw APK file seccomp filter installed for %s [%p, %p), all threads", library,
+    LOG_INFO("Raw APK file seccomp filter %s for %s [%p, %p), all threads",
+             options.install_after_fork ? "waits for the first fork" : "installed", library,
              reinterpret_cast<void *>(state->start), reinterpret_cast<void *>(state->end));
     return true;
 }
@@ -163,6 +175,12 @@ bool extend_raw_open_redirect(const uintptr_t start, const uintptr_t end) {
     const std::scoped_lock lock(install_mutex);
     redirect_state *const state = active.load(std::memory_order_acquire);
     if (state == nullptr || !state->installed || start >= end) return false;
+
+    // A filter installed now would reach the child that the held-back filter must not reach.
+    if (state->filter_deferred.load(std::memory_order_acquire)) {
+        LOG_ERROR("Cannot extend native APK redirection before %s forks", state->library.c_str());
+        return false;
+    }
 
     if (start >= state->start && end <= state->end) return true;
     for (const executable_range *range = state->unpacked_ranges.load(std::memory_order_acquire);

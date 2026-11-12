@@ -135,7 +135,9 @@ namespace signature::redirect {
             if (arguments.third != SEEK_END)
                 return signature_raw_syscall(number, descriptor, arguments.second, arguments.third, 0, 0, 0);
 
+            // st_size is 64-bit on 32-bit Android, where lseek takes a long offset.
             return signature_raw_syscall(number, descriptor,
+                                         // ReSharper disable once CppRedundantCastExpression
                                          static_cast<long>(identity.replacement.st_size + arguments.second),
                                          SEEK_SET, 0, 0, 0);
         }

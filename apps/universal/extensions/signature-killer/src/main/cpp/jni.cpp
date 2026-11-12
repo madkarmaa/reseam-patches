@@ -75,7 +75,7 @@ Java_top_madkarma_universal_signature_SignatureKiller_setNativeDiagnostics(
 extern "C" JNIEXPORT jboolean JNICALL
 Java_top_madkarma_universal_signature_SignatureKiller_trapRawApkOpens(
     JNIEnv *const env, jclass /*declaring_class*/, const jstring library_name,
-    const jboolean redirect_contents) {
+    const jboolean redirect_contents, const jboolean install_after_fork) {
     const path_mappings *const mappings = installed_path_mappings();
     if (mappings == nullptr) return JNI_FALSE;
 
@@ -94,6 +94,7 @@ Java_top_madkarma_universal_signature_SignatureKiller_trapRawApkOpens(
         .preserve_descriptor_identity = redirect_contents == JNI_TRUE,
         .redirect_file_contents = redirect_contents == JNI_TRUE,
         .snapshot_proc_file = redirect_contents == JNI_TRUE ? snapshot_process_file : nullptr,
+        .install_after_fork = install_after_fork == JNI_TRUE,
     };
 
     if (!install_raw_open_redirect(name->c_str(), paths, options)) return JNI_FALSE;

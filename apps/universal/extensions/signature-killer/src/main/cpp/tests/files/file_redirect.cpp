@@ -14,6 +14,7 @@ int main(const int count, const char *const *const arguments) {
     test.install_redirect();
     const int redirected = test.check_contents();
     test.check_metadata(redirected);
+    test.check_forked_child_filter();
     test.clean_up();
     puts("Native file redirection checks passed");
 }

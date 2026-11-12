@@ -10,7 +10,7 @@
 // ReSharper restore CppUnusedIncludeDirective
 
 // Set from the patch's diagnostics option right after loading. When off, nothing is logged.
-inline constinit std::atomic<bool> diagnostics{false};
+inline constinit std::atomic diagnostics{false};
 
 inline bool diagnostics_enabled() { return diagnostics.load(std::memory_order_relaxed); }
 

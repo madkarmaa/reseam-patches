@@ -2,9 +2,6 @@
 <!-- SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top> -->
 <!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
 <resources>
-    <string name="expose_pairip_dex_diagnostics_title">Log loaded methods</string>
-    <string name="expose_pairip_dex_description">Makes lifted methods from an embedded Pairip DEX available to Reseam patches and uses the patched methods at runtime. Keeps Pairip running. Does not support encrypted or VM-only method bodies.</string>
-    <string name="expose_pairip_dex_name">Expose Pairip DEX</string>
     <string name="force_extract_native_libs_description">Sets android:extractNativeLibs to true when it is false.</string>
     <string name="force_extract_native_libs_name">Force extract native libs</string>
     <string name="hide_packages_description">Hides the chosen packages from the app\'s PackageManager queries, as if they were not installed.</string>

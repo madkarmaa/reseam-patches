@@ -110,7 +110,7 @@ namespace signature::tests {
         int64_t seek_large_file(const int descriptor, const int64_t offset, const int origin) {
 #ifdef __arm__
             int64_t position = -1;
-            assert(protected_syscall(__NR__llseek, descriptor, static_cast<uint64_t>(offset) >> 32,
+            assert(protected_syscall(__NR__llseek, descriptor, static_cast<uint64_t>(offset) >> 32U,
                                      static_cast<uint32_t>(offset), reinterpret_cast<long>(&position), origin,
                                      0) == 0);
             return position;
@@ -127,8 +127,9 @@ namespace signature::tests {
         const int descriptor = raw_open(__NR_openat, path);
         std::array<char, large_contents.size()> buffer{};
         const auto read_contents = [&] {
-            assert(protected_syscall(__NR_read, descriptor, reinterpret_cast<long>(buffer.data()),
-                                     buffer.size(), 0, 0, 0) == large_contents.size());
+            assert(std::cmp_equal(protected_syscall(__NR_read, descriptor, reinterpret_cast<long>(buffer.data()),
+                                                    buffer.size(), 0, 0, 0),
+                                  large_contents.size()));
             assert(memcmp(buffer.data(), large_contents.data(), large_contents.size()) == 0);
         };
         assert(seek_large_file(descriptor, large_offset, SEEK_SET) == large_offset);
@@ -138,16 +139,17 @@ namespace signature::tests {
 #ifdef __arm__
         const long result =
             protected_syscall(__NR_pread64, descriptor, reinterpret_cast<long>(buffer.data()), buffer.size(),
-                              0, static_cast<uint32_t>(large_offset), large_offset >> 32);
+                              0, static_cast<uint32_t>(large_offset), static_cast<uint64_t>(large_offset) >> 32U);
         constexpr int mapping_syscall = __NR_mmap2;
-        constexpr long mapping_offset = large_offset >> 12;
+        // mmap2 takes the offset in 4096-byte units.
+        constexpr long mapping_offset = large_offset / 4096;
 #else
         const long result = protected_syscall(__NR_pread64, descriptor, reinterpret_cast<long>(buffer.data()),
                                               buffer.size(), large_offset, 0, 0);
         constexpr int mapping_syscall = __NR_mmap;
         constexpr long mapping_offset = large_offset;
 #endif
-        assert(result == large_contents.size());
+        assert(std::cmp_equal(result, large_contents.size()));
         assert(memcmp(buffer.data(), large_contents.data(), large_contents.size()) == 0);
         const long mapping = protected_syscall(mapping_syscall, 0, static_cast<long>(page_size), PROT_READ,
                                                MAP_PRIVATE, descriptor, mapping_offset);

@@ -26,6 +26,13 @@ namespace signature::hooks {
         constinit std::mutex allocations_mutex;
         std::vector<allocation_range> target_allocations;
 
+        // Rounds an address up to the next page boundary.
+        uintptr_t page_end(const uintptr_t address, const uintptr_t page_size) {
+            const uintptr_t page_mask = ~(page_size - 1);
+            const uintptr_t padded = address + page_size - 1;
+            return padded & page_mask;
+        }
+
         bool target_allocation(const uintptr_t start, const uintptr_t end) {
             const std::scoped_lock lock(allocations_mutex);
             return std::ranges::any_of(target_allocations, [start, end](const allocation_range &range) {
@@ -43,7 +50,7 @@ namespace signature::hooks {
             const std::scoped_lock lock(allocations_mutex);
             target_allocations.push_back({
                 .start = start,
-                .end = (start + size + page_size - 1) & ~(page_size - 1),
+                .end = page_end(start + size, page_size),
             });
         }
 
@@ -74,7 +81,7 @@ namespace signature::hooks {
                 start > maximum - (page_size - 1) || size > maximum - start - (page_size - 1))
                 abort();
 
-            const auto end = (start + size + page_size - 1) & ~(page_size - 1);
+            const auto end = page_end(start + size, page_size);
             if (extend_raw_open_redirect(first, end)) return;
 
             LOG_ERROR("Cannot redirect newly executable native mapping [%p, %p)",
@@ -107,7 +114,7 @@ namespace signature::hooks {
             return result;
         }
 
-        template <typename Offset, auto &Original>
+        template <typename Offset>
         void *mmap_proxy(void *const address, const size_t size, const int protection, const int flags,
                          const int descriptor, const Offset offset) {
             const auto caller = NATIVE_CALLER;
@@ -117,8 +124,8 @@ namespace signature::hooks {
             const auto position = static_cast<uint64_t>(offset);
             if (offset < 0 || (position & 4095U) != 0) return libc_result<void *>(-EINVAL, previous_errno);
             const auto page_size = static_cast<size_t>(sysconf(_SC_PAGESIZE));
-            const size_t rounded = (size + page_size - 1) & ~(page_size - 1);
-            if (rounded < size || rounded > static_cast<size_t>(PTRDIFF_MAX))
+            if (const size_t rounded = page_end(size, page_size);
+                rounded < size || rounded > static_cast<size_t>(PTRDIFF_MAX))
                 return libc_result<void *>(-ENOMEM, previous_errno);
             const auto redirected = redirect(caller, __NR_mmap2, reinterpret_cast<long>(address),
                                              static_cast<long>(size), protection, flags, descriptor,
@@ -143,8 +150,8 @@ namespace signature::hooks {
     std::span<const libc_hook> memory_hooks() {
         static const auto hooks = std::to_array({
             hook("mprotect", mprotect_proxy, original_mprotect),
-            hook("mmap", mmap_proxy<off_t, original_mmap>, original_mmap),
-            hook("mmap64", mmap_proxy<off64_t, original_mmap64>, original_mmap64),
+            hook("mmap", mmap_proxy<off_t>, original_mmap),
+            hook("mmap64", mmap_proxy<off64_t>, original_mmap64),
         });
         return hooks;
     }

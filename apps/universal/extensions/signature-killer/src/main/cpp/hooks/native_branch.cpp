@@ -48,7 +48,8 @@ namespace signature::hooks {
             0xd50324dfU,
         });
         const size_t index = std::ranges::contains(branch_targets, instructions.front()) ? 1 : 0;
-        const auto position = entry + (index * sizeof(uint32_t));
+        const size_t offset = index * sizeof(uint32_t);
+        const auto position = entry + offset;
         const uint32_t instruction = instructions.at(index);
         // B preserves the original LR. BL would make the wrapper itself the caller.
         if ((instruction & 0xfc000000U) == 0x14000000U) {
@@ -80,7 +81,7 @@ namespace signature::hooks {
         std::array<char, 4096> line{};
         unsigned protection = 0;
         bool found = false;
-        while (fgets(line.data(), static_cast<int>(line.size()), maps.get()) != nullptr) {
+        while (fgets(line.data(), line.size(), maps.get()) != nullptr) {
             const std::string_view text(line.data());
             const auto hyphen = text.find('-');
             const auto space = text.find(' ');

@@ -90,6 +90,8 @@ namespace signature::redirect {
             pthread_create(
                 &logger, nullptr,
                 [](void *const descriptor_argument) -> void * {
+                    // intptr_t is wider than int on 64-bit ABIs.
+                    // ReSharper disable once CppRedundantCastExpression
                     log_syscall_events(static_cast<int>(reinterpret_cast<intptr_t>(descriptor_argument)));
                     return nullptr;
                 },
