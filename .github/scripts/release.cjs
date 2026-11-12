@@ -19,6 +19,7 @@ exports.prepare = (_, { branch, nextRelease, cwd, env }) => {
             ],
             options,
         );
+        execFileSync("bun", ["fmt", "README.md"], options);
     }
 };
 
