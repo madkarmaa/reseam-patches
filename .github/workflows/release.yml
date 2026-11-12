@@ -43,9 +43,9 @@ jobs:
 
             # The CI image ships a Bun without the built-in formatter that README generation uses.
             - name: Set up Bun
-              uses: oven-sh/setup-bun@v2.2.0
+              uses: oven-sh/setup-bun@v2
               with:
-                  bun-version: 1.4.4
+                  bun-version: latest
 
             - name: Install Node deps
               run: bun ci
