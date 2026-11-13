@@ -5,14 +5,14 @@
 """
 Usage:
     compatibility_bump_notifier.py [--dry-run] [--package <id>] [--channel stable]
-                         [--base-url https://sniff.madkarma.top/v2]
+                         [--base-url https://sniff.madkarma.top/v3]
                          [--patches-json build/reseam/release/patches.json]
 
 Reads pinned versions from the release index. Generate the index first with
 `just index`.
 
 Environment:
-    SNIFF_BASE_URL  API base URL (default https://sniff.madkarma.top/v2).
+    SNIFF_BASE_URL  API base URL (default https://sniff.madkarma.top/v3).
     GH_TOKEN        token for `gh` (CI provides GITHUB_TOKEN).
 """
 
@@ -23,21 +23,13 @@ import json
 import os
 import subprocess
 import sys
-import urllib.error
-import urllib.request
 from pathlib import Path
+
+from sniff import DEFAULT_BASE_URL, DEFAULT_CHANNEL, latest_release
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_PATCHES_JSON = REPO_ROOT / "build" / "reseam" / "release" / "patches.json"
-DEFAULT_BASE_URL = "https://sniff.madkarma.top/v2"
-DEFAULT_CHANNEL = "stable"
 ISSUE_LABEL = "app-update"
-UA = {"User-Agent": "Mozilla/5.0"}
-
-
-def normalize_version_name(raw: str) -> str:
-    """Remove Play suffixes, for example turning '289.20 - Stable' into '289.20'."""
-    return raw.split(" - ")[0].strip().split()[0]
 
 
 def collect_pins(
@@ -80,33 +72,6 @@ def collect_pins(
             declared.setdefault(package, {})[patch["id"]] = patch.get("name", patch["id"])
 
     return pinned, declared
-
-
-def sniff_latest(package: str, base_url: str, channel: str) -> tuple[str, str] | None:
-    """Return the normalized version name and app title, or None on failure."""
-    url = f"{base_url.rstrip('/')}/download/{package}/{channel}"
-    req = urllib.request.Request(url, headers=UA)
-
-    try:
-        with urllib.request.urlopen(req, timeout=60) as resp:
-            payload = json.load(resp)
-    except urllib.error.HTTPError as e:
-        detail = e.read().decode("utf-8", "replace")[:200]
-        print(f"warning: {package}: GET {url} -> HTTP {e.code}: {detail}", file=sys.stderr)
-        return None
-    except urllib.error.URLError as e:
-        print(f"warning: {package}: GET {url} failed: {e}", file=sys.stderr)
-        return None
-
-    try:
-        item = payload["data"]["item"]
-        details = item["details"]["app_details"]
-        raw_version = str(details["version_string"])
-        title = str(item.get("title", package))
-    except KeyError, TypeError:
-        print(f"warning: {package}: unexpected details shape", file=sys.stderr)
-        return None
-    return normalize_version_name(raw_version), title
 
 
 def gh(*args: str) -> str:
@@ -259,11 +224,11 @@ def main(argv: list[str] | None = None) -> int:
             continue
 
         ordered = sorted(versions)
-        result = sniff_latest(package, args.base_url, args.channel)
+        result = latest_release(package, args.base_url, args.channel)
         if result is None:
             continue
 
-        latest, title_app = result
+        latest, title_app = result.version_name, result.title
         declaring = patches.get(package, {})
         if latest in versions:
             print(f"ok {package}: latest {latest} is pinned ({', '.join(ordered)})")
