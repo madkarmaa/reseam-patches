@@ -5,7 +5,7 @@
 """
 Usage:
     track_latest_versions.py [--dry-run] [--package <id>] [--channel stable]
-                             [--base-url https://sniff.madkarma.top/v2]
+                             [--base-url https://sniff.madkarma.top/v3]
                              [--patches-json build/reseam/release/patches.json]
                              [--issue-title "Latest upstream app versions"]
                              [--label app-latest]
@@ -14,12 +14,12 @@ Reads every package declared in the release index, including unpinned apps.
 Generate the index first with
 `just index`.
 
-Queries GET /v2/download/{package_name}/{channel} on https://sniff.madkarma.top
+Queries GET /v3/download/{package_name}/{channel} on https://sniff.madkarma.top
 for the latest release. The default channel is stable. Creates or updates
 one tracking issue as a daily checklist for patching the latest app versions.
 
 Environment:
-    SNIFF_BASE_URL  API base URL (default https://sniff.madkarma.top/v2).
+    SNIFF_BASE_URL  API base URL (default https://sniff.madkarma.top/v3).
     GH_TOKEN        token for `gh` (CI provides GITHUB_TOKEN).
 """
 
@@ -31,23 +31,15 @@ import os
 import subprocess
 import sys
 import tempfile
-import urllib.error
-import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
+from sniff import DEFAULT_BASE_URL, DEFAULT_CHANNEL, latest_release
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_PATCHES_JSON = REPO_ROOT / "build" / "reseam" / "release" / "patches.json"
-DEFAULT_BASE_URL = "https://sniff.madkarma.top/v2"
-DEFAULT_CHANNEL = "stable"
 STICKY_TITLE = "Latest upstream app versions"
 ISSUE_LABEL = "app-latest"
-UA = {"User-Agent": "Mozilla/5.0"}
-
-
-def normalize_version_name(raw: str) -> str:
-    """Remove Play suffixes, for example turning '289.20 - Stable' into '289.20'."""
-    return raw.split(" - ")[0].strip().split()[0]
 
 
 def collect_packages(
@@ -90,40 +82,6 @@ def collect_packages(
             declared.setdefault(package, {})[patch["id"]] = patch.get("name", patch["id"])
 
     return declared, {package: sorted(versions) for package, versions in pinned.items()}
-
-
-def sniff_latest(package: str, base_url: str, channel: str) -> tuple[str, int | None, str] | None:
-    """Return the normalized version name, optional version code, and app title.
-
-    Return None on failure.
-    """
-    url = f"{base_url.rstrip('/')}/download/{package}/{channel}"
-    req = urllib.request.Request(url, headers=UA)
-
-    try:
-        with urllib.request.urlopen(req, timeout=60) as resp:
-            payload = json.load(resp)
-    except urllib.error.HTTPError as e:
-        detail = e.read().decode("utf-8", "replace")[:200]
-        print(f"warning: {package}: GET {url} -> HTTP {e.code}: {detail}", file=sys.stderr)
-        return None
-    except urllib.error.URLError as e:
-        print(f"warning: {package}: GET {url} failed: {e}", file=sys.stderr)
-        return None
-
-    try:
-        item = payload["data"]["item"]
-        details = item["details"]["app_details"]
-        raw_version = str(details["version_string"])
-        title = str(item.get("title", package))
-    except KeyError, TypeError:
-        print(f"warning: {package}: unexpected details shape", file=sys.stderr)
-        return None
-
-    version_code = details.get("version_code")
-    if not isinstance(version_code, int):
-        version_code = None
-    return normalize_version_name(raw_version), version_code, title
 
 
 def gh(*args: str) -> str:
@@ -297,7 +255,7 @@ def main(argv: list[str] | None = None) -> int:
 
     results = []
     for package in targets:
-        result = sniff_latest(package, args.base_url, args.channel)
+        result = latest_release(package, args.base_url, args.channel)
         if result is None:
             print(f"unknown {package}: sniff lookup failed")
             results.append(
@@ -312,14 +270,13 @@ def main(argv: list[str] | None = None) -> int:
             )
             continue
 
-        latest, version_code, title = result
-        print(f"found {package}: {latest} ({title})")
+        print(f"found {package}: {result.version_name} ({result.title})")
         results.append(
             {
                 "package": package,
-                "title": title,
-                "latest": latest,
-                "version_code": version_code,
+                "title": result.title,
+                "latest": result.version_name,
+                "version_code": result.version_code,
                 "pinned": pinned.get(package, []),
                 "declaring": declared.get(package, {}),
             }
