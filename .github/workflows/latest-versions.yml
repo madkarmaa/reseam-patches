@@ -32,7 +32,7 @@ jobs:
                 shell: bash
 
         env:
-            SNIFF_BASE_URL: https://sniff.madkarma.top/v2
+            SNIFF_BASE_URL: https://sniff.madkarma.top/v3
             PACKAGE_NAME: ${{ inputs.package }}
             BUNDLE_SIGNING_KEY_B64: ${{ secrets.BUNDLE_SIGNING_KEY_B64 }}
             RESEAM_HOMEPAGE: ${{ github.server_url }}/${{ github.repository }}
