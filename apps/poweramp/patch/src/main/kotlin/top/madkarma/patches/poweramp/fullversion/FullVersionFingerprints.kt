@@ -64,6 +64,38 @@ internal val setIntegerPreference =
         params(Type.Int)
     }
 
+private val beginLicenseCall =
+    method("beginLicenseCall") {
+        inClass(licenseBridge)
+        calls(licenseBridge.method("native_acquire"))
+    }
+
+// The license status screen reads its labels from the bridge under the "ps" tag, which the
+// extension answers.
+internal val readLicenseStatus =
+    method("readLicenseStatus") {
+        strings("ps")
+        calls(beginLicenseCall)
+    }
+
+// Activity launches go through the native library under the "sac" tag. A few days after the trial
+// ends, it silently drops them.
+internal val launchActivity =
+    method("launchActivity") {
+        strings("sac")
+        calls(beginLicenseCall)
+    }
+
+// The app's message bus is the one Handler implementing MsgBus. The native library posts its
+// license verdicts to it.
+private val messageBus =
+    klass("messageBus") {
+        implements("Lcom/maxmpz/widget/MsgBus;")
+        extends("Landroid/os/Handler;")
+    }
+
+internal val postMessage = messageBus.method("post")
+
 // The purchased card joins two labels into "One time purchase | Lifetime license".
 internal val updatePurchaseCard =
     klass("com.maxmpz.audioplayer.preference.BaseBuyFvPref").method("update")

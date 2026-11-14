@@ -6,11 +6,18 @@
 
 package top.madkarma.extensions.poweramp
 
+import android.content.Context
+import android.content.Intent
 import android.util.Log
 import app.reseam.runtime.Export
 import com.maxmpz.audioplayer.Sync
 
 private val readingLicenseStatus = ThreadLocal<Boolean>()
+
+// The native library posts its license verdicts while a bridge call runs. Once the trial ends,
+// they open the expired dialog, jump to the main screen, and close every activity.
+private val runningNativeCall = ThreadLocal<Boolean>()
+
 private var fullVersionState: Any? = null
 private var pendingExpiry: Any? = null
 
@@ -53,5 +60,19 @@ fun label(index: Int): String? {
 }
 
 @Export
-fun release(value: Any?, command: Int): Int =
-    if (readingLicenseStatus.get() == true) 0 else Sync.native_release(value, command)
+fun release(value: Any?, command: Int): Int {
+    if (readingLicenseStatus.get() == true) return 0
+    runningNativeCall.set(true)
+    try {
+        return Sync.native_release(value, command)
+    } finally {
+        runningNativeCall.remove()
+    }
+}
+
+@Export fun dropLicensePost(): Boolean = runningNativeCall.get() == true
+
+@Export
+fun launchActivity(context: Context, intent: Intent) {
+    context.startActivity(intent)
+}

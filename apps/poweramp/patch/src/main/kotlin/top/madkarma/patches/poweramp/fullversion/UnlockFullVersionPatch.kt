@@ -67,8 +67,25 @@ val unlockFullVersion =
                 "Full version: every thanks_for_purchase translation shows the shared patch attribution.",
             )
 
-            // The bridge also handles activity launches and settings encryption. Keep those
-            // operations and JNI registration, replacing only the license-status response.
+            postMessage.before { whenTrue(FullVersion.dropLicensePost()) { returnVoid() } }
+            log.info(
+                "Full version: ${postMessage.descriptor} drops what the native library posts during license calls.",
+            )
+
+            // Find both tagged callers before the bridge calls they make are redirected below.
+            launchActivity.replace {
+                FullVersion.launchActivity(param(0), param(1))
+                returnVoid()
+            }
+            log.info(
+                "Full version: ${launchActivity.descriptor} starts activities without the native library.",
+            )
+            log.info(
+                "Full version: ${readLicenseStatus.descriptor} reads the license status labels from the extension.",
+            )
+
+            // The bridge also handles settings encryption and the license checks other native code
+            // relies on. Keep those and JNI registration, answering only the status read.
             val redirects =
                 mapOf(
                     "native_acquire" to FullVersion.acquire,
