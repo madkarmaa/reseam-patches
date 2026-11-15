@@ -27,7 +27,7 @@ universal patches that work on any app. Want an app supported?
 | Bug fixes                                             | Fixes app bugs.                                                                                                                           | None         |
 | Disable analytics                                     | Refuses and blocks analytics collection.                                                                                                  | None         |
 | Mindful launch                                        | Before a leisure app opens too often or for too long, shows a pause with a countdown on the open button. Configure it in Reseam settings. | None         |
-| Skip intro                                            | Skips the promo and terms screens and opens favorites setup.                                                                              | None         |
+| Skip intro                                            | Skips the promo and terms screens, opens favorites setup, and skips the tutorials after it.                                               | None         |
 | top.madkarma.patches.niagara.settings.niagaraSettings |                                                                                                                                           | None         |
 | Unlock Pro                                            | Unlocks Pro-only features.                                                                                                                | None         |
 | Weather widget fix                                    | Replaces the Niagara weather service with WeatherAPI.com. Enter your API key in Reseam settings, opened from Niagara settings.            | None         |
@@ -240,6 +240,16 @@ universal patches that work on any app. Want an app supported?
 | Remove annoyances | Removes promotional popups from the app.                              | None         |
 | Skip onboarding   | Skips the onboarding questionnaires shown at startup.                 | None         |
 | Unlock Ultra      | Unlocks Ultra-only features. Server credit balances remain unchanged. | None         |
+
+</details>
+
+<details>
+<summary><strong>com.pixelrespawn.linkboy</strong></summary>
+
+| Name            | Description                                                       | Version pins |
+| --------------- | ----------------------------------------------------------------- | ------------ |
+| GmsCore support | Signs in with Google through separately installed Reseam GmsCore. | None         |
+| Unlock Premium  | Unlocks Premium-only features.                                    | None         |
 
 </details>
 
