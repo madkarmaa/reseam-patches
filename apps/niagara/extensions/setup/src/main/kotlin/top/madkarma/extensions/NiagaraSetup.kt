@@ -25,10 +25,13 @@ private const val ANALYTICS_REFUSAL =
 
 private fun prefs(context: Context) = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
+/** Starts a fresh onboarding at favorites setup; one in progress or completed keeps its step. */
 @Suppress("UseKtx")
 @Export
 fun skipToFavoritesSetup(context: Context) {
-    prefs(context).edit().putString(KEY_BLOCK, BLOCK_SELECT_FAVORITES).apply()
+    val prefs = prefs(context)
+    if (prefs.contains(KEY_BLOCK)) return
+    prefs.edit().putString(KEY_BLOCK, BLOCK_SELECT_FAVORITES).apply()
 }
 
 @Suppress("UseKtx")
