@@ -10,10 +10,12 @@
     <string name="mindful_launch_name">Mindful launch</string>
     <string name="skip_intro_accept_terms_description">Marks the terms as accepted, skipping the terms screen.</string>
     <string name="skip_intro_accept_terms_title">Accept terms</string>
-    <string name="skip_intro_description">Skips the promo and terms screens and opens favorites setup.</string>
+    <string name="skip_intro_description">Skips the promo and terms screens, opens favorites setup, and skips the tutorials after it.</string>
     <string name="skip_intro_name">Skip intro</string>
     <string name="skip_intro_skip_to_favorites_description">Jumps the onboarding flow straight to the favorites setup step.</string>
     <string name="skip_intro_skip_to_favorites_title">Skip to favorites</string>
+    <string name="skip_intro_skip_tutorials_description">Skips the favorites highlight and alphabet swipe tutorials shown after setup.</string>
+    <string name="skip_intro_skip_tutorials_title">Skip tutorials</string>
     <string name="unlock_pro_description">Unlocks Pro-only features.</string>
     <string name="unlock_pro_name">Unlock Pro</string>
     <string name="weather_widget_fix_description">Replaces the Niagara weather service with WeatherAPI.com. Enter your API key in Reseam settings, opened from Niagara settings.</string>

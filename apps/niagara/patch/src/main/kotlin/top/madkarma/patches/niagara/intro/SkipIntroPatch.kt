@@ -5,10 +5,10 @@
 
 package top.madkarma.patches.niagara.intro
 
-import app.reseam.patch.appEntry
-import app.reseam.patch.patch
+import app.reseam.patch.*
 import top.madkarma.extensions.bindings.NiagaraSetup
 import top.madkarma.patches.niagara.NiagaraPatchStrings
+import top.madkarma.patches.shared.isPresent
 
 val skipIntro =
     patch(NiagaraPatchStrings.skipIntroName) {
@@ -31,6 +31,14 @@ val skipIntro =
                 default = true,
             )
 
+        val skipTutorialsOption =
+            boolOption(
+                "skipTutorials",
+                title = NiagaraPatchStrings.skipIntroSkipTutorialsTitle,
+                description = NiagaraPatchStrings.skipIntroSkipTutorialsDescription,
+                default = true,
+            )
+
         execute {
             if (options[acceptTermsOption]) {
                 appEntry {
@@ -45,5 +53,17 @@ val skipIntro =
                 }
                 log.info("Intro: skipping straight to favorites setup.")
             }
+
+            if (options[skipTutorialsOption]) skipTutorials()
         }
     }
+
+// Only some versions show these tutorials, so each is skipped where its variant reader exists.
+private fun PatchRuntime.skipTutorials() {
+    onboardingTutorials.forEach { tutorial ->
+        if (!isPresent(tutorial.readVariant)) return@forEach
+
+        tutorial.readVariant.before { returnValue(staticField(tutorial.skip)) }
+        log.info("Intro: ${tutorial.readVariant.descriptor} skips the ${tutorial.description}.")
+    }
+}
