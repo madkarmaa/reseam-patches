@@ -16,7 +16,6 @@ import top.madkarma.universal.signature.bindings.SignatureKiller
 // Lightroom keeps the Pairip VM running, and the VM must read the original APK files to pass its
 // integrity check.
 val lightroomIntegrity = patch {
-    hidden()
     compatibleWith("com.adobe.lrmobile")
     dependsOn(ExternalPatch("reseam-patches", "app.reseam.patches.universal.removePairip"))
     dependsOn(spoofApkFileAccess)

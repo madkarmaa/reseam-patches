@@ -22,7 +22,7 @@ val unlockVip =
 
         execute {
             val completionMask = completionIdentityMask
-            vipAccountState.replace { returnTrue() }
+            vipAccountState.alwaysReturn(true)
             log.info(
                 "VIP: ${vipAccountState.descriptor} reports every account state as VIP, keeping network storage open.",
             )
@@ -53,20 +53,25 @@ val unlockVip =
                 log.info("VIP: ${interceptor.descriptor} preserves the server's response.")
             }
 
+            // The bridge joins the component that holds the protection library, which a split
+            // install keeps in its ABI split.
             val nativeAbis =
-                files
-                    .list()
-                    .filter { it.startsWith("lib/") && it.endsWith("/libmtprotect.so") }
-                    .map { it.split('/')[1] }
+                files.components().flatMap { component ->
+                    val componentFiles = files.component(component)
+                    componentFiles
+                        .list()
+                        .filter { it.startsWith("lib/") && it.endsWith("/libmtprotect.so") }
+                        .map { componentFiles to it.split('/')[1] }
+                }
 
             if (nativeAbis.isEmpty()) error("MT protection library is missing")
 
-            for (abi in nativeAbis) {
+            for ((componentFiles, abi) in nativeAbis) {
                 val path = "lib/$abi/libmtvip.so"
                 val library =
                     VipResources.javaClass.classLoader.getResourceAsStream(path)
                         ?: error("Native VIP bridge is unavailable for $abi")
-                library.use { files.write(path, it) }
+                library.use { componentFiles.write(path, it) }
             }
 
             // Preserve the native declaration for the protector's registration. Rebind its JNI

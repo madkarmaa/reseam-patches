@@ -53,6 +53,7 @@ private val plusStateInitializer =
         calls { name("registerOnSharedPreferenceChangeListener") }
     }
 
+// The initializer is one case of a merged lambda, so only its preference read can be hooked.
 internal val initialStoredPlus =
     plusStateInitializer.point { string(PLUS_PREFERENCE) }.next { resultOf(Type.Boolean) }
 

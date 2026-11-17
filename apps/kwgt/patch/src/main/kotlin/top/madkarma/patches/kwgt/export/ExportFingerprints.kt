@@ -19,6 +19,8 @@ private val isPresetReadOnly =
         returns(Type.Boolean)
     }
 
+// The editor and the preset serializer also ask whether a preset is read-only and keep it locked,
+// so only the export dialog's answer is replaced.
 internal val presetExportReadOnlyCheck =
     exportPreset
         .point { calls(isPresetReadOnly) }

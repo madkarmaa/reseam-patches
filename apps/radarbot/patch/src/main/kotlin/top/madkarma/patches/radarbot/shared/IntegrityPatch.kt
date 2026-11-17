@@ -21,7 +21,6 @@ private const val APP_CHECK_PLACEHOLDER = "0"
 // Radarbot runs its splash screen and receivers inside the Pairip VM, so the VM must keep running
 // and read the original APK files to pass its integrity check.
 val radarbotIntegrity = patch {
-    hidden()
     compatibleWith("com.vialsoft.radarbot_free")
     dependsOn(ExternalPatch("reseam-patches", "app.reseam.patches.universal.removePairip"))
     dependsOn(spoofApkFileAccess)

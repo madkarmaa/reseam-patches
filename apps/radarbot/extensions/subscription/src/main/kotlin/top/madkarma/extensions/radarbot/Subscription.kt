@@ -9,6 +9,9 @@ package top.madkarma.extensions.radarbot
 import android.util.Log
 import app.reseam.runtime.Export
 
+// The highest tier granted so far; every tier up to it stays active.
+@Volatile private var grantedTier = -1
+
 /**
  * Marks [tier] and every lower tier as active. Tiers are ordered from lowest to highest, and each
  * flag in [tierFlags] belongs to the entitlement name at the same index in [tierNames].
@@ -21,5 +24,12 @@ fun grant(tierNames: Array<String?>?, tierFlags: BooleanArray?, tier: String?) {
         return
     }
 
-    for (index in 0..highestTier) tierFlags[index] = true
+    grantedTier = maxOf(grantedTier, highestTier)
+    for (index in 0..grantedTier) tierFlags[index] = true
+}
+
+/** Writes a tier flag for the app's subscription refresh, keeping granted tiers active. */
+@Export
+fun writeTierFlag(tierFlags: BooleanArray, index: Int, active: Boolean) {
+    tierFlags[index] = active || index <= grantedTier
 }

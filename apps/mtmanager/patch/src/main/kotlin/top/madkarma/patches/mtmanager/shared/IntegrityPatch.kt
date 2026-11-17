@@ -9,7 +9,6 @@ import top.madkarma.patches.universal.signature.spoofApkFileAccess
 import top.madkarma.universal.signature.bindings.SignatureKiller
 
 val integrity = patch {
-    hidden()
     compatibleWith("bin.mt.plus")
     dependsOn(spoofApkFileAccess)
 

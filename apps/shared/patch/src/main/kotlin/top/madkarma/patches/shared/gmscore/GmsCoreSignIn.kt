@@ -10,7 +10,9 @@ private const val PLAY_SERVICES = "com.google.android.gms"
 private const val MISSING_ACTIVITY = "top.madkarma.shared.gmscore.GmsCoreMissingActivity"
 private const val ENTRY_APPLICATION = "top.madkarma.shared.gmscore.GmsCoreApplication"
 
-// Google Sign-In's hub activity opens the Play Services sign-in screen here.
+// Google Sign-In's hub activity opens the Play Services sign-in screen here. The intent is built
+// locally, and an override of startActivityForResult is not possible everywhere (R8 makes the
+// inherited method final in some apps, such as Linkboy), so the hook sits on the call.
 private val signInLauncher =
     method("signInLauncher") {
         inClass(klass("com.google.android.gms.auth.api.signin.internal.SignInHubActivity"))
@@ -45,6 +47,9 @@ private val googleIdRequests =
  * without it. Service bindings call `GmsCore.servicePackageOverride` and `GmsCore.serviceAction`.
  */
 fun PatchRuntime.signInThroughGmsCore(vendor: String) {
+    // Play Services checks run on background threads before the app entry point (Truecaller calls
+    // its availability check first), so the vendor is compiled into the extension instead of being
+    // handed to it at startup.
     GmsCore.vendorGroupId.implement { returnValue(string(vendor)) }
 
     // The app entry point needs an Application class inside the app, which the framework's own is
