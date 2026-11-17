@@ -20,6 +20,16 @@ universal patches that work on any app. Want an app supported?
 </details>
 
 <details>
+<summary><strong>bin.mt.plus</strong></summary>
+
+| Name                                            | Description                                                          | Version pins |
+| ----------------------------------------------- | -------------------------------------------------------------------- | ------------ |
+| top.madkarma.patches.mtmanager.shared.integrity |                                                                      | None         |
+| Unlock VIP                                      | Unlocks VIP-only features. Server features still require an account. | None         |
+
+</details>
+
+<details>
 <summary><strong>bitpit.launcher</strong></summary>
 
 | Name                                                  | Description                                                                                                                               | Version pins |
