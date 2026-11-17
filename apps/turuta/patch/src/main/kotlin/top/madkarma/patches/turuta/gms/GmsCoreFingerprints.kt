@@ -26,9 +26,14 @@ internal val serviceConfigurationConstructor =
         strings("com.google.android.gms")
     }
 
-internal val servicePackage = serviceConfigurationConstructor.point {
-    string("com.google.android.gms")
-}
+// The constructor stores the Play Services package as a constant rather than a parameter. The
+// supervisor's bind timeout names the stalled service by that package.
+internal val servicePackage =
+    method("bindTimeout") { strings("Timeout waiting for ServiceConnection callback ") }
+        .field("servicePackage") {
+            owner(serviceConfigurationConstructor.owner)
+            type(Type.String)
+        }
 
 // All occurrences in this APK describe Google account types, rather than class/package names.
 internal val googleAccountTypes = methods("googleAccountTypes") { strings("com.google") }

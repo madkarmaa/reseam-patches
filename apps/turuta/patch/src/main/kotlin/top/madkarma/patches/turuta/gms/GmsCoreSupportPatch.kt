@@ -77,9 +77,9 @@ val gmsCoreSupport =
                 }
             }
 
-            servicePackage.captureAs("packageName").after {
+            serviceConfigurationConstructor.after {
                 whenNotNull(local(packageOverride)) {
-                    capture("packageName").assign(local(packageOverride))
+                    thisObject.set(servicePackage, local(packageOverride))
                 }
             }
             log.info(
