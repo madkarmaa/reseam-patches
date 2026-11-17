@@ -7,7 +7,10 @@
 package top.madkarma.universal.signature
 
 import android.content.Context
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.content.pm.Signature
+import android.os.Parcelable
 import android.util.Base64
 import app.reseam.runtime.Export
 import java.io.File
@@ -34,6 +37,15 @@ fun initializeNativeFileAccess(packageName: String, signature: String, diagnosti
     libcFileHooksEnabled = false
     initializeEarly(packageName, signature, true, diagnostics)
 }
+
+/** Wraps a creator an app retains independently of PackageInfo.CREATOR. */
+@Export
+fun wrapPackageCreator(
+    creator: Parcelable.Creator<PackageInfo>,
+    packageName: String,
+    signature: String,
+): Parcelable.Creator<PackageInfo> =
+    getCreator(creator, packageName, Signature(Base64.decode(signature, Base64.DEFAULT)))
 
 /**
  * Spoofs package signatures and optionally redirects installed-file reads to the embedded original.

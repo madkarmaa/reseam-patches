@@ -19,7 +19,7 @@ internal fun installPackageSignatures(packageName: String, signatureData: String
     val fakeSignature = Signature(Base64.decode(signatureData, Base64.DEFAULT))
     // Another hooker, or an earlier initialization in this process, may already wrap the creator.
     logDebug { "killPM: wrapping PackageInfo.CREATOR ${PackageInfo.CREATOR.javaClass.name}" }
-    val creator = getCreator(packageName, fakeSignature)
+    val creator = getCreator(PackageInfo.CREATOR, packageName, fakeSignature)
 
     try {
         findField(PackageInfo::class.java, "CREATOR").set(null, creator)
@@ -60,11 +60,11 @@ internal fun installPackageSignatures(packageName: String, signatureData: String
     }
 }
 
-private fun getCreator(
+internal fun getCreator(
+    originalCreator: Parcelable.Creator<PackageInfo>,
     packageName: String,
     fakeSignature: Signature,
 ): Parcelable.Creator<PackageInfo> {
-    val originalCreator = PackageInfo.CREATOR
     return object : Parcelable.Creator<PackageInfo> {
         override fun createFromParcel(source: Parcel): PackageInfo {
             val info = originalCreator.createFromParcel(source)
