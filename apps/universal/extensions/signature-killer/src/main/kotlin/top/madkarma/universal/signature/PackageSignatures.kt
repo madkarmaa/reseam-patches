@@ -22,7 +22,7 @@ internal fun installPackageSignatures(packageName: String, signatureData: String
     val creator = getCreator(PackageInfo.CREATOR, packageName, fakeSignature)
 
     try {
-        findField(PackageInfo::class.java, "CREATOR").set(null, creator)
+        replaceStaticField(findField(PackageInfo::class.java, "CREATOR"), creator)
     } catch (exception: ReflectiveOperationException) {
         throw RuntimeException(exception)
     } catch (exception: RuntimeException) {
@@ -130,6 +130,34 @@ private fun clearQuietly(what: String, action: () -> Unit) {
     } catch (exception: RuntimeException) {
         logWarning(exception) { "Clearing $what failed" }
     }
+}
+
+private fun replaceStaticField(field: Field, value: Any) {
+    try {
+        field.set(null, value)
+        return
+    } catch (exception: IllegalAccessException) {
+        // Android 17 refuses reflective writes to static final fields in apps targeting API 37+.
+        logInfo { "Reflective write to ${field.name} refused (${exception.message}); using Unsafe" }
+    }
+
+    // ART stores static field values inside the declaring Class object at the field's offset.
+    HiddenApiBypass.addHiddenApiExemptions("Ljava/lang/reflect/Field;", "Lsun/misc/Unsafe;")
+
+    val offset = findField(Field::class.java, "offset").getInt(field).toLong()
+    val unsafeClass = Class.forName("sun.misc.Unsafe")
+    val unsafe = findField(unsafeClass, "theUnsafe").get(null)
+
+    unsafeClass
+        .getMethod(
+            "putObjectVolatile",
+            Any::class.java,
+            Long::class.javaPrimitiveType,
+            Any::class.java,
+        )
+        .invoke(unsafe, field.declaringClass, offset, value)
+
+    check(field.get(null) === value) { "Unsafe write to ${field.name} did not take effect" }
 }
 
 private fun findField(start: Class<*>, fieldName: String): Field {
