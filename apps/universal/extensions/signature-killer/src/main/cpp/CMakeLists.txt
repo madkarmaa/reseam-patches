@@ -20,6 +20,12 @@ file(GLOB BYTEHOOK_SOURCES bytehook/*.c)
 add_library(bytehook STATIC ${BYTEHOOK_SOURCES})
 target_compile_features(bytehook PRIVATE c_std_17)
 target_compile_options(bytehook PRIVATE -Oz -ffunction-sections -fdata-sections)
+# Both libraries own bytesig, whose initializer rejects a second registration. Keep their
+# signal state separate when ByteHook and ShadowHook are linked into the same shared library.
+target_compile_definitions(bytehook PRIVATE
+        bytesig_init=signature_bytehook_bytesig_init
+        bytesig_protect=signature_bytehook_bytesig_protect
+        bytesig_unprotect=signature_bytehook_bytesig_unprotect)
 # As system headers, bytehook's macros keep their warnings out of this library's diagnostics.
 target_include_directories(bytehook SYSTEM PUBLIC
         bytehook
