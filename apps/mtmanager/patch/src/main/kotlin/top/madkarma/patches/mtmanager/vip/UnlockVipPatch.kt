@@ -8,6 +8,7 @@ package top.madkarma.patches.mtmanager.vip
 import app.reseam.patch.*
 import app.reseam.patch.dex.AccessFlags
 import top.madkarma.mtmanager.vip.bindings.Editor
+import top.madkarma.mtmanager.vip.bindings.License
 import top.madkarma.mtmanager.vip.bindings.NativeBridge
 import top.madkarma.mtmanager.vip.bindings.Network
 import top.madkarma.patches.mtmanager.MTManagerPatchStrings
@@ -24,6 +25,15 @@ val unlockVip =
             vipAccountState.replace { returnTrue() }
             log.info(
                 "VIP: ${vipAccountState.descriptor} reports every account state as VIP, keeping network storage open.",
+            )
+
+            licenseStartup.after { track(licenseState) }
+            accountStartup.after { track(accountState) }
+
+            val expiryGetters =
+                licenseValues.all.map { licenseState to it } + (accountState to vipExpiry)
+            log.info(
+                "VIP: ${expiryGetters.joinToString { it.second.descriptor }} read one shared VIP expiry.",
             )
 
             val responseBlockers = blockedNetworkResponses.all
@@ -75,6 +85,15 @@ val unlockVip =
                     completionIdentity,
                     Editor.completionIdentity(thisObject, int(completionMask)),
                 )
+
+                for ((state, getter) in expiryGetters) {
+                    License.coverExpiry(
+                        staticField(state),
+                        string(className(getter.owner)),
+                        string(getter.name),
+                    )
+                }
+
                 NativeBridge.install(
                     string(className(vipEntitlement.owner)),
                     string(vipEntitlement.name),
@@ -89,5 +108,11 @@ val unlockVip =
             )
         }
     }
+
+private fun CodeScope.track(state: FieldTarget) =
+    setStatic(
+        state,
+        License.track(staticField(state), string(className(state.type))).cast(state.type),
+    )
 
 private object VipResources
