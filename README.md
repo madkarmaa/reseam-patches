@@ -187,6 +187,15 @@ universal patches that work on any app. Want an app supported?
 </details>
 
 <details>
+<summary><strong>com.masum.cipher</strong></summary>
+
+| Name       | Description                | Version pins |
+| ---------- | -------------------------- | ------------ |
+| Unlock Pro | Unlocks Pro-only features. | None         |
+
+</details>
+
+<details>
 <summary><strong>com.maxmpz.audioplayer</strong></summary>
 
 | Name                | Description                        | Version pins |
@@ -281,6 +290,18 @@ universal patches that work on any app. Want an app supported?
 | Remove annoyances       | Removes rating prompts and their review activity.  | 2.6.0                                                         |
 | Skip onboarding         | Skips the setup screens and opens the home screen. | 2.2.1, 2.4.0, 2.4.1, 2.5.0, 2.5.1, 2.5.2, 2.5.3, 2.5.4, 2.6.0 |
 | Unlock Lifetime Premium | Unlocks Premium-only features.                     | 2.2.1, 2.4.0, 2.4.1, 2.5.0, 2.5.1, 2.5.2, 2.5.3, 2.5.4, 2.6.0 |
+
+</details>
+
+<details>
+<summary><strong>com.strava</strong></summary>
+
+| Name                | Description                                                                         | Version pins |
+| ------------------- | ----------------------------------------------------------------------------------- | ------------ |
+| Disable analytics   | Blocks analytics and install tracking, and opts out of data sharing without asking. | None         |
+| GmsCore support     | Signs in with Google through separately installed Reseam GmsCore.                   | None         |
+| Remove annoyances   | Skips the sign-up questions and removes the app popups.                             | None         |
+| Unlock Subscription | Unlocks subscription-only features. Server-sided features cannot be unlocked.       | None         |
 
 </details>
 
