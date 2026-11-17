@@ -270,3 +270,7 @@ apps/protonmail/patch/src/main/resources/lib/**
 !apps/motioncam/patch/src/main/resources/lib/
 !apps/motioncam/patch/src/main/resources/lib/**/
 !apps/motioncam/patch/src/main/resources/lib/**/libMotionCamRecording.so
+
+!apps/mtmanager/patch/src/main/resources/lib/
+!apps/mtmanager/patch/src/main/resources/lib/**/
+!apps/mtmanager/patch/src/main/resources/lib/**/libmtvip.so
