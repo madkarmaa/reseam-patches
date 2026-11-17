@@ -5,11 +5,15 @@
 
 package top.madkarma.patches.picsart.gms
 
+import app.reseam.patch.MethodTarget
+import app.reseam.patch.PatchRuntime
 import app.reseam.patch.Type
+import app.reseam.patch.after
 import app.reseam.patch.before
 import app.reseam.patch.patch
 import top.madkarma.patches.picsart.PicsartPatchStrings
 import top.madkarma.patches.shared.gmscore.signInThroughGmsCore
+import top.madkarma.patches.shared.isPresent
 import top.madkarma.patches.shared.originalSignerSha1
 import top.madkarma.shared.gmscore.bindings.GmsCore
 
@@ -40,31 +44,40 @@ val gmsCoreSupport =
 
             signInThroughGmsCore(vendor)
 
-            serviceConfigurationConstructor.before {
-                // The constructor takes the destination package, service action, and dynamic-lookup
-                // flag.
-                val packageOverride = call(GmsCore.servicePackageOverride, param(1))
+            if (isPresent(serviceConfigurationConstructor)) {
+                serviceConfigurationConstructor.before {
+                    // The constructor takes the destination package, service action, and
+                    // dynamic-lookup flag.
+                    val packageOverride = call(GmsCore.servicePackageOverride, param(1))
 
-                whenNotNull(packageOverride) {
-                    param(0).assign(packageOverride)
-                    param(1).assign(call(GmsCore.serviceAction, param(1)))
-                    paramOfType(Type.Boolean).assign(bool(false))
+                    whenNotNull(packageOverride) {
+                        param(0).assign(packageOverride)
+                        param(1).assign(call(GmsCore.serviceAction, param(1)))
+                        paramOfType(Type.Boolean).assign(bool(false))
+                    }
                 }
-            }
-            log.info(
-                "GmsCore: ${serviceConfigurationConstructor.descriptor} binds authentication services directly to $gmsPackage.",
-            )
+                log.info(
+                    "GmsCore: ${serviceConfigurationConstructor.descriptor} binds authentication services directly to $gmsPackage.",
+                )
 
-            requiresPlayServices.before {
-                whenNotNull(
-                    call(GmsCore.servicePackageOverride, thisObject.call(serviceAction)),
-                ) {
-                    returnFalse()
+                acceptGmsCore(requiresPlayServices, serviceAction)
+            } else if (isPresent(bindingConfigurationConstructor)) {
+                bindingConfigurationConstructor.after {
+                    // The constructor takes the service action, dynamic-lookup flag, and user.
+                    val packageOverride = call(GmsCore.servicePackageOverride, param(0))
+
+                    whenNotNull(packageOverride) {
+                        thisObject.set(bindingPackage, packageOverride)
+                        thisObject.set(bindingAction, call(GmsCore.serviceAction, param(0)))
+                        thisObject.set(bindingDynamicLookup, bool(false))
+                    }
                 }
-            }
-            log.info(
-                "GmsCore: ${requiresPlayServices.descriptor} accepts GmsCore for authentication clients.",
-            )
+                log.info(
+                    "GmsCore: ${bindingConfigurationConstructor.descriptor} binds authentication services directly to $gmsPackage.",
+                )
+
+                acceptGmsCore(renamedRequiresPlayServices, renamedServiceAction)
+            } else error("Unsupported Play services client")
 
             val accountTypes = googleAccountTypes.all
             check(accountTypes.isNotEmpty()) { "Google account types not found" }
@@ -110,3 +123,17 @@ val gmsCoreSupport =
             }
         }
     }
+
+private fun PatchRuntime.acceptGmsCore(
+    requiresPlayServices: MethodTarget,
+    serviceAction: MethodTarget,
+) {
+    requiresPlayServices.before {
+        whenNotNull(call(GmsCore.servicePackageOverride, thisObject.call(serviceAction))) {
+            returnFalse()
+        }
+    }
+    log.info(
+        "GmsCore: ${requiresPlayServices.descriptor} accepts GmsCore for authentication clients.",
+    )
+}
