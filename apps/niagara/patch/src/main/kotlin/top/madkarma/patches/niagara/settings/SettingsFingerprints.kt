@@ -6,7 +6,7 @@ package top.madkarma.patches.niagara.settings
 import app.reseam.patch.*
 
 // Every settings row is the row class or a subclass of it, and binds itself to a view holder.
-private val bindRow =
+internal val bindRow =
     method("bindRow") {
         strings("Trying to bind view for a preference not attached to a screen!")
     }
@@ -16,13 +16,8 @@ internal val settingsRow =
         bytecode.findClass(bindRow.owner) ?: error("Settings row class is missing")
     }
 
-// The binder reads one CharSequence field, the title, and shows the icon via setImageResource.
+// The binder reads one CharSequence field, the title.
 internal val rowTitle = bindRow.field("rowTitle") { type(Type.CharSequence) }
-
-internal val rowIcon =
-    fieldTarget("rowIcon") {
-        bindRow.point { invokeVirtual { name("setImageResource") } }.writer(1).field().ref
-    }
 
 // The row's only CharSequence getter resolves its summary.
 private val rowSummaryText =

@@ -32,7 +32,14 @@ val unlockPremium =
             // Both purchase queries and purchase updates pass through this Flutter converter.
             convertPurchases.before {
                 val purchases = paramOfType("java.util.List")
-                purchases.assign(call(PremiumPreferences.withPremium, purchases))
+                val lifetimePass =
+                    newInstance(
+                        purchaseConstructor.owner,
+                        purchaseConstructor.proto,
+                        PremiumPreferences.lifetimeReceipt(),
+                        string(""),
+                    )
+                purchases.assign(PremiumPreferences.withPurchase(purchases, lifetimePass))
             }
             log.info(
                 "Premium: ${convertPurchases.descriptor} includes a lifetime purchase in Flutter purchase results.",

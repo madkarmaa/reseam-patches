@@ -4,10 +4,10 @@
 package top.madkarma.patches.linkboy.gms
 
 import app.reseam.patch.Type
+import app.reseam.patch.field
 import app.reseam.patch.klass
 import app.reseam.patch.method
 import app.reseam.patch.methods
-import app.reseam.patch.point
 
 // Drive sync requests its access token from GoogleAuthUtil's GetToken service.
 internal val tokenServiceInitializer =
@@ -31,10 +31,14 @@ internal val serviceConfigurationConstructor =
         strings("com.google.android.gms")
     }
 
-// The constructor stores the Play Services package as a constant rather than a parameter.
-internal val servicePackage = serviceConfigurationConstructor.point {
-    string("com.google.android.gms")
-}
+// The constructor stores the Play Services package as a constant rather than a parameter. The
+// supervisor's bind timeout names the stalled service by that package.
+internal val servicePackage =
+    method("bindTimeout") { strings("Timeout waiting for ServiceConnection callback ") }
+        .field("servicePackage") {
+            owner(serviceConfigurationConstructor.owner)
+            type(Type.String)
+        }
 
 // Drive sync picks its account with Play Services' AccountPicker.
 internal val accountPickerIntent =

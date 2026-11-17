@@ -125,6 +125,22 @@ internal val deviceIdentityReads =
             .points("notificationIdentityReads") {
                 buildIdentityRead()
             },
+
+        // Notification registration payloads send the build ID, model, and manufacturer too.
+        methods("notificationRegistrationDeviceInfo") {
+                inClass(
+                    klass("notificationRegistrationClass") {
+                        strings("Failed getting device payload from GnpRegistrationDataProvider")
+                    },
+                )
+                accesses {
+                    owner("android.os.Build")
+                    name("MODEL")
+                }
+            }
+            .points("notificationRegistrationIdentityReads") {
+                buildIdentityRead()
+            },
         methods("growthDeviceInfo") {
                 inClass(
                     klass("growthDeviceInfoClass") {

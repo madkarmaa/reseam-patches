@@ -19,6 +19,26 @@ internal val tierFlags = rebuildFeatures.field { type("[Z") }
 
 internal val initializeTiers = klass(rebuildFeatures.owner).method("<clinit>")
 
+// RevenueCat's customer info refresh is the only code that writes the tier flags: one per
+// entitlement, and the legacy Pro flag.
+private val refreshEntitlements =
+    method("refreshEntitlements") {
+        strings("writeCachedPurchaserInfo")
+    }
+
+// A refresh clears an unpaid tier by writing its flag. Those element writes are the only place a
+// granted tier can be lost, and no declaration stands in for them.
+internal val tierFlagWrites =
+    refreshEntitlements.points("tierFlagWrites") {
+        arrayWrite { type(Type.Boolean) }
+        argument(0) {
+            field {
+                owner(tierFlags.owner)
+                name(tierFlags.name)
+            }
+        }
+    }
+
 private val userProperties =
     method("userProperties") {
         strings("x_user")

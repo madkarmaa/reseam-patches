@@ -22,6 +22,8 @@ private val realMode = billingModes.enumConstant("REAL")
 internal val lifetimeMode = billingModes.enumConstant("LIFETIME")
 internal val initializeBilling = billingRepository.method("<init>")
 
+// The constructor derives the Pro flag and its timestamps from this initial mode, so the mode is
+// replaced where it is read rather than in the fields afterwards.
 internal val defaultBillingMode =
     initializeBilling
         .point {

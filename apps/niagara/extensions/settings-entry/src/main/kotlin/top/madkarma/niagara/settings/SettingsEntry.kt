@@ -6,11 +6,10 @@
 
 package top.madkarma.niagara.settings
 
+import android.view.View
+import android.widget.ImageView
 import app.reseam.runtime.Export
-import app.reseam.runtime.Reseam
 import java.lang.ref.WeakReference
-
-private const val BUNDLE = "madkarma-patches"
 
 // Niagara rebuilds its settings rows for every screen, so only the newest row is tracked.
 private var entryRow = WeakReference<Any>(null)
@@ -20,11 +19,17 @@ fun rememberRow(row: Any?) {
     entryRow = WeakReference(row)
 }
 
-/** Opens the Reseam settings when [row] is the added entry row. */
-@Export
-fun openIfEntry(row: Any?): Boolean {
-    if (row == null || row !== entryRow.get()) return false
+/** Whether [row] is the added entry row, which opens the Reseam settings. */
+@Export fun isEntry(row: Any?): Boolean = row != null && row === entryRow.get()
 
-    Reseam.bundle(BUNDLE).openSettings()
-    return true
+/**
+ * Shows [iconRes] in [icon] when [row] is the added entry row. Its binder hides the icon frame of a
+ * row without an icon, so the frame is shown again.
+ */
+@Export
+fun showIcon(row: Any?, icon: ImageView?, iconRes: Int) {
+    if (icon == null || !isEntry(row)) return
+
+    icon.setImageResource(iconRes)
+    (icon.parent as? View)?.visibility = View.VISIBLE
 }

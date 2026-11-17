@@ -14,7 +14,6 @@ import top.madkarma.patches.universal.signature.spoofApkFileAccess
 import top.madkarma.universal.signature.bindings.SignatureKiller
 
 val textraIntegrity = patch {
-    hidden()
     compatibleWith("com.textra")
     dependsOn(ExternalPatch("reseam-patches", "app.reseam.patches.universal.removePairip"))
     dependsOn(spoofApkFileAccess)

@@ -7,7 +7,6 @@ import app.reseam.patch.*
 import top.madkarma.truecaller.behavior.bindings.FeatureFlags
 
 internal val featureFlagOverrides = patch {
-    hidden()
     execute {
         val readers = readFeatureFlags.all
         if (readers.isEmpty()) error("No feature flag getter found")

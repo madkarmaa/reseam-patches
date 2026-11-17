@@ -29,8 +29,14 @@ val unlockGold =
             log.info("Gold: string/$SUBSCRIPTION_STATUS displays the shared patch attribution.")
 
             grantTier("gold_access")
+            log.info("Gold: ${initializeTiers.descriptor} activates the Gold and Pro tiers.")
+
+            val flagWrites = tierFlagWrites.all
+            if (flagWrites.isEmpty()) error("Gold: the subscription refresh writes no tier flags")
+
+            flagWrites.forEach { it.redirectTo(Subscription.writeTierFlag) }
             log.info(
-                "Gold: ${initializeTiers.descriptor} and ${rebuildFeatures.descriptor} activate the Gold and Pro tiers.",
+                "Gold: ${flagWrites.first().method.descriptor} keeps granted tiers active in its ${flagWrites.size} tier flag writes.",
             )
 
             isExcludedUser.alwaysReturn(false)
@@ -52,19 +58,12 @@ val unlockTruck =
 
         execute {
             grantTier("truck_access")
-            log.info(
-                "Truck: ${initializeTiers.descriptor} and ${rebuildFeatures.descriptor} activate the Truck tier.",
-            )
+            log.info("Truck: ${initializeTiers.descriptor} activates the Truck tier.")
         }
     }
 
-// The tier flags start inactive and every subscription refresh rewrites them, so set them once at
-// class initialization and again before each feature rebuild reads them.
-private fun grantTier(tier: String) {
-    initializeTiers.after {
-        call(Subscription.grant, staticField(tierNames), staticField(tierFlags), string(tier))
-    }
-    rebuildFeatures.before {
-        call(Subscription.grant, staticField(tierNames), staticField(tierFlags), string(tier))
-    }
+// The tier flags start inactive, so grant the tier once at class initialization; the redirected
+// refresh writes keep it active afterwards.
+private fun grantTier(tier: String) = initializeTiers.after {
+    call(Subscription.grant, staticField(tierNames), staticField(tierFlags), string(tier))
 }

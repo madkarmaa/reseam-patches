@@ -6,9 +6,8 @@ package top.madkarma.patches.linkboy.premium
 import app.reseam.patch.Type
 import app.reseam.patch.classTarget
 import app.reseam.patch.dex.AccessFlags
-import app.reseam.patch.dex.ref
 import app.reseam.patch.enumConstant
-import app.reseam.patch.fieldTarget
+import app.reseam.patch.fieldOfType
 import app.reseam.patch.klass
 import app.reseam.patch.method
 
@@ -50,13 +49,11 @@ internal val stringArrayResource =
         returns(Type.List)
     }
 
-// Every Compose resource is keyed by "type:name", the only String field of their base class.
-internal val resourceKey =
-    fieldTarget("resourceKey") {
-        val resource =
-            stringArrayResourceType.classDef.superclass?.let(bytecode::findClass)
-                ?: error("Compose resource base class missing")
-
-        resource.instanceFields.singleOrNull { it.fieldType == "Ljava/lang/String;" }?.ref
-            ?: error("Expected exactly one resource key field")
+private val composeResource =
+    classTarget("composeResource") {
+        stringArrayResourceType.classDef.superclass?.let(bytecode::findClass)
+            ?: error("Compose resource base class missing")
     }
+
+// Every Compose resource is keyed by "type:name", the only String field of their base class.
+internal val resourceKey = composeResource.fieldOfType(Type.String)

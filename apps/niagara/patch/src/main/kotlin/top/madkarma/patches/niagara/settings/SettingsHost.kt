@@ -4,6 +4,7 @@
 package top.madkarma.patches.niagara.settings
 
 import app.reseam.patch.*
+import app.reseam.patch.settings.openSettings
 import app.reseam.patch.settings.settingsHost
 import top.madkarma.niagara.settings.bindings.SettingsEntry
 
@@ -27,14 +28,26 @@ val niagaraSettings =
                     newInstance(settingsRow.descriptor, "(Ljava/lang/String;)V", string(ROW_KEY))
                 row.set(rowTitle, string(ROW_TITLE).cast(Type.CharSequence))
                 row.set(rowSummary, string(ROW_SUMMARY).cast(Type.CharSequence))
-                row.set(rowIcon, int(icon.toInt()))
                 SettingsEntry.rememberRow(row)
                 paramOfType(addRow.owner).call(addRow, row)
             }
             log.info("Settings: ${productivitySettings.descriptor} lists Reseam settings first.")
 
+            // The row's view holder keeps one ImageView, the row's icon.
+            bindRow.after {
+                SettingsEntry.showIcon(
+                    thisObject,
+                    param(0).fieldOfType("android.widget.ImageView"),
+                    int(icon.toInt()),
+                )
+            }
+            log.info("Settings: ${bindRow.descriptor} shows the Reseam row's icon.")
+
             rowClicked.before {
-                whenTrue(SettingsEntry.openIfEntry(thisObject)) { returnVoid() }
+                whenTrue(SettingsEntry.isEntry(thisObject)) {
+                    openSettings()
+                    returnVoid()
+                }
             }
             log.info("Settings: ${rowClicked.descriptor} opens Reseam settings from its row.")
         }

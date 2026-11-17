@@ -3,15 +3,28 @@
 
 package top.madkarma.patches.picsart.onboarding
 
-import app.reseam.patch.method
+import app.reseam.patch.*
 
-// The launch order's "onboarding" entry expands to the onboarding steps this returns.
+private val launchOrderKey =
+    klass("launchOrderKey") {
+        enumConstants("ONBOARDING", "INTENT_BASED_ONBOARDING")
+    }
+
+private val onboardingKey = launchOrderKey.enumConstant("ONBOARDING")
+
+// Adding launch keys replaces the "onboarding" key with the onboarding steps.
+private val addLaunchKeys =
+    method("addLaunchKeys") {
+        hasParam(launchOrderKey.descriptor)
+        accesses {
+            owner(launchOrderKey.descriptor)
+            name(onboardingKey.name)
+        }
+    }
+
+// The onboarding launch order returns those steps.
 internal val onboardingLaunchOrder =
     method("onboardingLaunchOrder") {
-        calls {
-            owner(
-                $$"com.picsart.growth.launchorder.impl.data.RealLaunchOrderProvider$getOnboardingLaunchOrder$1",
-            )
-            name("<init>")
-        }
+        calledBy(addLaunchKeys)
+        returns("java.io.Serializable")
     }
