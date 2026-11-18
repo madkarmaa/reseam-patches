@@ -3,16 +3,16 @@
 
 @file:Suppress("unused")
 
-package top.madkarma.patches.assttouch.pro
+package top.madkarma.patches.assttouch.premium
 
 import app.reseam.patch.ExternalPatch
 import app.reseam.patch.before
 import app.reseam.patch.patch
 import top.madkarma.patches.assttouch.AssistiveTouchPatchStrings
 
-val unlockPro =
-    patch(AssistiveTouchPatchStrings.unlockProName) {
-        description(AssistiveTouchPatchStrings.unlockProDescription)
+val unlockPremium =
+    patch(AssistiveTouchPatchStrings.unlockPremiumName) {
+        description(AssistiveTouchPatchStrings.unlockPremiumDescription)
         compatibleWith("com.utae.assttouch")
         dependsOn(ExternalPatch("reseam-patches", "app.reseam.patches.universal.removePairip"))
 
@@ -21,11 +21,11 @@ val unlockPro =
                 thisObject.set(cachedEntitlement, staticField(premiumEntitlement))
             }
             log.info(
-                "Pro: ${publishEntitlement.descriptor} always publishes the Premium entitlement.",
+                "Premium: ${publishEntitlement.descriptor} always publishes the Premium entitlement.",
             )
 
             // Play Billing revokes Premium when it finds no purchase; keep every update entitled.
             updateEntitlement.before { param(0).assign(bool(true)) }
-            log.info("Pro: ${updateEntitlement.descriptor} always stores Premium as purchased.")
+            log.info("Premium: ${updateEntitlement.descriptor} always stores Premium as purchased.")
         }
     }

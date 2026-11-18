@@ -4,6 +4,6 @@
 <resources>
     <string name="remove_analytics_description">Turns off Firebase Analytics, Crashlytics, and Sessions, skips the ad consent form, and stops Meta Audience Network from starting with the app.</string>
     <string name="remove_analytics_name">Remove analytics</string>
-    <string name="unlock_pro_description">Unlocks the lifetime Premium purchase.</string>
-    <string name="unlock_pro_name">Unlock Pro</string>
+    <string name="unlock_premium_description">Unlocks the lifetime Premium purchase.</string>
+    <string name="unlock_premium_name">Unlock Premium</string>
 </resources>
