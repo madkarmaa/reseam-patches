@@ -2,6 +2,8 @@
 <!-- SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top> -->
 <!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
 <resources>
-    <string name="unlock_premium_description">Unlocks Premium-only features.</string>
-    <string name="unlock_premium_name">Unlock Premium</string>
+    <string name="remove_analytics_description">Turns off Firebase Analytics, Crashlytics, and Sessions.</string>
+    <string name="remove_analytics_name">Remove analytics</string>
+    <string name="unlock_premium_description">Unlocks premium and removes ads.</string>
+    <string name="unlock_premium_name">Unlock premium</string>
 </resources>
