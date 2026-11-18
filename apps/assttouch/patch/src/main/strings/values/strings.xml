@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top> -->
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<resources>
+    <string name="remove_analytics_description">Turns off Firebase Analytics, Crashlytics, and Sessions, skips the ad consent form, and stops Meta Audience Network from starting with the app.</string>
+    <string name="remove_analytics_name">Remove analytics</string>
+    <string name="unlock_pro_description">Unlocks the lifetime Premium purchase.</string>
+    <string name="unlock_pro_name">Unlock Pro</string>
+</resources>
