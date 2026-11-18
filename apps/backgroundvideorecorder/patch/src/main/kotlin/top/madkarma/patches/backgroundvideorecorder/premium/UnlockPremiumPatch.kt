@@ -16,7 +16,8 @@ val unlockPremium =
         compatibleWith("com.helgeapps.backgroundvideorecorder")
 
         execute {
-            // Every product reports as owned, so the donation and subscription screens show premium.
+            // Every product reports as owned, so the donation and subscription screens show
+            // premium.
             val constructors = purchaseInfoConstructors.all
             if (constructors.isEmpty()) error("Premium: no PurchaseInfo constructors found")
             constructors.forEach {
@@ -24,7 +25,8 @@ val unlockPremium =
                 log.info("Premium: ${it.descriptor} marks the product as purchased.")
             }
 
-            // Readers observe the flow the constructor seeds with NO_ADS. Purchase updates write to a
+            // Readers observe the flow the constructor seeds with NO_ADS. Purchase updates write to
+            // a
             // detached flow instead, so an empty or unowned product list never re-enables ads.
             billingManagerConstructor.after {
                 thisObject.set(adModeUpdates, call(stateFlowFactory, staticField(noAds)))

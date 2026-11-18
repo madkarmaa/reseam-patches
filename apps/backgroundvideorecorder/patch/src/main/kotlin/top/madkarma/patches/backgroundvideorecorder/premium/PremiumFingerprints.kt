@@ -18,7 +18,8 @@ private val purchaseInfo =
         strings("PurchaseInfo(id=")
     }
 
-internal val purchaseInfoConstructors = purchaseInfo.methods("purchaseInfoConstructors") { name("<init>") }
+internal val purchaseInfoConstructors =
+    purchaseInfo.methods("purchaseInfoConstructors") { name("<init>") }
 
 private val billingManager =
     klass("billingManager") {
