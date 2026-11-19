@@ -59,29 +59,29 @@
 <details>
 <summary><strong>com.accuweather.android</strong></summary>
 
-| Name                   | Description                    | Version pins |
-| ---------------------- | ------------------------------ | ------------ |
-| Unlock Family Premium+ | Unlocks Premium-only features. | None         |
+| Name                   | Description                            | Version pins |
+| ---------------------- | -------------------------------------- | ------------ |
+| Unlock Family Premium+ | Unlocks Family Premium+-only features. | None         |
 
 </details>
 
 <details>
 <summary><strong>com.adguard.android</strong></summary>
 
-| Name                    | Description                                                                                                               | Version pins |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------- | ------------ |
-| Skip setup              | Skips onboarding and applies the selected setup options on first startup. Configure advanced filters in the app settings. | None         |
-| Unlock Lifetime premium | Unlocks Premium-only features.                                                                                            | None         |
+| Name           | Description                                                                                                               | Version pins |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------- | ------------ |
+| Skip setup     | Skips onboarding and applies the selected setup options on first startup. Configure advanced filters in the app settings. | None         |
+| Unlock Premium | Unlocks Premium-only features.                                                                                            | None         |
 
 </details>
 
 <details>
 <summary><strong>com.adobe.lrmobile</strong></summary>
 
-| Name                                                     | Description                   | Version pins |
-| -------------------------------------------------------- | ----------------------------- | ------------ |
-| top.madkarma.patches.lightroom.shared.lightroomIntegrity |                               | None         |
-| Unlock premium                                           | Unlocks premium-only features | None         |
+| Name                                                     | Description                    | Version pins |
+| -------------------------------------------------------- | ------------------------------ | ------------ |
+| top.madkarma.patches.lightroom.shared.lightroomIntegrity |                                | None         |
+| Unlock Premium                                           | Unlocks Premium-only features. | None         |
 
 </details>
 
@@ -115,11 +115,20 @@
 </details>
 
 <details>
+<summary><strong>com.b_lam.resplash</strong></summary>
+
+| Name       | Description                | Version pins |
+| ---------- | -------------------------- | ------------ |
+| Unlock Pro | Unlocks Pro-only features. | None         |
+
+</details>
+
+<details>
 <summary><strong>com.cloudflare.onedotonedotonedotone</strong></summary>
 
-| Name                   | Description                                                                         | Version pins |
-| ---------------------- | ----------------------------------------------------------------------------------- | ------------ |
-| Unlock WARP+ Unlimited | Unlocks the local WARP+ Unlimited account state. Does not unlock server-side WARP+. | None         |
+| Name                   | Description                                                               | Version pins |
+| ---------------------- | ------------------------------------------------------------------------- | ------------ |
+| Unlock WARP+ Unlimited | Unlocks WARP+ Unlimited-only features. Does not unlock server-side WARP+. | None         |
 
 </details>
 
@@ -154,6 +163,15 @@
 </details>
 
 <details>
+<summary><strong>com.goodmooddroid.gestures</strong></summary>
+
+| Name       | Description                | Version pins |
+| ---------- | -------------------------- | ------------ |
+| Unlock Pro | Unlocks Pro-only features. | None         |
+
+</details>
+
+<details>
 <summary><strong>com.google.android.apps.photos</strong></summary>
 
 | Name                                                            | Description                                                                                                 | Version pins |
@@ -171,31 +189,60 @@
 | Name            | Description                                                       | Version pins |
 | --------------- | ----------------------------------------------------------------- | ------------ |
 | GmsCore support | Signs in with Google through separately installed Reseam GmsCore. | None         |
-| Unlock Pro      | Unlocks Pro-only features, including shop items.                  | None         |
+| Unlock Pro      | Unlocks Pro-only features.                                        | None         |
+
+</details>
+
+<details>
+<summary><strong>com.helgeapps.backgroundvideorecorder</strong></summary>
+
+| Name           | Description                    | Version pins |
+| -------------- | ------------------------------ | ------------ |
+| Unlock Premium | Unlocks Premium-only features. | None         |
+
+</details>
+
+<details>
+<summary><strong>com.inspolab.quicksettingstile</strong></summary>
+
+| Name                     | Description                                                                                                                                     | Version pins |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
+| Remove analytics         | Turns off Firebase Analytics, Crashlytics, and Sessions, skips the ad consent form, and stops Meta Audience Network from starting with the app. | None         |
+| Remove startup animation | Skips the animated launch screen so the app opens straight away.                                                                                | None         |
+| Unlock Premium           | Unlocks Premium-only features.                                                                                                                  | None         |
 
 </details>
 
 <details>
 <summary><strong>com.larvelplayer.app</strong></summary>
 
-| Name             | Description                                                            | Version pins |
-| ---------------- | ---------------------------------------------------------------------- | ------------ |
-| Unlock supporter | Unlocks lifetime ad removal and supporter access to rewarded features. | None         |
+| Name             | Description                      | Version pins |
+| ---------------- | -------------------------------- | ------------ |
+| Unlock Supporter | Unlocks Supporter-only features. | None         |
 
 </details>
 
 <details>
 <summary><strong>com.lemon.lvoverseas</strong></summary>
 
-| Name                                 | Description                                                                                                                                             | Version pins |
-| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
-| Bypass effects region restrictions   | Keeps locally blocked effects accessible. Server restrictions may still apply.                                                                          | None         |
-| Bypass geographic restrictions       | Keeps locally blocked tools, pages, and links accessible.                                                                                               | None         |
-| Bypass integrity checks              | Spoofs the original signature and registers a fresh device identity to avoid device bans.                                                               | None         |
-| Remove annoyances                    | Removes app annoyances, upsells and popups.                                                                                                             | None         |
-| Unlock Premium                       | Unlocks Premium-only features and removes subscription offers. Most, if not all, AI tools run on CapCut's servers and cannot be unlocked by this patch. | None         |
-| Unlock premium effects and templates | Allows local premium effects and template export.                                                                                                       | None         |
-| Unlock Ultra HD export               | Unlocks editor 2K/4K and template Ultra HD export.                                                                                                      | None         |
+| Name                                 | Description                                                                                                             | Version pins |
+| ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------- | ------------ |
+| Bypass effects region restrictions   | Keeps locally blocked effects accessible. Server restrictions may still apply.                                          | None         |
+| Bypass geographic restrictions       | Keeps locally blocked tools, pages, and links accessible.                                                               | None         |
+| Bypass integrity checks              | Spoofs the original signature and registers a fresh device identity to avoid device bans.                               | None         |
+| Remove annoyances                    | Removes app annoyances, upsells and popups.                                                                             | None         |
+| Unlock Premium                       | Unlocks Premium-only features. Most, if not all, AI tools run on CapCut's servers and cannot be unlocked by this patch. | None         |
+| Unlock premium effects and templates | Allows local premium effects and template export.                                                                       | None         |
+| Unlock Ultra HD export               | Unlocks editor 2K/4K and template Ultra HD export.                                                                      | None         |
+
+</details>
+
+<details>
+<summary><strong>com.loitran.minimalt9launcher.free</strong></summary>
+
+| Name       | Description                | Version pins |
+| ---------- | -------------------------- | ------------ |
+| Unlock Pro | Unlocks Pro-only features. | None         |
 
 </details>
 
@@ -211,9 +258,9 @@
 <details>
 <summary><strong>com.maxmpz.audioplayer</strong></summary>
 
-| Name                | Description                        | Version pins |
-| ------------------- | ---------------------------------- | ------------ |
-| Unlock full version | Unlocks the full version features. | None         |
+| Name                | Description                         | Version pins |
+| ------------------- | ----------------------------------- | ------------ |
+| Unlock Full version | Unlocks Full version-only features. | None         |
 
 </details>
 
@@ -232,6 +279,16 @@
 | Name                  | Description                                                                                             | Version pins |
 | --------------------- | ------------------------------------------------------------------------------------------------------- | ------------ |
 | Disable device checks | Starts Vi without the protection wrapper that blocks rooted devices and installed root-management apps. | None         |
+
+</details>
+
+<details>
+<summary><strong>com.orhotechnologies.orhoduomusic</strong></summary>
+
+| Name             | Description                                              | Version pins |
+| ---------------- | -------------------------------------------------------- | ------------ |
+| Remove analytics | Turns off Firebase Analytics, Crashlytics, and Sessions. | None         |
+| Unlock Premium   | Unlocks Premium-only features.                           | None         |
 
 </details>
 
@@ -290,19 +347,19 @@
 | Name           | Description                                                                | Version pins |
 | -------------- | -------------------------------------------------------------------------- | ------------ |
 | Skip intro     | Skips the first-launch tutorial, release tour, and long welcome animation. | None         |
-| Unlock premium | Unlocks Premium-only features.                                             | None         |
+| Unlock Premium | Unlocks Premium-only features.                                             | None         |
 
 </details>
 
 <details>
 <summary><strong>com.shahzaman.pricetracker</strong></summary>
 
-| Name                    | Description                                        | Version pins                                                  |
-| ----------------------- | -------------------------------------------------- | ------------------------------------------------------------- |
-| Disable ads             | Disables in-app ads and their consent prompt.      | 2.2.1, 2.4.0, 2.4.1, 2.5.0, 2.5.1, 2.5.2, 2.5.3, 2.5.4, 2.6.0 |
-| Remove annoyances       | Removes rating prompts and their review activity.  | 2.6.0                                                         |
-| Skip onboarding         | Skips the setup screens and opens the home screen. | 2.2.1, 2.4.0, 2.4.1, 2.5.0, 2.5.1, 2.5.2, 2.5.3, 2.5.4, 2.6.0 |
-| Unlock Lifetime Premium | Unlocks Premium-only features.                     | 2.2.1, 2.4.0, 2.4.1, 2.5.0, 2.5.1, 2.5.2, 2.5.3, 2.5.4, 2.6.0 |
+| Name              | Description                                        | Version pins                                                  |
+| ----------------- | -------------------------------------------------- | ------------------------------------------------------------- |
+| Disable ads       | Disables in-app ads and their consent prompt.      | 2.2.1, 2.4.0, 2.4.1, 2.5.0, 2.5.1, 2.5.2, 2.5.3, 2.5.4, 2.6.0 |
+| Remove annoyances | Removes rating prompts and their review activity.  | 2.6.0                                                         |
+| Skip onboarding   | Skips the setup screens and opens the home screen. | 2.2.1, 2.4.0, 2.4.1, 2.5.0, 2.5.1, 2.5.2, 2.5.3, 2.5.4, 2.6.0 |
+| Unlock Premium    | Unlocks Premium-only features.                     | 2.2.1, 2.4.0, 2.4.1, 2.5.0, 2.5.1, 2.5.2, 2.5.3, 2.5.4, 2.6.0 |
 
 </details>
 
@@ -314,7 +371,7 @@
 | Disable analytics   | Blocks analytics and install tracking, and opts out of data sharing without asking. | None         |
 | GmsCore support     | Signs in with Google through separately installed Reseam GmsCore.                   | None         |
 | Remove annoyances   | Skips the sign-up questions and removes the app popups.                             | None         |
-| Unlock Subscription | Unlocks subscription-only features. Server-sided features cannot be unlocked.       | None         |
+| Unlock Subscription | Unlocks Subscription-only features. Server-sided features cannot be unlocked.       | None         |
 
 </details>
 
@@ -325,7 +382,7 @@
 | -------------------------------------------------- | ---------------------------------------------------------------------------- | ------------ |
 | Disable telemetry                                  | Disables Textra reporting, advertising SDK collection, and ML Kit telemetry. | None         |
 | top.madkarma.patches.textra.shared.textraIntegrity |                                                                              | None         |
-| Unlock Pro                                         | Unlocks Pro-only features and removes ads.                                   | None         |
+| Unlock Pro                                         | Unlocks Pro-only features.                                                   | None         |
 
 </details>
 
@@ -343,8 +400,19 @@
 | Hide tabs                                                   | Hides selected tabs.                                                                              | None         |
 | Hide Wear OS settings                                       | Hides Wear OS settings and shortcuts.                                                             | None         |
 | top.madkarma.patches.truecaller.settings.truecallerSettings |                                                                                                   | None         |
-| Unlock premium                                              | Unlocks Premium-only features. Paid server-side services still need a subscription.               | None         |
+| Unlock Premium                                              | Unlocks Premium-only features. Paid server-side services still need a subscription.               | None         |
 | Use SMS for verification codes                              | Reads verification codes from SMS. Uses Google SMS retrieval without SMS permission.              | None         |
+
+</details>
+
+<details>
+<summary><strong>com.utae.assttouch</strong></summary>
+
+| Name                     | Description                                                                                                                                     | Version pins |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
+| Remove analytics         | Turns off Firebase Analytics, Crashlytics, and Sessions, skips the ad consent form, and stops Meta Audience Network from starting with the app. | None         |
+| Remove startup animation | Skips the animated launch screen so the app opens straight away.                                                                                | None         |
+| Unlock Premium           | Unlocks Premium-only features.                                                                                                                  | None         |
 
 </details>
 
@@ -357,7 +425,17 @@
 | GmsCore support                                        | Uses separately installed Reseam GmsCore for Google sign-in.                                            | None         |
 | top.madkarma.patches.radarbot.shared.radarbotIntegrity |                                                                                                         | None         |
 | Unlock Gold                                            | Unlocks Gold-only features.                                                                             | None         |
-| Unlock Truck                                           | Unlocks Truck-only features                                                                             | None         |
+| Unlock Truck                                           | Unlocks Truck-only features.                                                                            | None         |
+
+</details>
+
+<details>
+<summary><strong>com.wallpaper.liveloop</strong></summary>
+
+| Name             | Description                                                                              | Version pins |
+| ---------------- | ---------------------------------------------------------------------------------------- | ------------ |
+| Remove analytics | Removes the ad consent prompt, its Ad Settings entry, and analytics and crash reporting. | None         |
+| Unlock Premium   | Unlocks Premium-only features.                                                           | None         |
 
 </details>
 
@@ -392,9 +470,9 @@
 <details>
 <summary><strong>ginlemon.flowerfree</strong></summary>
 
-| Name                    | Description                    | Version pins |
-| ----------------------- | ------------------------------ | ------------ |
-| Unlock Lifetime premium | Unlocks Premium-only features. | None         |
+| Name           | Description                    | Version pins |
+| -------------- | ------------------------------ | ------------ |
+| Unlock Premium | Unlocks Premium-only features. | None         |
 
 </details>
 
@@ -421,10 +499,10 @@
 <details>
 <summary><strong>pe.tumicro.android</strong></summary>
 
-| Name                    | Description                                           | Version pins |
-| ----------------------- | ----------------------------------------------------- | ------------ |
-| GmsCore support         | Signs in through separately installed Reseam GmsCore. | None         |
-| Unlock Lifetime Premium | Unlocks Premium-only features.                        | None         |
+| Name            | Description                                           | Version pins |
+| --------------- | ----------------------------------------------------- | ------------ |
+| GmsCore support | Signs in through separately installed Reseam GmsCore. | None         |
+| Unlock Premium  | Unlocks Premium-only features.                        | None         |
 
 </details>
 
@@ -433,7 +511,18 @@
 
 | Name           | Description                    | Version pins |
 | -------------- | ------------------------------ | ------------ |
-| Unlock premium | Unlocks Premium-only features. | None         |
+| Unlock Premium | Unlocks Premium-only features. | None         |
+
+</details>
+
+<details>
+<summary><strong>xyz.inspoapps.alwaysonwidgets</strong></summary>
+
+| Name                     | Description                                                                                                                                     | Version pins |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
+| Remove analytics         | Turns off Firebase Analytics, Crashlytics, and Sessions, skips the ad consent form, and stops Meta Audience Network from starting with the app. | None         |
+| Remove startup animation | Skips the animated launch screen so the app opens straight away.                                                                                | None         |
+| Unlock Premium           | Unlocks Premium-only features.                                                                                                                  | None         |
 
 </details>
 
