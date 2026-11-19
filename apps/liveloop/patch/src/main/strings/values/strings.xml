@@ -5,5 +5,5 @@
     <string name="remove_analytics_description">Removes the ad consent prompt, its Ad Settings entry, and analytics and crash reporting.</string>
     <string name="remove_analytics_name">Remove analytics</string>
     <string name="unlock_premium_description">Unlocks Premium-only features.</string>
-    <string name="unlock_premium_name">Unlock premium</string>
+    <string name="unlock_premium_name">Unlock Premium</string>
 </resources>

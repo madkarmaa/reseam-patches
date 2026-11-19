@@ -2,6 +2,6 @@
 <!-- SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top> -->
 <!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
 <resources>
-    <string name="unlock_full_version_description">Unlocks the full version features.</string>
-    <string name="unlock_full_version_name">Unlock full version</string>
+    <string name="unlock_full_version_description">Unlocks Full version-only features.</string>
+    <string name="unlock_full_version_name">Unlock Full version</string>
 </resources>

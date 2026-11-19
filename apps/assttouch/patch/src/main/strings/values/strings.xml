@@ -6,6 +6,6 @@
     <string name="remove_analytics_name">Remove analytics</string>
     <string name="remove_startup_animation_description">Skips the animated launch screen so the app opens straight away.</string>
     <string name="remove_startup_animation_name">Remove startup animation</string>
-    <string name="unlock_premium_description">Unlocks the lifetime Premium purchase.</string>
+    <string name="unlock_premium_description">Unlocks Premium-only features.</string>
     <string name="unlock_premium_name">Unlock Premium</string>
 </resources>

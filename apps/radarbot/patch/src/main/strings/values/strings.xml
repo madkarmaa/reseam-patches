@@ -9,6 +9,6 @@
     <string name="gms_core_support_name">GmsCore support</string>
     <string name="unlock_gold_description">Unlocks Gold-only features.</string>
     <string name="unlock_gold_name">Unlock Gold</string>
-    <string name="unlock_truck_description">Unlocks Truck-only features</string>
+    <string name="unlock_truck_description">Unlocks Truck-only features.</string>
     <string name="unlock_truck_name">Unlock Truck</string>
 </resources>

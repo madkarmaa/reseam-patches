@@ -9,6 +9,6 @@
     <string name="gms_core_support_name">GmsCore support</string>
     <string name="remove_annoyances_description">Skips the sign-up questions and removes the app popups.</string>
     <string name="remove_annoyances_name">Remove annoyances</string>
-    <string name="unlock_subscription_description">Unlocks subscription-only features. Server-sided features cannot be unlocked.</string>
+    <string name="unlock_subscription_description">Unlocks Subscription-only features. Server-sided features cannot be unlocked.</string>
     <string name="unlock_subscription_name">Unlock Subscription</string>
 </resources>

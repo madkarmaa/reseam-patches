@@ -20,7 +20,7 @@
     <string name="hide_wear_settings_description">Hides Wear OS settings and shortcuts.</string>
     <string name="hide_wear_settings_name">Hide Wear OS settings</string>
     <string name="unlock_premium_description">Unlocks Premium-only features. Paid server-side services still need a subscription.</string>
-    <string name="unlock_premium_name">Unlock premium</string>
+    <string name="unlock_premium_name">Unlock Premium</string>
     <string name="use_sms_verification_description">Reads verification codes from SMS. Uses Google SMS retrieval without SMS permission.</string>
     <string name="use_sms_verification_name">Use SMS for verification codes</string>
 </resources>

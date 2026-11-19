@@ -19,5 +19,5 @@
     <string name="skip_setup_skip_approval_popups_description">Treat all annoyance filters as approved to skip consent dialogs when enabling them.</string>
     <string name="skip_setup_skip_approval_popups_title">Skip approval popups</string>
     <string name="unlock_lifetime_description">Unlocks Premium-only features.</string>
-    <string name="unlock_lifetime_name">Unlock Lifetime premium</string>
+    <string name="unlock_lifetime_name">Unlock Premium</string>
 </resources>

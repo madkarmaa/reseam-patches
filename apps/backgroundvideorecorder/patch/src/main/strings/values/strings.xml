@@ -2,6 +2,6 @@
 <!-- SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top> -->
 <!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
 <resources>
-    <string name="unlock_premium_description">Unlocks premium and removes ads.</string>
-    <string name="unlock_premium_name">Unlock premium</string>
+    <string name="unlock_premium_description">Unlocks Premium-only features.</string>
+    <string name="unlock_premium_name">Unlock Premium</string>
 </resources>

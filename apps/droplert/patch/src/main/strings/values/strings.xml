@@ -9,5 +9,5 @@
     <string name="skip_onboarding_description">Skips the setup screens and opens the home screen.</string>
     <string name="skip_onboarding_name">Skip onboarding</string>
     <string name="unlock_premium_description">Unlocks Premium-only features.</string>
-    <string name="unlock_premium_name">Unlock Lifetime Premium</string>
+    <string name="unlock_premium_name">Unlock Premium</string>
 </resources>
