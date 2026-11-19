@@ -6,7 +6,7 @@
   <a href="https://reseam.app/add/?url=https://github.com/madkarmaa/reseam-patches"><img src="./.github/assets/add-to-reseam.svg" alt="Add to Reseam" height="48"></a>
 </p>
 
-> [!IMPORTANT]
+> [!TIP]
 > Want an app supported? [Open a patch request](https://github.com/madkarmaa/reseam-patches/issues/new?template=patch_request.yml).
 
 ## Patches
