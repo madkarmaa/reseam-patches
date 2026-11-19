@@ -2,6 +2,6 @@
 <!-- SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top> -->
 <!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
 <resources>
-    <string name="unlock_unlimited_description">Unlocks the local WARP+ Unlimited account state. Does not unlock server-side WARP+.</string>
+    <string name="unlock_unlimited_description">Unlocks WARP+ Unlimited-only features. Does not unlock server-side WARP+.</string>
     <string name="unlock_unlimited_name">Unlock WARP+ Unlimited</string>
 </resources>

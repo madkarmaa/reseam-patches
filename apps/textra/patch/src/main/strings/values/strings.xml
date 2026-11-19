@@ -4,6 +4,6 @@
 <resources>
     <string name="disable_telemetry_description">Disables Textra reporting, advertising SDK collection, and ML Kit telemetry.</string>
     <string name="disable_telemetry_name">Disable telemetry</string>
-    <string name="unlock_pro_description">Unlocks Pro-only features and removes ads.</string>
+    <string name="unlock_pro_description">Unlocks Pro-only features.</string>
     <string name="unlock_pro_name">Unlock Pro</string>
 </resources>

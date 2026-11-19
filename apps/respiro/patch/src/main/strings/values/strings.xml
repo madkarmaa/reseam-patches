@@ -5,5 +5,5 @@
     <string name="skip_intro_description">Skips the first-launch tutorial, release tour, and long welcome animation.</string>
     <string name="skip_intro_name">Skip intro</string>
     <string name="unlock_premium_description">Unlocks Premium-only features.</string>
-    <string name="unlock_premium_name">Unlock premium</string>
+    <string name="unlock_premium_name">Unlock Premium</string>
 </resources>
