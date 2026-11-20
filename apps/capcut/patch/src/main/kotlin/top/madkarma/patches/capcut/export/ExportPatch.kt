@@ -9,6 +9,10 @@ import app.reseam.patch.*
 import top.madkarma.patches.capcut.CapCutPatchStrings
 import top.madkarma.patches.capcut.premium.unlockPremium
 
+private const val FUNCTION1 = "kotlin.jvm.functions.Function1"
+private const val BUSINESS_RESULT = "com.vega.subscriptionapi.core.Result"
+private const val COMPLETABLE_JOB = "kotlinx.coroutines.CompletableJob"
+
 val unlockUltraHdExport =
     patch(CapCutPatchStrings.unlockUltraHdExportName) {
         description(CapCutPatchStrings.unlockUltraHdExportDescription)
@@ -38,29 +42,32 @@ val unlockUltraHdExport =
                 "UHD: ${templateUltraHdAvailable.descriptor} exposes the existing template UHD control.",
             )
 
-            // This entry only authorizes the checkbox. Its callers still enforce draft/device
-            // support.
-            templateUltraHdUseCheck.replace {
-                val accepted =
-                    callStatic(
-                        "java.lang.Boolean",
-                        "valueOf",
-                        proto("java.lang.Boolean", Type.Boolean),
-                        bool(true),
-                    )
-
-                paramOfType("kotlin.jvm.functions.Function1")
+            // The callback is the caller's completion handler; a default Result reports success
+            // (code 0), the same value the use flow sends after server verification succeeds.
+            templateUltraHdUse.replace {
+                paramOfType(FUNCTION1)
                     .callInterface(
-                        "kotlin.jvm.functions.Function1",
+                        FUNCTION1,
                         "invoke",
                         proto(Type.Object, Type.Object),
-                        accepted,
+                        newInstance(BUSINESS_RESULT),
                     )
 
-                returnVoid()
+                val finished =
+                    callStatic(
+                        "kotlinx.coroutines.JobKt",
+                        $$"Job$default",
+                        proto(COMPLETABLE_JOB, "kotlinx.coroutines.Job", Type.Int, Type.Object),
+                        nullObject,
+                        int(1),
+                        nullObject,
+                    )
+                finished.callInterface(COMPLETABLE_JOB, "complete", proto(Type.Boolean))
+
+                returnValue(finished)
             }
             log.info(
-                "UHD: ${templateUltraHdUseCheck.descriptor} continues the template UHD selection callback.",
+                "UHD: ${templateUltraHdUse.descriptor} reports a successful template UHD use without trials or purchases.",
             )
         }
     }

@@ -49,16 +49,15 @@ internal val templateUltraHdEntitlement =
         }
     }
 
-private val templateUltraHdUtilities =
-    klass("templateUltraHdUtilities") {
-        strings("sp_export_high_definition_")
-    }
-
-internal val templateUltraHdUseCheck =
-    method("templateUltraHdUseCheck") {
-        inClass(templateUltraHdUtilities)
-        params("kotlin.jvm.functions.Function1")
-        returns(Type.Void)
+// The business function's own use flow consumes trial benefits or opens a purchase panel before
+// reporting its result. Newer versions inline the former static use-check wrapper into each caller.
+internal val templateUltraHdUse =
+    method("templateUltraHdUse") {
+        inClass(templateUltraHdBusiness)
+        params(
+            "com.vega.subscriptionapi.core.IBusinessFunctionParam",
+            "kotlin.jvm.functions.Function1",
+        )
     }
 
 private val templateUltraHdConfiguration =
