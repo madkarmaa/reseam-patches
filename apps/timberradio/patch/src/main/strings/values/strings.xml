@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top> -->
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<resources>
+    <string name="radio_browser_stations_description">Adds stations from radio-browser.info to station search and country lists.</string>
+    <string name="radio_browser_stations_name">Radio Browser stations</string>
+    <string name="remove_tracking_description">Stops listening statistics reports, analytics, crash reporting, and ad SDK startup.</string>
+    <string name="remove_tracking_name">Remove tracking</string>
+    <string name="unlock_premium_description">Unlocks Premium-only features and removes ads.</string>
+    <string name="unlock_premium_name">Unlock Premium</string>
+</resources>
