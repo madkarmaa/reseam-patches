@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top> -->
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<resources>
+    <string name="disable_google_maps_description">Removes the Google Maps provider, whose map tiles do not load in patched apps, and uses OSM/Mapbox maps by default.</string>
+    <string name="disable_google_maps_name">Disable Google Maps</string>
+    <string name="remove_analytics_description">Blocks Firebase Analytics, Crashlytics, Performance Monitoring, Mapbox telemetry and Huawei analytics, and removes the usage statistics, crash report and diagnostics switches from the settings.</string>
+    <string name="remove_analytics_name">Remove analytics</string>
+    <string name="unlock_pro_description">Unlocks Pro-only features.</string>
+    <string name="unlock_pro_name">Unlock Pro</string>
+</resources>
