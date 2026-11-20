@@ -1,0 +1,48 @@
+// SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+package top.madkarma.patches.inshot.gms
+
+import app.reseam.patch.field
+import app.reseam.patch.klass
+import app.reseam.patch.method
+import app.reseam.patch.methods
+
+private val serviceClient =
+    klass("serviceClient") {
+        strings("Calling connect() while still connected, missing disconnect() for ")
+    }
+
+private val serviceConfiguration =
+    serviceClient.method("getEndpointPackageName").field { owner(serviceClient.descriptor) }
+
+// Takes the destination package, the service action, and ends with the dynamic-lookup flag.
+internal val serviceConfigurationConstructor =
+    method("serviceConfigurationConstructor") {
+        inClass(klass(serviceConfiguration.type))
+        name("<init>")
+    }
+
+internal val serviceAction = serviceClient.method("getStartServiceAction")
+internal val requiresPlayServices = serviceClient.method("requiresGooglePlayServices")
+
+// These literals are account types, including Account parcel reconstruction and default accounts.
+internal val googleAccountTypes = methods("googleAccountTypes") { strings("com.google") }
+
+internal val credentialProviderFromManifest =
+    method("credentialProviderFromManifest") {
+        strings("androidx.credentials.CREDENTIAL_PROVIDER_KEY")
+    }
+
+internal val selectCredentialProvider =
+    method("selectCredentialProvider") {
+        calls(credentialProviderFromManifest)
+        inClass(klass(credentialProviderFromManifest.owner))
+    }
+
+internal val credentialsAvailable =
+    klass("androidx.credentials.playservices.CredentialProviderPlayServicesImpl").method(
+        "isAvailableOnDevice",
+    ) {
+        params()
+    }
