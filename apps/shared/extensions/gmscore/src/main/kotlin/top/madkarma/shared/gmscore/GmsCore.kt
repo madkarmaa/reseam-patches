@@ -10,6 +10,9 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.credentials.Credential
+import android.credentials.GetCredentialResponse
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import app.reseam.runtime.Export
@@ -23,6 +26,9 @@ private const val FILTER_BY_AUTHORIZED_ACCOUNTS =
     "$GOOGLE_ID.BUNDLE_KEY_FILTER_BY_AUTHORIZED_ACCOUNTS"
 private const val TOKEN_SUBTYPE = "$GOOGLE_ID.BUNDLE_KEY_GOOGLE_ID_TOKEN_SUBTYPE"
 private const val SIGN_IN_WITH_GOOGLE = "$GOOGLE_ID.TYPE_GOOGLE_ID_TOKEN_SIWG_CREDENTIAL"
+private const val CREDENTIAL_RESPONSE = "android.service.credentials.extra.GET_CREDENTIAL_RESPONSE"
+private const val CREDENTIAL_TYPE = "androidx.credentials.provider.extra.EXTRA_CREDENTIAL_TYPE"
+private const val CREDENTIAL_DATA = "androidx.credentials.provider.extra.EXTRA_CREDENTIAL_DATA"
 
 /** The GmsCore vendor group selected at patch time. */
 @Export external fun vendorGroupId(): String
@@ -70,6 +76,23 @@ fun identityCredentialsAvailable(): Boolean {
 
     Log.i(TAG, "Using legacy credential flows for the vendor-prefixed identity credential service")
     return false
+}
+
+/**
+ * Converts a GmsCore credential response to the framework form. GmsCore returns the pre-Android 14
+ * Bundle form, but AndroidX reads a framework response on Android 14+.
+ */
+@Export
+fun restoreFrameworkCredentialResponse(intent: Intent) {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) return
+
+    @Suppress("DEPRECATION")
+    val response = intent.extras?.get(CREDENTIAL_RESPONSE) as? Bundle ?: return
+    val type = response.getString(CREDENTIAL_TYPE) ?: return
+    val data = response.getBundle(CREDENTIAL_DATA) ?: return
+
+    intent.putExtra(CREDENTIAL_RESPONSE, GetCredentialResponse(Credential(type, data)))
+    Log.i(TAG, "Converted the GmsCore $type response for Android 14+")
 }
 
 /**
