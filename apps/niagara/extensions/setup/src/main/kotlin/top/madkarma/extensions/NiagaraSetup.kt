@@ -48,7 +48,7 @@ fun refuseAnalytics(context: Context) {
 
 @Suppress("UseKtx")
 @Export
-fun disableAnalyticsFlags(context: Context) {
+fun disableTelemetryFlags(context: Context) {
     prefs(context)
         .edit()
         .putBoolean(KEY_MARKETING_ANALYTICS_ENABLED, false)

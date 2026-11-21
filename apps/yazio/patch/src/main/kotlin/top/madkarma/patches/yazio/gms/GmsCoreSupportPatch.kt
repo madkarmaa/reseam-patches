@@ -10,7 +10,6 @@ import top.madkarma.patches.shared.gmscore.signInThroughGmsCore
 import top.madkarma.patches.shared.originalSignerSha1
 import top.madkarma.patches.yazio.YazioPatchStrings
 import top.madkarma.shared.gmscore.bindings.GmsCore
-import top.madkarma.yazio.gms.bindings.GmsCoreSupport
 
 val gmsCoreSupport =
     patch(YazioPatchStrings.gmsCoreSupportName) {
@@ -93,7 +92,7 @@ val gmsCoreSupport =
 
             frameworkCredentialResponseReader.before {
                 call(
-                    GmsCoreSupport.restoreFrameworkCredentialResponse,
+                    GmsCore.restoreFrameworkCredentialResponse,
                     paramOfType("android.content.Intent"),
                 )
             }

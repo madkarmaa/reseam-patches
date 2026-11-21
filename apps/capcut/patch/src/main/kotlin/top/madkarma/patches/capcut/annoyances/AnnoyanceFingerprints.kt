@@ -30,6 +30,12 @@ internal val startupQuestionnaireEnabled =
         strings("auto test hide questionnaire")
     }
 
+// Server-configured sign-in page opened on later cold starts for signed-out users.
+internal val coldStartLoginEligible =
+    method("coldStartLoginEligible") {
+        strings("isShowColdStartLogin PopCenter disable")
+    }
+
 internal val coldStartPromotionEligible =
     method("coldStartPromotionEligible") {
         strings("canShowColdBootAlert popCenter disable")

@@ -23,6 +23,11 @@ val removeAnnoyances =
                 "Annoyances: ${startupQuestionnaireEnabled.descriptor} skips the startup questionnaire.",
             )
 
+            coldStartLoginEligible.alwaysReturn(false)
+            log.info(
+                "Annoyances: ${coldStartLoginEligible.descriptor} skips the cold-start sign-in page.",
+            )
+
             coldStartPromotionEligible.alwaysReturn(false)
             log.info(
                 "Annoyances: ${coldStartPromotionEligible.descriptor} declines cold-start tool promotions.",

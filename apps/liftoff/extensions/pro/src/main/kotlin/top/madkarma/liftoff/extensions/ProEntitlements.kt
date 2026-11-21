@@ -7,8 +7,8 @@
 package top.madkarma.liftoff.extensions
 
 import app.reseam.runtime.Export
-import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import top.madkarma.shared.dates.iso8601
 
 /** Supplies lifetime Pro entries in RevenueCat's React Native mapper format. */
 @Export
@@ -20,7 +20,7 @@ fun applyProEntitlements(result: MutableMap<String, Any?>) {
 
 private fun proActiveEntries(): Map<String, Any?> {
     val nowMillis = System.currentTimeMillis()
-    val nowIso = iso8601(nowMillis)
+    val nowIso = iso8601(Date(nowMillis))
 
     val pro =
         hashMapOf<String, Any?>(
@@ -47,10 +47,4 @@ private fun proActiveEntries(): Map<String, Any?> {
         )
 
     return hashMapOf("pro" to pro, "premium" to pro)
-}
-
-private fun iso8601(millis: Long): String {
-    val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US)
-    format.timeZone = TimeZone.getTimeZone("UTC")
-    return format.format(Date(millis))
 }
