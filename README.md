@@ -8,6 +8,9 @@
 
 > [!TIP]
 > Want an app supported? [Open a patch request](https://github.com/madkarmaa/reseam-patches/issues/new?template=patch_request.yml).
+>
+> And hey, if you find this bundle useful, consider giving it a star, and maybe [donating to Reseam](https://reseam.app/donate/)
+> or [to me directly](https://ko-fi.com/madkarma). It helps more than you might think :&#41;
 
 ## Patches
 
