@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top> -->
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<resources>
+    <string name="disable_telemetry_description">Removes ads and the ad consent prompt, and stops Firebase Analytics, Crashlytics, Amplitude, AppsFlyer, CleverTap, Microsoft Clarity, and Facebook app events.</string>
+    <string name="disable_telemetry_name">Disable telemetry</string>
+    <string name="unlock_premium_description">Unlocks Premium-only features. Server-side tools cannot be unlocked.</string>
+    <string name="unlock_premium_name">Unlock Premium</string>
+</resources>
