@@ -9,6 +9,7 @@ package top.madkarma.extensions.mapy
 import android.util.Log
 import app.reseam.runtime.Export
 import java.lang.reflect.Modifier
+import top.madkarma.shared.attribution.PATCH_ATTRIBUTION
 
 @Export
 fun unlockFeatures(features: Any?, offlineMaps: Any?, featureAccess: Any?) {
@@ -41,5 +42,5 @@ fun unlockFeatures(features: Any?, offlineMaps: Any?, featureAccess: Any?) {
 @Export fun enabled(): Any = true
 
 @Export
-fun premiumTitle(text: String?, attribution: String?): String? =
-    if (text == "Mapy.com Premium" || text == "Mapy.com פרימיום") attribution else text
+fun premiumTitle(text: String?): String? =
+    if (text == "Mapy.com Premium" || text == "Mapy.com פרימיום") PATCH_ATTRIBUTION else text

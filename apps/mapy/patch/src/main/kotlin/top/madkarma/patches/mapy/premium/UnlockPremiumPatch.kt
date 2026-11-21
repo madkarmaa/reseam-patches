@@ -8,7 +8,6 @@ package top.madkarma.patches.mapy.premium
 import app.reseam.patch.*
 import top.madkarma.extensions.mapy.bindings.Premium
 import top.madkarma.patches.mapy.MapyPatchStrings
-import top.madkarma.patches.shared.PATCH_ATTRIBUTION
 
 val unlockPremium =
     patch(MapyPatchStrings.unlockPremiumName) {
@@ -22,7 +21,6 @@ val unlockPremium =
                         call(
                             Premium.premiumTitle,
                             paramOfType(Type.String),
-                            string(PATCH_ATTRIBUTION),
                         ),
                     )
             }

@@ -8,7 +8,6 @@ package top.madkarma.patches.linkboy.premium
 import app.reseam.patch.*
 import top.madkarma.linkboy.extensions.bindings.PremiumFeatures
 import top.madkarma.patches.linkboy.LinkboyPatchStrings
-import top.madkarma.patches.shared.PATCH_ATTRIBUTION
 
 val unlockPremium =
     patch(LinkboyPatchStrings.unlockPremiumName) {
@@ -27,10 +26,9 @@ val unlockPremium =
 
             stringArrayResource.after {
                 returnValue(
-                    PremiumFeatures.withRow(
+                    PremiumFeatures.withAttribution(
                         param(0).field(resourceKey),
                         result,
-                        string(PATCH_ATTRIBUTION),
                     ),
                 )
             }

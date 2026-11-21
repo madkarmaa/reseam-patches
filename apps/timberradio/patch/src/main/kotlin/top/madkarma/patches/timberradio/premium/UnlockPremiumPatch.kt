@@ -8,7 +8,6 @@ package top.madkarma.patches.timberradio.premium
 import app.reseam.patch.after
 import app.reseam.patch.alwaysReturn
 import app.reseam.patch.patch
-import top.madkarma.patches.shared.PATCH_ATTRIBUTION
 import top.madkarma.patches.timberradio.TimberRadioPatchStrings
 import top.madkarma.timberradio.premium.bindings.PremiumCard
 
@@ -34,7 +33,6 @@ val unlockPremium =
                 PremiumCard.showAttribution(
                     binding.field(premiumCard),
                     binding.field(subscribeButton),
-                    string(PATCH_ATTRIBUTION),
                 )
             }
             log.info(

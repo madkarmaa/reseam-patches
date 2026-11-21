@@ -9,18 +9,19 @@ package top.madkarma.timberradio.premium
 import android.view.View
 import android.widget.TextView
 import app.reseam.runtime.Export
+import top.madkarma.shared.attribution.PATCH_ATTRIBUTION
 
 /**
- * Turns the Premium card into a status card: [subscribeButton] shows [attribution], and neither it
- * nor [card] opens the purchase screen.
+ * Turns the Premium card into a status card: [subscribeButton] shows the shared attribution, and
+ * neither it nor [card] opens the purchase screen.
  */
 @Export
-fun showAttribution(card: View, subscribeButton: TextView, attribution: String) {
+fun showAttribution(card: View, subscribeButton: TextView) {
     card.setOnClickListener(null)
     card.isClickable = false
 
     subscribeButton.setOnClickListener(null)
     subscribeButton.isClickable = false
     subscribeButton.isAllCaps = false
-    subscribeButton.text = attribution
+    subscribeButton.text = PATCH_ATTRIBUTION
 }

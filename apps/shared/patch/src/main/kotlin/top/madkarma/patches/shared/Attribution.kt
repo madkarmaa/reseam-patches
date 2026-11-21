@@ -3,4 +3,5 @@
 
 package top.madkarma.patches.shared
 
+// Keep in sync with top.madkarma.shared.attribution.PATCH_ATTRIBUTION, which extensions read.
 const val PATCH_ATTRIBUTION = "Patched with ❤ by MadKarma ;)"

@@ -5,8 +5,4 @@ plugins {
     id("app.reseam.patches")
 }
 
-dependencies {
-    compileOnly(project(":apps:shared:patch"))
-}
-
 reseamStrings { objectName = "top.madkarma.patches.mapy.MapyPatchStrings" }

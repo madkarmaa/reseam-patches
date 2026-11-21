@@ -12,7 +12,6 @@ import app.reseam.patch.before
 import app.reseam.patch.patch
 import top.madkarma.inshot.pro.bindings.SubscriptionCard
 import top.madkarma.patches.inshot.InShotPatchStrings
-import top.madkarma.patches.shared.PATCH_ATTRIBUTION
 import top.madkarma.patches.universal.signature.signatureKiller
 
 val unlockPro =
@@ -37,7 +36,6 @@ val unlockPro =
                     paramOfType(VIEW_HOLDER).field(itemView),
                     int(descriptionId.toInt()),
                     int(arrowId.toInt()),
-                    string(PATCH_ATTRIBUTION),
                 )
             }
             log.info(

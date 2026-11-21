@@ -10,7 +10,6 @@ import top.madkarma.capcut.premium.bindings.Profile
 import top.madkarma.capcut.premium.bindings.SubscriptionUpsell
 import top.madkarma.patches.capcut.CapCutPatchStrings
 import top.madkarma.patches.capcut.integrity.bypassIntegrityChecks
-import top.madkarma.patches.shared.PATCH_ATTRIBUTION
 
 val unlockPremium =
     patch(CapCutPatchStrings.unlockPremiumName) {
@@ -56,7 +55,7 @@ val unlockPremium =
             updateLynxTranslations.before {
                 // The callback receives the resource channel, then the translation JSON, then its
                 // status.
-                param(1).assign(Profile.withAttribution(param(1), string(PATCH_ATTRIBUTION)))
+                param(1).assign(Profile.withAttribution(param(1)))
             }
             log.info(
                 "Premium: ${updateLynxTranslations.descriptor} displays the shared attribution in the profile Help Center row.",

@@ -10,6 +10,7 @@ import android.util.Log
 import app.reseam.runtime.Export
 import org.json.JSONException
 import org.json.JSONObject
+import top.madkarma.shared.attribution.PATCH_ATTRIBUTION
 
 @Export
 fun hideSubscriptionEntrance(configuration: JSONObject?) {
@@ -39,14 +40,14 @@ fun subscriptionTouchConfiguration(name: String?, configuration: String?): Strin
 }
 
 @Export
-fun withAttribution(translations: String?, attribution: String): String? {
+fun withAttribution(translations: String?): String? {
     if (translations == null || !translations.contains("mob_me_help_center")) return translations
 
     return try {
         val strings = JSONObject(translations)
         if (!strings.has("mob_me_help_center")) return translations
 
-        strings.put("mob_me_help_center", attribution)
+        strings.put("mob_me_help_center", PATCH_ATTRIBUTION)
 
         Log.i("CapCutPremium", "Replaced the profile Help Center label with the shared attribution")
         strings.toString()

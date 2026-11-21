@@ -10,9 +10,10 @@ import android.util.Log
 import android.webkit.WebView
 import app.reseam.runtime.Export
 import org.json.JSONObject
+import top.madkarma.shared.attribution.PATCH_ATTRIBUTION
 
 @Export
-fun install(webView: WebView?, attribution: String?) {
+fun install(webView: WebView?) {
     if (webView == null) return
 
     try {
@@ -61,7 +62,7 @@ fun install(webView: WebView?, attribution: String?) {
             })();
             """
                 .trimIndent()
-                .format(JSONObject.quote(attribution)) + "\n"
+                .format(JSONObject.quote(PATCH_ATTRIBUTION)) + "\n"
         webView.evaluateJavascript(script, null)
     } catch (exception: RuntimeException) {
         Log.w("ReseamAccuWeather", "Could not install membership attribution", exception)

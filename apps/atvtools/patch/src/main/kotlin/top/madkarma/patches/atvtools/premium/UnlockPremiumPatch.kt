@@ -12,7 +12,6 @@ import app.reseam.patch.patch
 import java.util.Base64
 import top.madkarma.atvtools.premium.bindings.Premium
 import top.madkarma.patches.atvtools.AtvToolsPatchStrings
-import top.madkarma.patches.shared.PATCH_ATTRIBUTION
 import top.madkarma.patches.universal.signature.spoofApkFileAccess
 import top.madkarma.universal.signature.bindings.NativeSignatures
 
@@ -52,7 +51,7 @@ val unlockPremium =
                 "Premium: ${billingConstructor.descriptor} exposes permanent premium access through ${premiumState.name}.",
             )
 
-            premiumScreen.after { Premium.showAttribution(thisObject, string(PATCH_ATTRIBUTION)) }
+            premiumScreen.after { Premium.showAttribution(thisObject) }
             log.info(
                 "Premium: ${premiumScreen.descriptor} shows the shared patch attribution instead of purchase options.",
             )

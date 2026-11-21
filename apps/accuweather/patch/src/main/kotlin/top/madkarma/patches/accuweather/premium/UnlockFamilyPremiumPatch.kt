@@ -9,7 +9,6 @@ import app.reseam.patch.before
 import app.reseam.patch.patch
 import top.madkarma.extensions.accuweather.bindings.MembershipAttribution
 import top.madkarma.patches.accuweather.AccuweatherPatchStrings
-import top.madkarma.patches.shared.PATCH_ATTRIBUTION
 
 val unlockFamilyPremium =
     patch(AccuweatherPatchStrings.unlockFamilyPremiumName) {
@@ -29,7 +28,6 @@ val unlockFamilyPremium =
                 call(
                     MembershipAttribution.install,
                     paramOfType("android.webkit.WebView"),
-                    string(PATCH_ATTRIBUTION),
                 )
             }
             log.info(

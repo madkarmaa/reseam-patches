@@ -11,6 +11,7 @@ import android.util.Log
 import android.widget.Toast
 import app.reseam.runtime.Export
 import org.json.JSONObject
+import top.madkarma.shared.attribution.PATCH_ATTRIBUTION
 
 @Export
 fun state(purchaseClassName: String): Any {
@@ -39,7 +40,7 @@ fun state(purchaseClassName: String): Any {
 }
 
 @Export
-fun showAttribution(activity: Activity, attribution: String) {
-    Toast.makeText(activity, attribution, Toast.LENGTH_LONG).show()
+fun showAttribution(activity: Activity) {
+    Toast.makeText(activity, PATCH_ATTRIBUTION, Toast.LENGTH_LONG).show()
     activity.finish()
 }
