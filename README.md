@@ -41,7 +41,7 @@
 | Name                                                  | Description                                                                                                                               | Version pins |
 | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
 | Bug fixes                                             | Fixes app bugs.                                                                                                                           | None         |
-| Disable analytics                                     | Refuses and blocks analytics collection.                                                                                                  | None         |
+| Disable telemetry                                     | Refuses and blocks analytics collection.                                                                                                  | None         |
 | Mindful launch                                        | Before a leisure app opens too often or for too long, shows a pause with a countdown on the open button. Configure it in Reseam settings. | None         |
 | Skip intro                                            | Skips the promo and terms screens, opens favorites setup, and skips the tutorials after it.                                               | None         |
 | top.madkarma.patches.niagara.settings.niagaraSettings |                                                                                                                                           | None         |
@@ -127,6 +127,18 @@
 </details>
 
 <details>
+<summary><strong>com.camerasideas.instashot</strong></summary>
+
+| Name                   | Description                                                                                                                                                | Version pins |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
+| Disable telemetry      | Stops app event tracking, Firebase Analytics, Crashlytics, and Facebook app events.                                                                        | None         |
+| GmsCore support        | Signs in with Google through separately installed Reseam GmsCore.                                                                                          | None         |
+| Remove AI integrations | Removes the cloud AI tools that upload your media. Turning this patch off does not make them work: InShot's servers require a Google Play Integrity check. | None         |
+| Unlock Pro             | Unlocks Pro-only features.                                                                                                                                 | None         |
+
+</details>
+
+<details>
 <summary><strong>com.cloudflare.onedotonedotonedotone</strong></summary>
 
 | Name                   | Description                                                               | Version pins |
@@ -206,11 +218,32 @@
 </details>
 
 <details>
+<summary><strong>com.ilovepdf.www</strong></summary>
+
+| Name            | Description                                                       | Version pins |
+| --------------- | ----------------------------------------------------------------- | ------------ |
+| GmsCore support | Signs in with Google through separately installed Reseam GmsCore. | None         |
+| Unlock Premium  | Unlocks Premium-only features.                                    | None         |
+
+</details>
+
+<details>
+<summary><strong>com.ilyabogdanovich.geotracker</strong></summary>
+
+| Name                | Description                                                                                                                                                                                       | Version pins |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
+| Disable Google Maps | Removes the Google Maps provider, whose map tiles do not load in patched apps, and uses OSM/Mapbox maps by default.                                                                               | None         |
+| Disable telemetry   | Blocks Firebase Analytics, Crashlytics, Performance Monitoring, Mapbox telemetry and Huawei analytics, and removes the usage statistics, crash report and diagnostics switches from the settings. | None         |
+| Unlock Pro          | Unlocks Pro-only features.                                                                                                                                                                        | None         |
+
+</details>
+
+<details>
 <summary><strong>com.inspolab.quicksettingstile</strong></summary>
 
 | Name                     | Description                                                                                                                                     | Version pins |
 | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
-| Remove analytics         | Turns off Firebase Analytics, Crashlytics, and Sessions, skips the ad consent form, and stops Meta Audience Network from starting with the app. | None         |
+| Disable telemetry        | Turns off Firebase Analytics, Crashlytics, and Sessions, skips the ad consent form, and stops Meta Audience Network from starting with the app. | None         |
 | Remove startup animation | Skips the animated launch screen so the app opens straight away.                                                                                | None         |
 | Unlock Premium           | Unlocks Premium-only features.                                                                                                                  | None         |
 
@@ -268,11 +301,32 @@
 </details>
 
 <details>
+<summary><strong>com.mobilefootie.wc2010</strong></summary>
+
+| Name            | Description                                                       | Version pins |
+| --------------- | ----------------------------------------------------------------- | ------------ |
+| GmsCore support | Signs in with Google through separately installed Reseam GmsCore. | None         |
+| Unlock FotMob+  | Unlocks FotMob+-only features.                                    | None         |
+
+</details>
+
+<details>
 <summary><strong>com.motioncam</strong></summary>
 
 | Name                | Description                                            | Version pins |
 | ------------------- | ------------------------------------------------------ | ------------ |
 | Unlimited recording | Removes the trial's five-second video recording limit. | None         |
+
+</details>
+
+<details>
+<summary><strong>com.msoft.timberradio</strong></summary>
+
+| Name                   | Description                                                                         | Version pins |
+| ---------------------- | ----------------------------------------------------------------------------------- | ------------ |
+| Disable telemetry      | Stops listening statistics reports, analytics, crash reporting, and ad SDK startup. | None         |
+| Radio Browser stations | Adds stations from radio-browser.info to station search and country lists.          | None         |
+| Unlock Premium         | Unlocks Premium-only features and removes ads.                                      | None         |
 
 </details>
 
@@ -288,10 +342,10 @@
 <details>
 <summary><strong>com.orhotechnologies.orhoduomusic</strong></summary>
 
-| Name             | Description                                              | Version pins |
-| ---------------- | -------------------------------------------------------- | ------------ |
-| Remove analytics | Turns off Firebase Analytics, Crashlytics, and Sessions. | None         |
-| Unlock Premium   | Unlocks Premium-only features.                           | None         |
+| Name              | Description                                              | Version pins |
+| ----------------- | -------------------------------------------------------- | ------------ |
+| Disable telemetry | Turns off Firebase Analytics, Crashlytics, and Sessions. | None         |
+| Unlock Premium    | Unlocks Premium-only features.                           | None         |
 
 </details>
 
@@ -301,6 +355,24 @@
 | Name       | Description                | Version pins |
 | ---------- | -------------------------- | ------------ |
 | Unlock Pro | Unlocks Pro-only features. | None         |
+
+</details>
+
+<details>
+<summary><strong>com.overdevs.at4k</strong></summary>
+
+| Name           | Description                    | Version pins |
+| -------------- | ------------------------------ | ------------ |
+| Unlock Premium | Unlocks Premium-only features. | None         |
+
+</details>
+
+<details>
+<summary><strong>com.overdevs.kyulauncher</strong></summary>
+
+| Name           | Description                    | Version pins |
+| -------------- | ------------------------------ | ------------ |
+| Unlock Premium | Unlocks Premium-only features. | None         |
 
 </details>
 
@@ -345,6 +417,16 @@
 </details>
 
 <details>
+<summary><strong>com.salt.music</strong></summary>
+
+| Name                   | Description                                                                  | Version pins |
+| ---------------------- | ---------------------------------------------------------------------------- | ------------ |
+| Unlock Audiophile Pack | Unlocks USB exclusive output, DAC controls, and Morvanium smart transitions. | None         |
+| Unlock Pro             | Unlocks Pro-only features.                                                   | None         |
+
+</details>
+
+<details>
 <summary><strong>com.sgnoogle.respiro</strong></summary>
 
 | Name           | Description                                                                | Version pins |
@@ -367,11 +449,20 @@
 </details>
 
 <details>
+<summary><strong>com.spocky.projengmenu</strong></summary>
+
+| Name           | Description                    | Version pins |
+| -------------- | ------------------------------ | ------------ |
+| Unlock Premium | Unlocks Premium-only features. | None         |
+
+</details>
+
+<details>
 <summary><strong>com.strava</strong></summary>
 
 | Name                | Description                                                                         | Version pins |
 | ------------------- | ----------------------------------------------------------------------------------- | ------------ |
-| Disable analytics   | Blocks analytics and install tracking, and opts out of data sharing without asking. | None         |
+| Disable telemetry   | Blocks analytics and install tracking, and opts out of data sharing without asking. | None         |
 | GmsCore support     | Signs in with Google through separately installed Reseam GmsCore.                   | None         |
 | Remove annoyances   | Skips the sign-up questions and removes the app popups.                             | None         |
 | Unlock Subscription | Unlocks Subscription-only features. Server-sided features cannot be unlocked.       | None         |
@@ -386,6 +477,18 @@
 | Disable telemetry                                  | Disables Textra reporting, advertising SDK collection, and ML Kit telemetry. | None         |
 | top.madkarma.patches.textra.shared.textraIntegrity |                                                                              | None         |
 | Unlock Pro                                         | Unlocks Pro-only features.                                                   | None         |
+
+</details>
+
+<details>
+<summary><strong>com.touchtype.swiftkey</strong></summary>
+
+| Name                  | Description                                                                                                                                                                     | Version pins |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
+| Disable telemetry     | Stops usage telemetry, Adjust attribution tracking, and Firebase crash reporting.                                                                                               | None         |
+| Install theme packs   | Installs community theme packs (.rwift or .zip files, as Rwiftkey uses them) without root: open or share a pack with SwiftKey, or pick one from Install theme pack in settings. | None         |
+| Remove AI features    | Removes Copilot, Bing Search, Microsoft Rewards, Image Creator, Camera Remix, and AI sticker generation from the keyboard and settings.                                         | None         |
+| Unlock hidden layouts | Offers every extended Latin keyboard layout, such as BÉPO, Neo 2, and Swiss French QWERTZ, to every Latin-script language.                                                      | None         |
 
 </details>
 
@@ -413,7 +516,7 @@
 
 | Name                     | Description                                                                                                                                     | Version pins |
 | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
-| Remove analytics         | Turns off Firebase Analytics, Crashlytics, and Sessions, skips the ad consent form, and stops Meta Audience Network from starting with the app. | None         |
+| Disable telemetry        | Turns off Firebase Analytics, Crashlytics, and Sessions, skips the ad consent form, and stops Meta Audience Network from starting with the app. | None         |
 | Remove startup animation | Skips the animated launch screen so the app opens straight away.                                                                                | None         |
 | Unlock Premium           | Unlocks Premium-only features.                                                                                                                  | None         |
 
@@ -435,10 +538,11 @@
 <details>
 <summary><strong>com.wallpaper.liveloop</strong></summary>
 
-| Name             | Description                                                                              | Version pins |
-| ---------------- | ---------------------------------------------------------------------------------------- | ------------ |
-| Remove analytics | Removes the ad consent prompt, its Ad Settings entry, and analytics and crash reporting. | None         |
-| Unlock Premium   | Unlocks Premium-only features.                                                           | None         |
+| Name              | Description                                                                              | Version pins |
+| ----------------- | ---------------------------------------------------------------------------------------- | ------------ |
+| Disable telemetry | Removes the ad consent prompt, its Ad Settings entry, and analytics and crash reporting. | None         |
+| GmsCore support   | Signs in with Google through separately installed Reseam GmsCore.                        | None         |
+| Unlock Premium    | Unlocks Premium-only features.                                                           | None         |
 
 </details>
 
@@ -490,6 +594,15 @@
 </details>
 
 <details>
+<summary><strong>jp.ne.ibis.ibispaintx.app</strong></summary>
+
+| Name         | Description                                                           | Version pins |
+| ------------ | --------------------------------------------------------------------- | ------------ |
+| Unlock Prime | Unlocks Prime-only features. Server-side features cannot be unlocked. | None         |
+
+</details>
+
+<details>
 <summary><strong>org.kustom.widget</strong></summary>
 
 | Name                       | Description                                  | Version pins |
@@ -510,6 +623,15 @@
 </details>
 
 <details>
+<summary><strong>sen.typinghero</strong></summary>
+
+| Name           | Description                    | Version pins |
+| -------------- | ------------------------------ | ------------ |
+| Unlock Premium | Unlocks Premium-only features. | None         |
+
+</details>
+
+<details>
 <summary><strong>video.player.videoplayer</strong></summary>
 
 | Name           | Description                    | Version pins |
@@ -523,7 +645,7 @@
 
 | Name                     | Description                                                                                                                                     | Version pins |
 | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
-| Remove analytics         | Turns off Firebase Analytics, Crashlytics, and Sessions, skips the ad consent form, and stops Meta Audience Network from starting with the app. | None         |
+| Disable telemetry        | Turns off Firebase Analytics, Crashlytics, and Sessions, skips the ad consent form, and stops Meta Audience Network from starting with the app. | None         |
 | Remove startup animation | Skips the animated launch screen so the app opens straight away.                                                                                | None         |
 | Unlock Premium           | Unlocks Premium-only features.                                                                                                                  | None         |
 
