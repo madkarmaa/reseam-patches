@@ -30,5 +30,12 @@ val unlockLayouts =
             log.info(
                 "Layouts: ${listLayoutNames.descriptor} offers every extended Latin layout, not only those of installed packs.",
             )
+
+            // Language packs list only the redesigned layouts, such as Arabic's, and the app keeps
+            // the replaced ones working only for people who had already picked them.
+            packLayouts.after { returnValue(Layouts.withLegacyLayouts(result)) }
+            log.info(
+                "Layouts: ${packLayouts.descriptor} adds the legacy layouts its redesigned layouts replaced.",
+            )
         }
     }

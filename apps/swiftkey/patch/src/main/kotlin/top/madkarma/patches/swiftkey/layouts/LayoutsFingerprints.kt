@@ -16,3 +16,10 @@ internal val listLayoutNames =
         inClass(layoutSettings)
         returns("Ljava/util/HashMap;")
     }
+
+// The layouts a language pack lists, its default first.
+internal val packLayouts =
+    method("packLayouts") {
+        calledBy(listLayoutNames)
+        returns("Ljava/util/List;")
+    }

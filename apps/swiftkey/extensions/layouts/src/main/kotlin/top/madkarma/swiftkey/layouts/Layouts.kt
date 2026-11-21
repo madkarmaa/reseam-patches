@@ -17,3 +17,23 @@ fun everyLayout(layouts: List<*>): List<*> {
     val layout = layouts.firstOrNull() as? Enum<*> ?: return layouts
     return layout.declaringJavaClass.enumConstants.toList()
 }
+
+/**
+ * [layouts] followed by the legacy layouts that its redesigned layouts replaced. The app names a
+ * redesigned layout after the one it replaced, with a `_V2` suffix, and keeps the old one.
+ */
+@Export
+fun withLegacyLayouts(layouts: List<*>): List<*> {
+    val layout = layouts.firstOrNull() as? Enum<*> ?: return layouts
+    val layoutsByName = layout.declaringJavaClass.enumConstants.associateBy { it.name }
+
+    val legacy =
+        layouts
+            .map { (it as Enum<*>).name }
+            .filter { it.endsWith("_V2") }
+            .mapNotNull { layoutsByName[it.removeSuffix("_V2")] }
+            .filterNot { it in layouts }
+    if (legacy.isEmpty()) return layouts
+
+    return layouts + legacy
+}
