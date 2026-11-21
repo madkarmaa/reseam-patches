@@ -152,3 +152,10 @@ path = ["apps/googlephotos/patch/src/main/resources/reseam-settings/reseam_setti
 precedence = "override"
 SPDX-FileCopyrightText = "2026 Reseam contributors <https://reseam.app>"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
+
+# The download icon of Google's Material Icons, on the SwiftKey theme pack row.
+[[annotations]]
+path = ["apps/swiftkey/patch/src/main/resources/swiftkey-themes/install_theme_pack.xml"]
+precedence = "override"
+SPDX-FileCopyrightText = "Google LLC"
+SPDX-License-Identifier = "Apache-2.0"
