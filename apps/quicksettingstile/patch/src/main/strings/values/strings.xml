@@ -2,8 +2,8 @@
 <!-- SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top> -->
 <!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
 <resources>
-    <string name="remove_analytics_description">Turns off Firebase Analytics, Crashlytics, and Sessions, skips the ad consent form, and stops Meta Audience Network from starting with the app.</string>
-    <string name="remove_analytics_name">Remove analytics</string>
+    <string name="disable_telemetry_description">Turns off Firebase Analytics, Crashlytics, and Sessions, skips the ad consent form, and stops Meta Audience Network from starting with the app.</string>
+    <string name="disable_telemetry_name">Disable telemetry</string>
     <string name="remove_startup_animation_description">Skips the animated launch screen so the app opens straight away.</string>
     <string name="remove_startup_animation_name">Remove startup animation</string>
     <string name="unlock_premium_description">Unlocks Premium-only features.</string>

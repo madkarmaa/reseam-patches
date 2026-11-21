@@ -3,7 +3,7 @@
 
 @file:Suppress("unused")
 
-package top.madkarma.patches.duomusic.analytics
+package top.madkarma.patches.duomusic.telemetry
 
 import app.reseam.patch.patch
 import top.madkarma.patches.duomusic.DuoMusicPatchStrings
@@ -18,9 +18,9 @@ private val firebaseCollection =
         "firebase_sessions_enabled" to "false",
     )
 
-val removeAnalytics =
-    patch(DuoMusicPatchStrings.removeAnalyticsName) {
-        description(DuoMusicPatchStrings.removeAnalyticsDescription)
+val disableTelemetry =
+    patch(DuoMusicPatchStrings.disableTelemetryName) {
+        description(DuoMusicPatchStrings.disableTelemetryDescription)
         compatibleWith("com.orhotechnologies.orhoduomusic")
 
         execute {
@@ -29,7 +29,7 @@ val removeAnalytics =
 
                 for ((name, value) in firebaseCollection) {
                     val existing = findByTag("meta-data").filter { it["android:name"] == name }
-                    if (existing.size > 1) error("Analytics: duplicate Firebase metadata $name")
+                    if (existing.size > 1) error("Telemetry: duplicate Firebase metadata $name")
 
                     val entry =
                         existing.singleOrNull()
@@ -40,7 +40,7 @@ val removeAnalytics =
                 }
             }
             log.info(
-                "Analytics: the manifest turns off Firebase Analytics, Crashlytics, and Sessions.",
+                "Telemetry: the manifest turns off Firebase Analytics, Crashlytics, and Sessions.",
             )
         }
     }

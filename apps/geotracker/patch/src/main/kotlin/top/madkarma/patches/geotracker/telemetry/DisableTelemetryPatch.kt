@@ -3,7 +3,7 @@
 
 @file:Suppress("unused")
 
-package top.madkarma.patches.geotracker.analytics
+package top.madkarma.patches.geotracker.telemetry
 
 import app.reseam.patch.*
 import top.madkarma.geotracker.settings.bindings.SettingsSections
@@ -21,9 +21,9 @@ private val firebaseCollection =
         "google_analytics_adid_collection_enabled" to "false",
     )
 
-val removeAnalytics =
-    patch(GeoTrackerPatchStrings.removeAnalyticsName) {
-        description(GeoTrackerPatchStrings.removeAnalyticsDescription)
+val disableTelemetry =
+    patch(GeoTrackerPatchStrings.disableTelemetryName) {
+        description(GeoTrackerPatchStrings.disableTelemetryDescription)
         compatibleWith("com.ilyabogdanovich.geotracker")
 
         execute {
@@ -34,7 +34,7 @@ val removeAnalytics =
                 param(2).assign(bool(false))
             }
             log.info(
-                "Analytics: ${dataCollectionConstructor.descriptor} keeps Firebase Analytics, Crashlytics and Performance off.",
+                "Telemetry: ${dataCollectionConstructor.descriptor} keeps Firebase Analytics, Crashlytics and Performance off.",
             )
 
             // Settings' only Boolean values are the usage statistics, crash report and diagnostics
@@ -50,7 +50,7 @@ val removeAnalytics =
                 for (switch in collectionSwitches) param(switch).assign(bool(false))
             }
             log.info(
-                "Analytics: ${settingsConstructor.descriptor} keeps usage statistics, crash reports and diagnostics off.",
+                "Telemetry: ${settingsConstructor.descriptor} keeps usage statistics, crash reports and diagnostics off.",
             )
 
             // The switches stay off, so the settings screen drops the section that holds them.
@@ -71,7 +71,7 @@ val removeAnalytics =
                 )
             }
             log.info(
-                "Analytics: ${settingsSectionInitializer.descriptor} removes the Privacy section from the settings screen.",
+                "Telemetry: ${settingsSectionInitializer.descriptor} removes the Privacy section from the settings screen.",
             )
 
             manifest.edit {
@@ -79,7 +79,7 @@ val removeAnalytics =
 
                 for ((name, value) in firebaseCollection) {
                     val existing = findByTag("meta-data").filter { it["android:name"] == name }
-                    if (existing.size > 1) error("Analytics: duplicate Firebase metadata $name")
+                    if (existing.size > 1) error("Telemetry: duplicate Firebase metadata $name")
 
                     val entry =
                         existing.singleOrNull()
@@ -90,7 +90,7 @@ val removeAnalytics =
                 }
             }
             log.info(
-                "Analytics: the manifest turns off Firebase Analytics, Crashlytics, Performance and Sessions.",
+                "Telemetry: the manifest turns off Firebase Analytics, Crashlytics, Performance and Sessions.",
             )
 
             val telemetryConstructors = mapTelemetryConstructors.all
@@ -98,28 +98,28 @@ val removeAnalytics =
             for (constructor in telemetryConstructors) {
                 constructor.after { thisObject.call(disableTelemetrySession) }
                 log.info(
-                    "Analytics: ${constructor.descriptor} turns off Mapbox telemetry collection.",
+                    "Telemetry: ${constructor.descriptor} turns off Mapbox telemetry collection.",
                 )
             }
 
             setUserTelemetryRequestState.before { param(0).assign(bool(false)) }
             log.info(
-                "Analytics: ${setUserTelemetryRequestState.descriptor} keeps Mapbox telemetry off.",
+                "Telemetry: ${setUserTelemetryRequestState.descriptor} keeps Mapbox telemetry off.",
             )
 
             shouldSendMapEvents.alwaysReturn(false)
             log.info(
-                "Analytics: ${shouldSendMapEvents.descriptor} drops Mapbox map load and performance events.",
+                "Telemetry: ${shouldSendMapEvents.descriptor} drops Mapbox map load and performance events.",
             )
 
             mapTurnstileEvent.alwaysReturn()
-            log.info("Analytics: ${mapTurnstileEvent.descriptor} drops Mapbox turnstile events.")
+            log.info("Telemetry: ${mapTurnstileEvent.descriptor} drops Mapbox turnstile events.")
 
             val huaweiEvents = huaweiAnalyticsEvents.all
             check(huaweiEvents.isNotEmpty()) { "Huawei analytics events not found" }
             for (event in huaweiEvents) {
                 event.alwaysReturn()
-                log.info("Analytics: ${event.descriptor} drops Huawei analytics events.")
+                log.info("Telemetry: ${event.descriptor} drops Huawei analytics events.")
             }
         }
     }

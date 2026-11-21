@@ -2,8 +2,8 @@
 <!-- SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top> -->
 <!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
 <resources>
-    <string name="disable_analytics_description">Blocks analytics and install tracking, and opts out of data sharing without asking.</string>
-    <string name="disable_analytics_name">Disable analytics</string>
+    <string name="disable_telemetry_description">Blocks analytics and install tracking, and opts out of data sharing without asking.</string>
+    <string name="disable_telemetry_name">Disable telemetry</string>
     <string name="gms_core_support_description">Signs in with Google through separately installed Reseam GmsCore.</string>
     <string name="gms_core_support_gms_core_vendor_group_id_title">GmsCore vendor group ID</string>
     <string name="gms_core_support_name">GmsCore support</string>

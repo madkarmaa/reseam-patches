@@ -22,9 +22,9 @@ private val collectionSwitches =
         "com.facebook.sdk.AdvertiserIDCollectionEnabled" to "false",
     )
 
-val removeTelemetry =
-    patch(InShotPatchStrings.removeTelemetryName) {
-        description(InShotPatchStrings.removeTelemetryDescription)
+val disableTelemetry =
+    patch(InShotPatchStrings.disableTelemetryName) {
+        description(InShotPatchStrings.disableTelemetryDescription)
         compatibleWith("com.camerasideas.instashot")
         // The native video engine kills the app when its signing certificate changes.
         dependsOn(signatureKiller)

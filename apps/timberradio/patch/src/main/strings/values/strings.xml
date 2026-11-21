@@ -4,8 +4,8 @@
 <resources>
     <string name="radio_browser_stations_description">Adds stations from radio-browser.info to station search and country lists.</string>
     <string name="radio_browser_stations_name">Radio Browser stations</string>
-    <string name="remove_analytics_description">Stops listening statistics reports, analytics, crash reporting, and ad SDK startup.</string>
-    <string name="remove_analytics_name">Remove analytics</string>
+    <string name="disable_telemetry_description">Stops listening statistics reports, analytics, crash reporting, and ad SDK startup.</string>
+    <string name="disable_telemetry_name">Disable telemetry</string>
     <string name="unlock_premium_description">Unlocks Premium-only features and removes ads.</string>
     <string name="unlock_premium_name">Unlock Premium</string>
 </resources>

@@ -3,23 +3,23 @@
 
 @file:Suppress("unused")
 
-package top.madkarma.patches.niagara.analytics
+package top.madkarma.patches.niagara.telemetry
 
 import app.reseam.patch.appEntry
 import app.reseam.patch.patch
 import top.madkarma.extensions.bindings.NiagaraSetup
 import top.madkarma.patches.niagara.NiagaraPatchStrings
 
-val disableAnalytics =
-    patch(NiagaraPatchStrings.disableAnalyticsName) {
-        description(NiagaraPatchStrings.disableAnalyticsDescription)
+val disableTelemetry =
+    patch(NiagaraPatchStrings.disableTelemetryName) {
+        description(NiagaraPatchStrings.disableTelemetryDescription)
         compatibleWith("bitpit.launcher")
 
         execute {
             appEntry {
                 call(NiagaraSetup.refuseAnalytics, application)
-                call(NiagaraSetup.disableAnalyticsFlags, application)
+                call(NiagaraSetup.disableTelemetryFlags, application)
             }
-            log.info("Analytics: collection refused and blocked at startup.")
+            log.info("Telemetry: collection refused and blocked at startup.")
         }
     }

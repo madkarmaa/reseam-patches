@@ -6,8 +6,8 @@
     <string name="install_theme_packs_name">Install theme packs</string>
     <string name="remove_ai_features_description">Removes Copilot, Bing Search, Microsoft Rewards, Image Creator, Camera Remix, and AI sticker generation from the keyboard and settings.</string>
     <string name="remove_ai_features_name">Remove AI features</string>
-    <string name="remove_telemetry_description">Stops usage telemetry, Adjust attribution tracking, and Firebase crash reporting.</string>
-    <string name="remove_telemetry_name">Remove telemetry</string>
+    <string name="disable_telemetry_description">Stops usage telemetry, Adjust attribution tracking, and Firebase crash reporting.</string>
+    <string name="disable_telemetry_name">Disable telemetry</string>
     <string name="unlock_layouts_description">Offers every extended Latin keyboard layout, such as BÉPO, Neo 2, and Swiss French QWERTZ, to every Latin-script language.</string>
     <string name="unlock_layouts_name">Unlock hidden layouts</string>
 </resources>

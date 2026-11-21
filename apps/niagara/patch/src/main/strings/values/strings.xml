@@ -4,8 +4,8 @@
 <resources>
     <string name="bug_fixes_description">Fixes app bugs.</string>
     <string name="bug_fixes_name">Bug fixes</string>
-    <string name="disable_analytics_description">Refuses and blocks analytics collection.</string>
-    <string name="disable_analytics_name">Disable analytics</string>
+    <string name="disable_telemetry_description">Refuses and blocks analytics collection.</string>
+    <string name="disable_telemetry_name">Disable telemetry</string>
     <string name="mindful_launch_description">Before a leisure app opens too often or for too long, shows a pause with a countdown on the open button. Configure it in Reseam settings.</string>
     <string name="mindful_launch_name">Mindful launch</string>
     <string name="skip_intro_accept_terms_description">Marks the terms as accepted, skipping the terms screen.</string>

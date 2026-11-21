@@ -3,7 +3,7 @@
 
 @file:Suppress("unused")
 
-package top.madkarma.patches.liveloop.analytics
+package top.madkarma.patches.liveloop.telemetry
 
 import app.reseam.patch.*
 import top.madkarma.patches.liveloop.LiveLoopPatchStrings
@@ -22,9 +22,9 @@ private const val AUDIENCE_NETWORK_PROVIDER = "com.facebook.ads.AudienceNetworkC
 
 private const val APPLOVIN_PRIVACY = "Lcom/applovin/sdk/AppLovinPrivacySettings;"
 
-val removeAnalytics =
-    patch(LiveLoopPatchStrings.removeAnalyticsName) {
-        description(LiveLoopPatchStrings.removeAnalyticsDescription)
+val disableTelemetry =
+    patch(LiveLoopPatchStrings.disableTelemetryName) {
+        description(LiveLoopPatchStrings.disableTelemetryDescription)
         compatibleWith("com.wallpaper.liveloop")
         dependsOn(ExternalPatch("reseam-patches", "app.reseam.patches.universal.removePairip"))
 
@@ -32,7 +32,7 @@ val removeAnalytics =
             // Without a consent update, the form never loads and Ad Settings stays hidden.
             requestConsentInfoUpdate.alwaysReturn()
             log.info(
-                "Analytics: ${requestConsentInfoUpdate.descriptor} skips the consent form and Ad Settings.",
+                "Telemetry: ${requestConsentInfoUpdate.descriptor} skips the consent form and Ad Settings.",
             )
 
             appEntry {
@@ -40,14 +40,14 @@ val removeAnalytics =
                 callStatic(APPLOVIN_PRIVACY, "setHasUserConsent", context, bool(false), application)
                 callStatic(APPLOVIN_PRIVACY, "setDoNotSell", context, bool(true), application)
             }
-            log.info("Analytics: app entry denies AppLovin consent and data sale.")
+            log.info("Telemetry: app entry denies AppLovin consent and data sale.")
 
             manifest.edit {
                 val application = findByTag("application").single()
 
                 for ((name, value) in firebaseCollection) {
                     val existing = findByTag("meta-data").filter { it["android:name"] == name }
-                    if (existing.size > 1) error("Analytics: duplicate Firebase metadata $name")
+                    if (existing.size > 1) error("Telemetry: duplicate Firebase metadata $name")
 
                     val entry =
                         existing.singleOrNull()
@@ -59,11 +59,11 @@ val removeAnalytics =
 
                 findByTag("provider")
                     .singleOrNull { it["android:name"] == AUDIENCE_NETWORK_PROVIDER }
-                    ?.remove() ?: error("Analytics: $AUDIENCE_NETWORK_PROVIDER provider missing")
+                    ?.remove() ?: error("Telemetry: $AUDIENCE_NETWORK_PROVIDER provider missing")
             }
             log.info(
-                "Analytics: the manifest turns off Firebase Analytics, Crashlytics, and Sessions.",
+                "Telemetry: the manifest turns off Firebase Analytics, Crashlytics, and Sessions.",
             )
-            log.info("Analytics: the manifest no longer starts Meta Audience Network with the app.")
+            log.info("Telemetry: the manifest no longer starts Meta Audience Network with the app.")
         }
     }

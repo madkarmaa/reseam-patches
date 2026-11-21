@@ -3,7 +3,7 @@
 
 @file:Suppress("unused")
 
-package top.madkarma.patches.alwaysonwidgets.analytics
+package top.madkarma.patches.alwaysonwidgets.telemetry
 
 import app.reseam.patch.ExternalPatch
 import app.reseam.patch.after
@@ -23,9 +23,9 @@ private val firebaseCollection =
 // Initializes Meta Audience Network at process start, which samples the motion sensors.
 private const val AUDIENCE_NETWORK_PROVIDER = "com.facebook.ads.AudienceNetworkContentProvider"
 
-val removeAnalytics =
-    patch(AlwaysOnWidgetsPatchStrings.removeAnalyticsName) {
-        description(AlwaysOnWidgetsPatchStrings.removeAnalyticsDescription)
+val disableTelemetry =
+    patch(AlwaysOnWidgetsPatchStrings.disableTelemetryName) {
+        description(AlwaysOnWidgetsPatchStrings.disableTelemetryDescription)
         compatibleWith("xyz.inspoapps.alwaysonwidgets")
         dependsOn(ExternalPatch("reseam-patches", "app.reseam.patches.universal.removePairip"))
 
@@ -34,7 +34,7 @@ val removeAnalytics =
             // blocked.
             consentManagerConstructor.after { thisObject.set(adsConfigured, bool(false)) }
             log.info(
-                "Analytics: ${consentManagerConstructor.descriptor} marks ads as unconfigured, skipping the consent form.",
+                "Telemetry: ${consentManagerConstructor.descriptor} marks ads as unconfigured, skipping the consent form.",
             )
 
             manifest.edit {
@@ -42,7 +42,7 @@ val removeAnalytics =
 
                 for ((name, value) in firebaseCollection) {
                     val existing = findByTag("meta-data").filter { it["android:name"] == name }
-                    if (existing.size > 1) error("Analytics: duplicate Firebase metadata $name")
+                    if (existing.size > 1) error("Telemetry: duplicate Firebase metadata $name")
 
                     val entry =
                         existing.singleOrNull()
@@ -54,11 +54,11 @@ val removeAnalytics =
 
                 findByTag("provider")
                     .singleOrNull { it["android:name"] == AUDIENCE_NETWORK_PROVIDER }
-                    ?.remove() ?: error("Analytics: $AUDIENCE_NETWORK_PROVIDER provider missing")
+                    ?.remove() ?: error("Telemetry: $AUDIENCE_NETWORK_PROVIDER provider missing")
             }
             log.info(
-                "Analytics: the manifest turns off Firebase Analytics, Crashlytics, and Sessions.",
+                "Telemetry: the manifest turns off Firebase Analytics, Crashlytics, and Sessions.",
             )
-            log.info("Analytics: the manifest no longer starts Meta Audience Network with the app.")
+            log.info("Telemetry: the manifest no longer starts Meta Audience Network with the app.")
         }
     }

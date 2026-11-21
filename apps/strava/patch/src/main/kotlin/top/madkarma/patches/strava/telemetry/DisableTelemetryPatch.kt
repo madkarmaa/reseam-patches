@@ -3,7 +3,7 @@
 
 @file:Suppress("unused")
 
-package top.madkarma.patches.strava.analytics
+package top.madkarma.patches.strava.telemetry
 
 import app.reseam.patch.Type
 import app.reseam.patch.after
@@ -15,19 +15,19 @@ import top.madkarma.patches.strava.StravaPatchStrings
 
 private const val BRANCH_TRACKING_DISABLED = "bnc_tracking_state"
 
-val disableAnalytics =
-    patch(StravaPatchStrings.disableAnalyticsName) {
-        description(StravaPatchStrings.disableAnalyticsDescription)
+val disableTelemetry =
+    patch(StravaPatchStrings.disableTelemetryName) {
+        description(StravaPatchStrings.disableTelemetryDescription)
         compatibleWith("com.strava")
 
         execute {
             // Covers Strava's own events and Snowplow's automatic lifecycle and screen events.
             trackEvent.alwaysReturnNull()
-            log.info("Analytics: ${trackEvent.descriptor} drops every Snowplow event.")
+            log.info("Telemetry: ${trackEvent.descriptor} drops every Snowplow event.")
 
             applyDataSharing.before { paramOfType(Type.Boolean).assign(bool(true)) }
             log.info(
-                "Analytics: ${applyDataSharing.descriptor} opts out of data sharing and Firebase Analytics.",
+                "Telemetry: ${applyDataSharing.descriptor} opts out of data sharing and Firebase Analytics.",
             )
 
             // Answers the registration consent prompt before it is shown.
@@ -35,7 +35,7 @@ val disableAnalytics =
                 thisObject.call(handleRegistrationEvent, staticField(rejectConsent))
             }
             log.info(
-                "Analytics: ${registrationFlowConstructor.descriptor} rejects data sharing without asking.",
+                "Telemetry: ${registrationFlowConstructor.descriptor} rejects data sharing without asking.",
             )
 
             branchPreferenceFlag.before {
@@ -50,7 +50,7 @@ val disableAnalytics =
                 whenTrue(trackingDisabled) { returnTrue() }
             }
             log.info(
-                "Analytics: ${branchPreferenceFlag.descriptor} keeps Branch tracking disabled.",
+                "Telemetry: ${branchPreferenceFlag.descriptor} keeps Branch tracking disabled.",
             )
         }
     }

@@ -7,8 +7,8 @@
     <string name="gms_core_support_name">GmsCore support</string>
     <string name="remove_ai_integrations_description">Removes the cloud AI tools that upload your media. Turning this patch off does not make them work: InShot\'s servers require a Google Play Integrity check.</string>
     <string name="remove_ai_integrations_name">Remove AI integrations</string>
-    <string name="remove_telemetry_description">Stops app event tracking, Firebase Analytics, Crashlytics, and Facebook app events.</string>
-    <string name="remove_telemetry_name">Remove telemetry</string>
+    <string name="disable_telemetry_description">Stops app event tracking, Firebase Analytics, Crashlytics, and Facebook app events.</string>
+    <string name="disable_telemetry_name">Disable telemetry</string>
     <string name="unlock_pro_description">Unlocks Pro-only features.</string>
     <string name="unlock_pro_name">Unlock Pro</string>
 </resources>

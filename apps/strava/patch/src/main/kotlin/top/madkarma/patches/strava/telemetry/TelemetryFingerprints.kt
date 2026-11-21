@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-package top.madkarma.patches.strava.analytics
+package top.madkarma.patches.strava.telemetry
 
 import app.reseam.patch.Type
 import app.reseam.patch.dex.ref

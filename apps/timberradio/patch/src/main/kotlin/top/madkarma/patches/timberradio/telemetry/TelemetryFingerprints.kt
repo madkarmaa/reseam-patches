@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 MadKarma <me@madkarma.top>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-package top.madkarma.patches.timberradio.analytics
+package top.madkarma.patches.timberradio.telemetry
 
 import app.reseam.patch.enumConstant
 import app.reseam.patch.klass

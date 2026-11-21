@@ -3,37 +3,39 @@
 
 @file:Suppress("unused")
 
-package top.madkarma.patches.swiftkey.telemetry
+package top.madkarma.patches.timberradio.telemetry
 
 import app.reseam.patch.*
-import top.madkarma.patches.swiftkey.SwiftKeyPatchStrings
+import top.madkarma.patches.timberradio.TimberRadioPatchStrings
 
 // Firebase reads these before the app configures it.
 private val firebaseCollection =
     mapOf(
         "firebase_analytics_collection_deactivated" to "true",
+        "firebase_analytics_collection_enabled" to "false",
         "firebase_crashlytics_collection_enabled" to "false",
         "firebase_sessions_enabled" to "false",
-        "google_analytics_adid_collection_enabled" to "false",
     )
 
-val removeTelemetry =
-    patch(SwiftKeyPatchStrings.removeTelemetryName) {
-        description(SwiftKeyPatchStrings.removeTelemetryDescription)
-        compatibleWith("com.touchtype.swiftkey")
+val disableTelemetry =
+    patch(TimberRadioPatchStrings.disableTelemetryName) {
+        description(TimberRadioPatchStrings.disableTelemetryDescription)
+        compatibleWith("com.msoft.timberradio")
 
         execute {
-            queueTelemetryEvent.alwaysReturn()
-            log.info("Telemetry: ${queueTelemetryEvent.descriptor} no longer queues events.")
-
-            stageTelemetryUpload.alwaysReturn()
+            // The player reports each played station and its stream to radar.php and
+            // trending_report.php as STATISTICS uploads.
+            uploadDataToServer.before {
+                whenEqual(paramOfType(uploadType.descriptor), staticField(statisticsUpload)) {
+                    returnVoid()
+                }
+            }
             log.info(
-                "Telemetry: ${stageTelemetryUpload.descriptor} no longer stages queued events for upload.",
+                "Telemetry: ${uploadDataToServer.descriptor} drops listening statistics uploads.",
             )
 
-            // Without an initialized SDK, Adjust drops every tracked event.
-            initializeAdjust.alwaysReturn()
-            log.info("Telemetry: ${initializeAdjust.descriptor} no longer starts the Adjust SDK.")
+            initializeAds.alwaysReturn()
+            log.info("Telemetry: ${initializeAds.descriptor} no longer starts the AdMob SDK.")
 
             manifest.edit {
                 val application = findByTag("application").single()
