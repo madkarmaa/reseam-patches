@@ -7,6 +7,7 @@ package top.madkarma.patches.poweramp.fullversion
 
 import app.reseam.patch.*
 import top.madkarma.extensions.poweramp.bindings.FullVersion
+import top.madkarma.extensions.poweramp.bindings.Playback
 import top.madkarma.patches.poweramp.PowerampPatchStrings
 import top.madkarma.patches.shared.PATCH_ATTRIBUTION
 import top.madkarma.patches.shared.setStringEverywhere
@@ -27,7 +28,37 @@ val unlockFullVersion =
                 )
                 fullLicense()
             }
-            initializeNativeLicense.after { fullLicense() }
+
+            // The core library keeps its own trial clock and, once the trial ends, rejects every
+            // playback pipeline built after the first one in a process. Ship the native fix beside
+            // each copy of the core library and install it once the license VM is initialized.
+            val coreLibraries =
+                files.components().flatMap { component ->
+                    files
+                        .component(component)
+                        .list()
+                        .filter { it.startsWith("lib/") && it.endsWith("/libpowerampcore.so") }
+                        .map { component to it }
+                }
+            if (coreLibraries.isEmpty())
+                error("Poweramp: core library missing; include the native APK split")
+
+            for ((component, coreLibrary) in coreLibraries) {
+                val extensionPath =
+                    coreLibrary.replace("libpowerampcore.so", "libPowerampPlayback.so")
+                val extension =
+                    NativeResources.javaClass.classLoader.getResourceAsStream(extensionPath)
+                        ?: error("Poweramp: no native playback fix for $coreLibrary")
+                extension.use { files.component(component).writeStored(extensionPath, it) }
+            }
+
+            initializeNativeLicense.after {
+                fullLicense()
+                call(Playback.allowPlayback)
+            }
+            log.info(
+                "Full version: ${initializeNativeLicense.descriptor} makes the core library accept every playback pipeline license verdict (${coreLibraries.joinToString { it.second }}).",
+            )
             setIntegerPreference.before {
                 param(0).assign(FullVersion.licenseInteger(thisObject, param(0)))
             }
@@ -107,3 +138,5 @@ private fun CodeScope.fullLicense() {
     staticField(fullVersionState).call(setIntegerPreference, int(229))
     staticField(pendingLicenseExpiry).call(setIntegerPreference, int(0))
 }
+
+private object NativeResources
