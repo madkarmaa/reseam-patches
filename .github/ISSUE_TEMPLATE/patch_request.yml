@@ -1,7 +1,7 @@
 name: Patch request
 description: Request patches for a new app or new patches for a supported app.
 title: "request: "
-labels: ["app-request"]
+labels: ["request"]
 body:
     - type: markdown
       attributes:
